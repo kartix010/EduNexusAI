@@ -4317,10 +4317,14 @@
             </div>`;
         });
 
-     // 🔥 2. CODE BLOCK RENDERER (Bulletproof for ALL languages) 🔥
+    // 🔥 2. CHATGPT-STYLE CODE BLOCK (With Copy Button & Perfect Indentation) 🔥
         aiResponse = aiResponse.replace(/```[^\n]*\n([\s\S]*?)```/gi, function(match, code) {
-            return `<div style="background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 8px; margin: 10px 0; overflow-x: auto; font-family: monospace; border-left: 4px solid #5ee7c5; white-space: pre;">
-                ${code.trim()}
+            return `<div style="background: #1e1e1e; border-radius: 8px; margin: 15px 0; overflow: hidden; border: 1px solid #333;">
+                <div style="background: #2d2d2d; padding: 8px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333;">
+                    <span style="color: #a3a3a3; font-size: 12px; font-family: sans-serif;">&lt; / &gt; Code</span>
+                    <button onclick="navigator.clipboard.writeText(this.parentElement.nextElementSibling.innerText); this.innerText='✔ Copied!'; setTimeout(() => this.innerText='📋 Copy', 2000);" style="background: none; border: none; color: #5ee7c5; cursor: pointer; font-size: 12px; font-weight: bold; transition: 0.3s;">📋 Copy</button>
+                </div>
+                <pre style="margin: 0; padding: 15px; overflow-x: auto; white-space: pre; font-family: monospace; color: #d4d4d4; font-size: 14px; line-height: 1.5;"><code>${code.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code></pre>
             </div>`;
         });
 
