@@ -2916,6 +2916,7 @@
     mermaid.initialize({ startOnLoad: false, theme: 'dark' });
 </script>
 <!-- 👆👆 YAHAN TAK 👆👆 -->
+ <script>
 
     
     // Consistent premium smooth-scroll feel across phone, tablet and desktop
@@ -4270,14 +4271,14 @@
             </div>`;
         });
 
-        // 🔥 3. CHATGPT-STYLE CODE BLOCK (Bulletproof for ANY quote/backtick) 🔥
+        // 🔥 3. PREMIUM CODE BLOCK (EduNexus Theme Matched) 🔥
         aiResponse = aiResponse.replace(/(?:```|'''|""")[^\n]*\n([\s\S]*?)(?:```|'''|""")/gi, function(match, code) {
-            return `<div style="background: #1e1e1e; border-radius: 8px; margin: 15px 0; overflow: hidden; border: 1px solid #333;">
-                <div style="background: #2d2d2d; padding: 8px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333;">
-                    <span style="color: #a3a3a3; font-size: 12px; font-family: sans-serif;">&lt; / &gt; Code</span>
-                    <button onclick="navigator.clipboard.writeText(this.parentElement.nextElementSibling.innerText); this.innerText='✔ Copied!'; setTimeout(() => this.innerText='📋 Copy', 2000);" style="background: none; border: none; color: #5ee7c5; cursor: pointer; font-size: 12px; font-weight: bold; transition: 0.3s;">📋 Copy</button>
+            return `<div style="background: #090d16; border-radius: 12px; margin: 15px 0; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 5px 20px rgba(0,0,0,0.3);">
+                <div style="background: #111826; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                    <span style="color: #727d91; font-size: 11px; font-family: 'Space Grotesk', sans-serif; letter-spacing: 1px; font-weight: 700;">&lt; / &gt; SOURCE CODE</span>
+                    <button onclick="navigator.clipboard.writeText(this.parentElement.nextElementSibling.innerText); this.innerText='✔ COPIED!'; this.style.background='rgba(94, 231, 197, 0.2)'; setTimeout(() => {this.innerText='📋 COPY'; this.style.background='rgba(94, 231, 197, 0.08)';}, 2000);" style="background: rgba(94, 231, 197, 0.08); border: 1px solid rgba(94, 231, 197, 0.2); color: #5ee7c5; cursor: pointer; font-size: 10px; font-weight: 800; padding: 5px 12px; border-radius: 6px; transition: 0.3s; letter-spacing: 0.5px;">📋 COPY</button>
                 </div>
-                <pre style="margin: 0; padding: 15px; overflow-x: auto; white-space: pre; font-family: monospace; color: #d4d4d4; font-size: 14px; line-height: 1.5;"><code>${code.trim().replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code></pre>
+                <pre style="margin: 0; padding: 16px; overflow-x: auto; white-space: pre; font-family: monospace; color: #dce2ee; font-size: 13px; line-height: 1.6;"><code>${code.trim().replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code></pre>
             </div>`;
         });
 
@@ -4340,14 +4341,14 @@
             </div>`;
         });
 
- // 🔥 2. CHATGPT-STYLE CODE BLOCK (Bulletproof for ANY quote/backtick) 🔥
+// 🔥 3. PREMIUM CODE BLOCK (EduNexus Theme Matched) 🔥
         aiResponse = aiResponse.replace(/(?:```|'''|""")[^\n]*\n([\s\S]*?)(?:```|'''|""")/gi, function(match, code) {
-            return `<div style="background: #1e1e1e; border-radius: 8px; margin: 15px 0; overflow: hidden; border: 1px solid #333;">
-                <div style="background: #2d2d2d; padding: 8px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333;">
-                    <span style="color: #a3a3a3; font-size: 12px; font-family: sans-serif;">&lt; / &gt; Code</span>
-                    <button onclick="navigator.clipboard.writeText(this.parentElement.nextElementSibling.innerText); this.innerText='✔ Copied!'; setTimeout(() => this.innerText='📋 Copy', 2000);" style="background: none; border: none; color: #5ee7c5; cursor: pointer; font-size: 12px; font-weight: bold; transition: 0.3s;">📋 Copy</button>
+            return `<div style="background: #090d16; border-radius: 12px; margin: 15px 0; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 5px 20px rgba(0,0,0,0.3);">
+                <div style="background: #111826; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                    <span style="color: #727d91; font-size: 11px; font-family: 'Space Grotesk', sans-serif; letter-spacing: 1px; font-weight: 700;">&lt; / &gt; SOURCE CODE</span>
+                    <button onclick="navigator.clipboard.writeText(this.parentElement.nextElementSibling.innerText); this.innerText='✔ COPIED!'; this.style.background='rgba(94, 231, 197, 0.2)'; setTimeout(() => {this.innerText='📋 COPY'; this.style.background='rgba(94, 231, 197, 0.08)';}, 2000);" style="background: rgba(94, 231, 197, 0.08); border: 1px solid rgba(94, 231, 197, 0.2); color: #5ee7c5; cursor: pointer; font-size: 10px; font-weight: 800; padding: 5px 12px; border-radius: 6px; transition: 0.3s; letter-spacing: 0.5px;">📋 COPY</button>
                 </div>
-                <pre style="margin: 0; padding: 15px; overflow-x: auto; white-space: pre; font-family: monospace; color: #d4d4d4; font-size: 14px; line-height: 1.5;"><code>${code.trim().replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code></pre>
+                <pre style="margin: 0; padding: 16px; overflow-x: auto; white-space: pre; font-family: monospace; color: #dce2ee; font-size: 13px; line-height: 1.6;"><code>${code.trim().replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code></pre>
             </div>`;
         });
         document.getElementById(loadingId).innerHTML = `
