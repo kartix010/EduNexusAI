@@ -4317,9 +4317,9 @@
             </div>`;
         });
 
-        // 🔥 2. CODE BLOCK RENDERER (For Python, JS, etc.) 🔥
-        aiResponse = aiResponse.replace(/```[a-zA-Z]*[\s]*\n([\s\S]*?)```/gi, function(match, code) {
-            return `<div style="background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 8px; margin: 10px 0; overflow-x: auto; font-family: monospace; border-left: 4px solid #5ee7c5;">
+     // 🔥 2. CODE BLOCK RENDERER (Bulletproof for ALL languages) 🔥
+        aiResponse = aiResponse.replace(/```[^\n]*\n([\s\S]*?)```/gi, function(match, code) {
+            return `<div style="background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 8px; margin: 10px 0; overflow-x: auto; font-family: monospace; border-left: 4px solid #5ee7c5; white-space: pre;">
                 ${code.trim()}
             </div>`;
         });
