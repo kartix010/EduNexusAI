@@ -2163,6 +2163,11 @@
   0%, 80%, 100% { transform: scale(0.6); opacity: 0.3; }
   40% { transform: scale(1.2); opacity: 1; background: #5ee7c5; }
 }
+/* 🔥 PREMIUM SCROLLBAR FIX 🔥 */
+    .messages::-webkit-scrollbar { width: 8px; }
+    .messages::-webkit-scrollbar-track { background: transparent; }
+    .messages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
+    .messages::-webkit-scrollbar-thumb:hover { background: var(--accent2); }
  
   </style>
 
@@ -2727,7 +2732,7 @@
             <div class="chat-head">
               <span class="online-dot"></span> AI Tutor <span class="tiny">Online</span>
             </div>
-            <div class="messages" id="messages"></div>
+            <div class="messages" id="messages" data-lenis-prevent="true"></div>
 
             <div id="attachment-preview" class="preview-pane" style="display: none;">
               <img id="preview-img" class="preview-thumb" src="" style="display:none;">
