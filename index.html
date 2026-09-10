@@ -2099,6 +2099,71 @@
     .no-scroll {
       overflow: hidden !important;
     }
+    /* 🔥 EXACT GEMINI AI BUBBLE LOADER (NO WOBBLE, ONLY CORNER LIGHT) 🔥 */
+.ai-thinking {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 56px;
+  height: 42px;
+  /* Ye hai wo magic shape: Top-Left nukila, baaki sab gol! */
+  border-radius: 4px 20px 20px 20px; 
+  /* Ye line light ko bahar failne se rokegi (No Wobble) */
+  overflow: hidden; 
+  z-index: 1;
+}
+
+/* Ye hai wo ghumne wali 'Laser Light' jo sirf edges par aayegi */
+.ai-thinking::before {
+  content: '';
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  /* 70% transparent rakha hai, taaki light sirf ek hisse mein chamke aur ghoome */
+  background: conic-gradient(transparent 70%, #5ee7c5 85%, #8b7cff 100%);
+  animation: aiBorderRotate 1.5s linear infinite;
+  z-index: -2;
+}
+
+/* Andar ka solid dark core, jiske bahar light ghumegi */
+.ai-thinking::after {
+  content: '';
+  position: absolute;
+  inset: 1.5px; /* Ye border ki thickness set karega */
+  border-radius: 3px 18.5px 18.5px 18.5px; /* Perfect inner curve */
+  background: #0e1421; /* Tere dark mode ka base color */
+  z-index: -1;
+}
+
+@keyframes aiBorderRotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ✦ Andar ke 3 clean dots ✦ */
+.ai-dots-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.typing-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #ffffff;
+  animation: aiBounce 1.4s infinite ease-in-out both;
+}
+
+.typing-dot:nth-child(1) { animation-delay: -0.32s; }
+.typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes aiBounce {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.3; }
+  40% { transform: scale(1.2); opacity: 1; background: #5ee7c5; }
+}
+ 
   </style>
 
 </head>
@@ -2841,8 +2906,18 @@
 
   <!-- 🔥 JS FOR PARTICLES BACKGROUND (LIVE CONSTELLATION) 🔥 -->
   <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  <!-- JS FOR PARTICLES BACKGROUND (LIVE CONSTELLATION) -->
+<script src="https://cdn.jsdelivr.net/npm/tsparticles..."></script>
 
-  <script>
+<!-- 👇👇 YAHAN PAR PASTE KARNA HAI (Line 2910) 👇👇 -->
+<!-- 🔥 MERMAID JS FOR DYNAMIC AI DIAGRAMS 🔥 -->
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+    mermaid.initialize({ startOnLoad: false, theme: 'dark' });
+</script>
+<!-- 👆👆 YAHAN TAK 👆👆 -->
+
+    
     // Consistent premium smooth-scroll feel across phone, tablet and desktop
     const lenis = new Lenis({ autoRaf: true });
   </script>
@@ -4108,7 +4183,7 @@
       }
 
       const payload = {
-        message: memoryText + q + " [Do NOT use LaTeX math formatting. Use standard plain text.]",
+        message: memoryText + q,
         session_id: sessionId,
         user_name: localStorage.getItem('studymate_username') || "Student",
         history: typeof chatMemory !== 'undefined' ? chatMemory : []
@@ -4125,7 +4200,7 @@
       clearAttachment();
 
       const loadingId = "load-" + Date.now();
-      wrap.insertAdjacentHTML('beforeend', `<div class="message ai" id="${loadingId}"><span class="msg-avatar">✦</span><div>Initializing concepts with EduNexus AI... ✦</div></div>`);
+      wrap.insertAdjacentHTML('beforeend', `<div class="message ai" id="${loadingId}"><span class="msg-avatar">✦</span><div class="ai-thinking"><div class="ai-dots-container"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div></div>`);
       wrap.scrollTop = wrap.scrollHeight;
 
       try {
@@ -4208,7 +4283,7 @@
       wrap.scrollTop = wrap.scrollHeight;
 
       // 2. लोडिंग एनीमेशन दिखाओ
-      wrap.insertAdjacentHTML('beforeend', `<div class="message ai" id="${loadingId}"><span class="msg-avatar">✦</span><div>Initializing session with EduNexus AI... ✦</div></div>`);
+      wrap.insertAdjacentHTML('beforeend', `<div class="message ai" id="${loadingId}"><span class="msg-avatar">✦</span><div class="ai-thinking"><div class="ai-dots-container"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div></div>`);
       wrap.scrollTop = wrap.scrollHeight;
 
       // 3. Backend को वो बड़ा वाला प्रॉम्प्ट भेजो
@@ -4225,6 +4300,13 @@
           headers: { "Content-Type": "application/json", "Accept": "application/json" },
           body: JSON.stringify(payload)
         });
+        // 🔥 DYNAMIC MERMAID RENDERER (Convert text to real diagrams) 🔥
+aiResponse = aiResponse.replace(/```mermaid\n([\s\S]*?)```/gi, function(match, code) {
+    return `<div class="mermaid" style="background: #0e1421; padding: 15px; border-radius: 8px; border: 1px solid #5ee7c5; margin: 10px 0;">
+        ${code}
+    </div>`;
+});
+        
 
         if (!res.ok) throw new Error("Server sleeping");
         const data = await res.json();
@@ -4243,6 +4325,8 @@
         document.getElementById(loadingId).innerHTML = `<span class="msg-avatar">🚨</span><div style="color:#ff4757;"><b>System Alert:</b> Engine is warming up. Please try again in 5 seconds.</div>`;
       }
       wrap.scrollTop = wrap.scrollHeight;
+      // Render the diagrams on screen
+setTimeout(() => { mermaid.init(undefined, document.querySelectorAll('.mermaid')); }, 100);
     }
 
 
