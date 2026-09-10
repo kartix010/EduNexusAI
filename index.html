@@ -4259,15 +4259,38 @@
           chatMemory.push({ role: "model", content: { text: aiResponse } });
           if (chatMemory.length > 12) chatMemory = chatMemory.slice(chatMemory.length - 12);
         }
+        // 🔥 1. CLEAN SCORE TAG & BOLD TEXT 🔥
+        aiResponse = aiResponse.replace(/\[SCORE:\s*\d+\/\d+\]/i, '').trim();
+        aiResponse = aiResponse.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
 
-        let answer = aiResponse.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>").replace(/\n/g, "<br>");
+        // 🔥 2. MERMAID DIAGRAM RENDERER (Bulletproof) 🔥
+        aiResponse = aiResponse.replace(/```mermaid[\s]*\n([\s\S]*?)```/gi, function(match, code) {
+            return `<div class="mermaid" style="background: #0e1421; padding: 15px; border-radius: 8px; border: 1px solid #5ee7c5; margin: 10px 0;">
+                ${code.trim()}
+            </div>`;
+        });
+
+        // 🔥 3. CHATGPT-STYLE CODE BLOCK (Bulletproof for ANY quote/backtick) 🔥
+        aiResponse = aiResponse.replace(/(?:```|'''|""")[^\n]*\n([\s\S]*?)(?:```|'''|""")/gi, function(match, code) {
+            return `<div style="background: #1e1e1e; border-radius: 8px; margin: 15px 0; overflow: hidden; border: 1px solid #333;">
+                <div style="background: #2d2d2d; padding: 8px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333;">
+                    <span style="color: #a3a3a3; font-size: 12px; font-family: sans-serif;">&lt; / &gt; Code</span>
+                    <button onclick="navigator.clipboard.writeText(this.parentElement.nextElementSibling.innerText); this.innerText='✔ Copied!'; setTimeout(() => this.innerText='📋 Copy', 2000);" style="background: none; border: none; color: #5ee7c5; cursor: pointer; font-size: 12px; font-weight: bold; transition: 0.3s;">📋 Copy</button>
+                </div>
+                <pre style="margin: 0; padding: 15px; overflow-x: auto; white-space: pre; font-family: monospace; color: #d4d4d4; font-size: 14px; line-height: 1.5;"><code>${code.trim().replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code></pre>
+            </div>`;
+        });
 
         document.getElementById(loadingId).innerHTML = `
-      <span class="msg-avatar">✦</span>
-      <div style="flex:1;">${answer}</div>
-      <button onclick="speakText(this.previousElementSibling.innerText, this)" style="background:transparent; border:none; cursor:pointer; font-size:16px; padding:0; margin-left:8px; align-self:flex-start;" title="Listen to AI">🔊</button>
-    `;
+          <span class="msg-avatar">✦</span>
+          <div style="flex:1; white-space: pre-wrap;">${aiResponse}</div>
+          <button onclick="speakText(this.previousElementSibling.innerText, this)" style="background:transparent; border:none; cursor:pointer; font-size:16px; padding:0; margin-left:8px; align-self:flex-start;" title="Listen to AI">🔊</button>
+        `;
 
+        // 🔥 Render the diagrams on screen 🔥
+        setTimeout(() => { mermaid.init(undefined, document.querySelectorAll('.mermaid')); }, 100);
+
+       
       } catch (error) {
         document.getElementById(loadingId).innerHTML = `<span class="msg-avatar">🚨</span><div style="color:#ff4757; font-size:11px; line-height:1.5;"><b>Connection Blocked!</b><br>Browser blocked the request (CORS) because the server is offline or sleeping.</div>`;
       }
