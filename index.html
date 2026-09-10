@@ -4374,23 +4374,35 @@
           const total = parseInt(scoreMatch[2]);
           const percentage = (score / total) * 100;
 
-          // सीक्रेट टैग को चैट से हटा दो ताकि बच्चे को ना दिखे
+          // 1. सीक्रेट टैग को चैट से हटा दो ताकि बच्चे को ना दिखे
           aiResponse = aiResponse.replace(/\[SCORE:\s*\d+\/\d+\]/i, '').trim();
 
-          // 100% REAL PROGRESS UPDATE
+          // 🔥 2. MAIN STATS UPDATE (Quizzes, Accuracy, Topics) 🔥
+          userStats.totalQuizzes += 1;
+          userStats.totalScorePerc += percentage;
+          if (percentage >= 80) {
+              userStats.topicsMastered += 1; // 80% se upar aaya toh master ban gaya!
+          }
+          
+          // Browser ki memory me save karo aur UI update karo
+          localStorage.setItem('edunexus_stats', JSON.stringify(userStats));
+          if (typeof updateStatsUI === 'function') updateStatsUI();
+
+          // 🔥 3. SUBJECT MASTERY (Progress Bars) UPDATE 🔥
           if (typeof selectedSubjectForQuiz !== 'undefined' && selectedSubjectForQuiz && typeof subjectMastery !== 'undefined') {
             let boost = Math.floor(percentage / 10); // 100% स्कोर पर 10% मास्टरी बढ़ेगी
             subjectMastery[selectedSubjectForQuiz] = Math.min(100, subjectMastery[selectedSubjectForQuiz] + boost);
 
-            // मेमोरी और क्लाउड में सेव करो
             localStorage.setItem('edunexus_mastery', JSON.stringify(subjectMastery));
             if (typeof updateProgressUI === 'function') updateProgressUI();
 
-            showToast(`🎯 Quiz Complete! You scored ${score}/${total}. ${selectedSubjectForQuiz} mastery increased!`);
+            showToast(`🎯 Quiz Complete! Scored ${score}/${total}. Progress & Stats updated!`);
 
+            // 🔥 4. FIREBASE CLOUD SYNC (Ab Stats bhi cloud par jayenge) 🔥
             if (typeof firebase !== 'undefined' && firebase.auth().currentUser) {
               firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).set({
-                masteryScores: subjectMastery
+                masteryScores: subjectMastery,
+                stats: userStats // <-- NAYA: User Stats Database me gaye
               }, { merge: true });
             }
           }
