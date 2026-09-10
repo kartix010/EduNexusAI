@@ -2225,6 +2225,8 @@
       pointer-events: auto !important;
     }
   </style>
+  <!-- 🔥 PREMIUM PDF GENERATOR ENGINE 🔥 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 </head>
 
@@ -2722,6 +2724,9 @@
             <label>TARGET EXAM / GOAL
               <input type="text" id="goal" placeholder="e.g., Board Exams, JEE..." autocomplete="off" required>
             </label>
+            <label>SUBJECT
+              <input type="text" id="planSubject" placeholder="e.g., Physics, Chemistry, History..." autocomplete="off" required>
+            </label>
 
             <!-- 🔥 NAYA: SYLLABUS UPLOAD UI 🔥 -->
             <label>PASTE SYLLABUS OR UPLOAD FILE 📎
@@ -2790,7 +2795,7 @@
             <div class="chat-head">
               <span class="online-dot"></span> AI Tutor <span class="tiny">Online</span>
             </div>
-            <div class="messages" id="messages"></div>
+            <div class="messages" id="messages" data-lenis-prevent="true" style="-webkit-overflow-scrolling: touch; overscroll-behavior: contain;"></div>
 
             <div id="attachment-preview" class="preview-pane" style="display: none;">
               <img id="preview-img" class="preview-thumb" src="" style="display:none;">
@@ -3579,6 +3584,7 @@
 
       const currentUser = localStorage.getItem('studymate_username') || "Student";
       const goal = $("goal").value;
+      const planSubject = $("planSubject").value.trim();
       const userClass = $("planClass").value;
       const customSyllabus = $("planSyllabus").value.trim();
       const hours = $("hours").value;
@@ -3607,6 +3613,7 @@
               body: JSON.stringify({
                   class_grade: userClass,
                   exam: goal,
+                  subject: planSubject,
                   hours: parseInt(hours),
                   days: totalDays,
                   syllabus: customSyllabus,
@@ -3644,7 +3651,7 @@
                   let status = index === 0 ? "Start Session ✦" : "Planned";
                   
                   let safeTopic = item.topic.replace(/'/g, "\\'"); 
-                  let onclickAttr = index === 0 ? `onclick="startSession('${goal}', '${safeTopic}')" style="cursor: pointer; border: 1px solid rgba(94, 231, 197, 0.4); background: rgba(94, 231, 197, 0.08); box-shadow: 0 0 15px rgba(94, 231, 197, 0.1);"` : '';
+                  let onclickAttr = index === 0 ? `onclick="startSession('${planSubject}', '${safeTopic}')" style="cursor: pointer; border: 1px solid rgba(94, 231, 197, 0.4); background: rgba(94, 231, 197, 0.08); box-shadow: 0 0 15px rgba(94, 231, 197, 0.1);"` : '';
                   
                   let btnSpan = index === 0
                       ? `<span style="background: var(--accent2); color: #000; padding: 6px 14px; border-radius: 8px; font-weight: 800; font-size: 11px; box-shadow: 0 4px 10px rgba(94,231,197,0.3);">${status}</span>`
@@ -3659,46 +3666,40 @@
                       <p style="margin-top: 8px; font-size: 12px; color: #7f8a9e;"><span style="color:#8f86ff; font-weight:bold;">${item.topic}</span> • ${item.task_type} • ${item.time_mins} min</p>
                     </div>`;
               });
-              // 🔥 4. DISPLAY THE BEAUTIFUL UI (MOBILE OPTIMIZED) 🔥
+// 🔥 4. DISPLAY THE BEAUTIFUL UI (WITH PDF EXPORT & SCROLL FIX) 🔥
               $("planResult").innerHTML = `
               <style>
                 .days-list-premium::-webkit-scrollbar { width: 5px; }
                 .days-list-premium::-webkit-scrollbar-track { background: transparent; }
                 .days-list-premium::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
                 
-                /* Default (Mobile) Layout: Ek ke neeche ek (Stacked) */
-                .plan-container { display: flex; flex-direction: column; gap: 20px; margin-top: 25px; }
-                .plan-col-left { width: 100%; max-height: 400px; overflow-y: auto; padding-right: 5px; }
-                .plan-col-right { width: 100%; position: relative; }
-
-                /* Desktop Layout: Bagal-bagal mein (Side-by-side) */
-                @media(min-width: 850px) {
-                    .plan-container { flex-direction: row; align-items: flex-start; }
-                    .plan-col-left { flex: 1.4; width: auto; padding-right: 12px; max-height: 480px; }
-                    .plan-col-right { flex: 1; width: auto; position: sticky; top: 20px; }
-                }
+                .plan-container { margin-top: 20px; }
+                /* 🔥 SCROLL FIX: Added touch scrolling for mobile 🔥 */
+                .plan-list-wrapper { width: 100%; max-height: 480px; overflow-y: auto; overflow-x: hidden; padding-right: 8px; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
               </style>
 
-              <div class="generated-plan" style="animation: popIn 0.5s ease-out; text-align: left;">
+              <div class="generated-plan" id="pdf-export-area" style="animation: popIn 0.5s ease-out; text-align: left;">
                 <div>
                     <span class="eyebrow" style="color: var(--accent2);">✦ ${totalDays}-DAY TRUE AI ROADMAP FOR ${currentUser.toUpperCase()}</span>
-                    <h3 style="margin-top:10px; font-size: 26px; color: #fff;">Your ${goal} Roadmap</h3>
-                    <div class="plan-meta">
+                    <h3 style="margin-top:10px; font-size: 26px; color: #fff;">Your ${planSubject} Roadmap</h3>
+                    
+                    <div class="plan-meta" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
                       <span class="chip">${totalDays} Days</span>
                       <span class="chip">${hours} hrs/day</span>
                       <span class="chip">Custom Syllabus</span>
+                      
+                      <!-- 🔥 THE KILLER FEATURE: PDF BUTTON 🔥 -->
+                      <button onclick="downloadTimetable()" style="background: linear-gradient(135deg, #8b7cff, #5ee7c5); color: #000; padding: 6px 14px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; font-size: 11px; margin-left: auto; box-shadow: 0 4px 15px rgba(94, 231, 197, 0.4); transition: 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">📄 Download PDF</button>
+                    </div>
+
+                    <div style="margin-top: 15px; padding: 10px 15px; background: rgba(139, 124, 255, 0.1); border-left: 3px solid #8b7cff; border-radius: 0 8px 8px 0; display: inline-block;">
+                        <p style="margin: 0; font-size: 11px; color: #d6d2ff;">💡 Click <b style="color:#fff;">Start Session</b> on Day 1 to initialize the AI Tutor.</p>
                     </div>
 
                     <div class="plan-container">
-                        <div class="plan-col-left days-list-premium" data-lenis-prevent="true">
+                        <!-- 🔥 SCROLL TRAP FIX: Added data-lenis-prevent="true" back 🔥 -->
+                        <div class="plan-list-wrapper days-list-premium" data-lenis-prevent="true">
                           ${daysHtml}
-                        </div>
-                        <div class="plan-col-right ai-analytics-box" style="padding: 24px; background: #ffffff03; border: 1px solid rgba(255,255,255,0.05); border-radius: 16px;">
-                            <h4 style="color: #fff; font-size: 15px; margin-top: 0; margin-bottom: 18px; font-family: 'Space Grotesk';">✦ AI Syllabus Breakdown</h4>
-                            <p style="font-size: 11px; color: #a9b1c1; line-height: 1.6;">The KX Neural Core has strictly analyzed your custom syllabus and perfectly distributed it over ${totalDays} days.</p>
-                            <div style="margin-top: 20px; padding: 15px; background: rgba(139, 124, 255, 0.1); border-left: 3px solid #8b7cff; border-radius: 0 8px 8px 0;">
-                                <p style="margin: 0; font-size: 11px; color: #d6d2ff; line-height: 1.5;">Click <b style="color:#fff;">Start Session</b> on Day 1 to initialize the AI Tutor with today's topic!</p>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -4825,7 +4826,72 @@ setTimeout(() => { mermaid.init(undefined, document.querySelectorAll('.mermaid')
         })
       }).catch(err => console.log("Install tracker silent fail"));
     });
+    // 🔥 THE PREMIUM PDF DOWNLOADER ENGINE (100% FIXED & PRO) 🔥
+function downloadTimetable() {
+    showToast("⏳ Architecting your Premium PDF...");
+    
+    const element = document.getElementById('pdf-export-area');
+    const listWrapper = element.querySelector('.plan-list-wrapper');
+    const downloadBtn = element.querySelector('button'); // Download button ko target kiya
 
+    // 1. THE SMART HACK: PDF me button nahi aana chahiye, use chupao
+    if(downloadBtn) downloadBtn.style.display = 'none';
+
+    // 2. Scroll hatao aur element ko pura kholo
+    const originalMaxHeight = listWrapper.style.maxHeight;
+    const originalOverflow = listWrapper.style.overflowY;
+    listWrapper.style.maxHeight = 'none';
+    listWrapper.style.overflowY = 'visible';
+    
+    // 3. Force Explicit Background (Taki kale dabbe na aayein)
+    const originalBg = element.style.background;
+    element.style.background = '#0b101a'; // EduNexus premium dark theme color
+    element.style.padding = '25px'; // PDF margins ke liye perfect padding
+    element.style.borderRadius = '0px';
+
+    // Browser ko UI update karne ke liye 300ms ka time do
+    setTimeout(() => {
+        const opt = {
+            margin:       10, 
+            filename:     `EduNexus_${selectedSubjectForQuiz || 'AI'}_Roadmap.pdf`,
+            image:        { type: 'jpeg', quality: 1 },
+            html2canvas:  { 
+                scale: 2, 
+                useCORS: true, 
+                backgroundColor: '#0b101a', 
+                windowWidth: 1000, // 🔥 SABSE ZAROORI: Force desktop width! (UI squish nahi hoga)
+                scrollY: 0
+            },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        // Generate and Save
+        html2pdf().set(opt).from(element).save().then(() => {
+            showToast("✅ Roadmap PDF Downloaded Successfully! 🚀");
+            
+            // 4. UI KO WAPAS NORMAL KARO (Jadoo)
+            listWrapper.style.maxHeight = originalMaxHeight;
+            listWrapper.style.overflowY = originalOverflow;
+            element.style.background = originalBg;
+            element.style.padding = '15px';
+            element.style.borderRadius = '12px';
+            if(downloadBtn) downloadBtn.style.display = 'inline-block';
+            
+        }).catch(err => {
+            console.log(err);
+            showToast("❌ Error generating PDF.");
+            
+            // Error aane par bhi UI theek kar do
+            listWrapper.style.maxHeight = originalMaxHeight;
+            listWrapper.style.overflowY = originalOverflow;
+            element.style.background = originalBg;
+            element.style.padding = '15px';
+            element.style.borderRadius = '12px';
+            if(downloadBtn) downloadBtn.style.display = 'inline-block';
+        });
+    }, 300);
+}
+    
 
   </script>
 
