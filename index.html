@@ -4300,12 +4300,7 @@
           headers: { "Content-Type": "application/json", "Accept": "application/json" },
           body: JSON.stringify(payload)
         });
-        // 🔥 DYNAMIC MERMAID RENDERER (Convert text to real diagrams) 🔥
-aiResponse = aiResponse.replace(/```mermaid\n([\s\S]*?)```/gi, function(match, code) {
-    return `<div class="mermaid" style="background: #0e1421; padding: 15px; border-radius: 8px; border: 1px solid #5ee7c5; margin: 10px 0;">
-        ${code}
-    </div>`;
-});
+     
         
 
         if (!res.ok) throw new Error("Server sleeping");
@@ -4314,11 +4309,24 @@ aiResponse = aiResponse.replace(/```mermaid\n([\s\S]*?)```/gi, function(match, c
 
         // Score tag छुपाने का लॉजिक
         aiResponse = aiResponse.replace(/\[SCORE:\s*\d+\/\d+\]/i, '').trim();
-        let answer = aiResponse.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>").replace(/\n/g, "<br>");
+        aiResponse = aiResponse.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
+        // 🔥 1. MERMAID DIAGRAM RENDERER (Bulletproof) 🔥
+        aiResponse = aiResponse.replace(/```mermaid[\s]*\n([\s\S]*?)```/gi, function(match, code) {
+            return `<div class="mermaid" style="background: #0e1421; padding: 15px; border-radius: 8px; border: 1px solid #5ee7c5; margin: 10px 0;">
+                ${code.trim()}
+            </div>`;
+        });
+
+        // 🔥 2. CODE BLOCK RENDERER (For Python, JS, etc.) 🔥
+        aiResponse = aiResponse.replace(/```[a-zA-Z]*[\s]*\n([\s\S]*?)```/gi, function(match, code) {
+            return `<div style="background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 8px; margin: 10px 0; overflow-x: auto; font-family: monospace; border-left: 4px solid #5ee7c5;">
+                ${code.trim()}
+            </div>`;
+        });
 
         document.getElementById(loadingId).innerHTML = `
           <span class="msg-avatar">✦</span>
-          <div style="flex:1;">${answer}</div>
+          <div style="flex:1; white-space: pre-wrap;">${aiResponse}</div>
           <button onclick="speakText(this.previousElementSibling.innerText, this)" style="background:transparent; border:none; cursor:pointer; font-size:16px; padding:0; margin-left:8px; align-self:flex-start;" title="Listen to AI">🔊</button>
         `;
       } catch (error) {
