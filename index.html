@@ -1070,6 +1070,7 @@
       flex: 1;
       overflow-y: auto;
       scroll-behavior: smooth;
+      overscroll-behavior: contain;
     }
 
     .message {
@@ -2168,7 +2169,61 @@
     .messages::-webkit-scrollbar-track { background: transparent; }
     .messages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
     .messages::-webkit-scrollbar-thumb:hover { background: var(--accent2); }
- 
+    /* 🔥 MOBILE RESPONSIVENESS FIX FOR PLANNER 🔥 */
+    @media(max-width: 850px) {
+      .section-heading {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+      }
+      .section-heading h2 {
+        font-size: 32px !important;
+        word-wrap: break-word;
+      }
+      .section-heading > p {
+        margin-top: 10px !important;
+        max-width: 100% !important;
+      }
+      .planner-grid {
+        display: flex !important;
+        flex-direction: column !important;
+      }
+    }
+    /* 🔥 CHAT BUBBLE MOBILE FIX 🔥 */
+    @media(max-width: 850px) {
+      .messages {
+        padding: 15px 10px !important; /* फालतू पैडिंग हटा दी */
+        width: 100% !important;
+      }
+      .message {
+        max-width: 98% !important; /* AI को पूरा फैलने की आज़ादी दे दी */
+      }
+      .message > div {
+        padding: 12px 14px !important;
+      }
+      .chat-input {
+        padding: 10px !important; 
+      }
+    }
+    
+  </style>
+
+  <!-- 🔥 THE ZERO-FLICKER MAGIC (LOGIN FLASH FIX) 🔥 -->
+  <script>
+    if (localStorage.getItem('studymate_username')) {
+      document.documentElement.classList.add('already-logged-in');
+    }
+  </script>
+  <style>
+    html.already-logged-in #login-overlay {
+      display: none !important;
+      opacity: 0 !important;
+      visibility: hidden !important;
+    }
+    html.already-logged-in #main-content {
+      filter: blur(0px) brightness(1) !important;
+      pointer-events: auto !important;
+    }
   </style>
 
 </head>
@@ -2735,7 +2790,7 @@
             <div class="chat-head">
               <span class="online-dot"></span> AI Tutor <span class="tiny">Online</span>
             </div>
-            <div class="messages" id="messages" data-lenis-prevent="true"></div>
+            <div class="messages" id="messages"></div>
 
             <div id="attachment-preview" class="preview-pane" style="display: none;">
               <img id="preview-img" class="preview-thumb" src="" style="display:none;">
@@ -3604,16 +3659,24 @@
                       <p style="margin-top: 8px; font-size: 12px; color: #7f8a9e;"><span style="color:#8f86ff; font-weight:bold;">${item.topic}</span> • ${item.task_type} • ${item.time_mins} min</p>
                     </div>`;
               });
-
-              // 🔥 DISPLAY THE BEAUTIFUL UI 🔥
+              // 🔥 4. DISPLAY THE BEAUTIFUL UI (MOBILE OPTIMIZED) 🔥
               $("planResult").innerHTML = `
               <style>
                 .days-list-premium::-webkit-scrollbar { width: 5px; }
                 .days-list-premium::-webkit-scrollbar-track { background: transparent; }
                 .days-list-premium::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
-                .plan-container { display: flex; flex-wrap: wrap; gap: 25px; margin-top: 25px; align-items: flex-start; }
-                .plan-col-left { flex: 1.4; min-width: 320px; }
-                .plan-col-right { flex: 1; min-width: 280px; position: sticky; top: 20px; }
+                
+                /* Default (Mobile) Layout: Ek ke neeche ek (Stacked) */
+                .plan-container { display: flex; flex-direction: column; gap: 20px; margin-top: 25px; }
+                .plan-col-left { width: 100%; max-height: 400px; overflow-y: auto; padding-right: 5px; }
+                .plan-col-right { width: 100%; position: relative; }
+
+                /* Desktop Layout: Bagal-bagal mein (Side-by-side) */
+                @media(min-width: 850px) {
+                    .plan-container { flex-direction: row; align-items: flex-start; }
+                    .plan-col-left { flex: 1.4; width: auto; padding-right: 12px; max-height: 480px; }
+                    .plan-col-right { flex: 1; width: auto; position: sticky; top: 20px; }
+                }
               </style>
 
               <div class="generated-plan" style="animation: popIn 0.5s ease-out; text-align: left;">
@@ -3627,7 +3690,7 @@
                     </div>
 
                     <div class="plan-container">
-                        <div class="plan-col-left days-list-premium" data-lenis-prevent="true" style="max-height: 480px; overflow-y: auto; padding-right: 12px;">
+                        <div class="plan-col-left days-list-premium" data-lenis-prevent="true">
                           ${daysHtml}
                         </div>
                         <div class="plan-col-right ai-analytics-box" style="padding: 24px; background: #ffffff03; border: 1px solid rgba(255,255,255,0.05); border-radius: 16px;">
@@ -3640,6 +3703,8 @@
                     </div>
                 </div>
               </div>`;
+
+            
               showToast("✅ True AI Timetable Generated!");
               
               // Sab hone ke baad purani photo clear kar do
