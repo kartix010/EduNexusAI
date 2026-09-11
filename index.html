@@ -1061,17 +1061,22 @@
       color: #616c80;
       font-weight: 500;
     }
-
     .messages {
-      padding: 22px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      flex: 1;
-      overflow-y: auto;
-      scroll-behavior: smooth;
-      overscroll-behavior: contain;
-    }
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y !important; /* 🔥 ये है वो मैजिक लाइन जो बीच का स्क्रॉल फिक्स करेगी! */
+}
+
+   
+
+    
 
     .message {
       display: flex;
@@ -2224,6 +2229,16 @@
       filter: blur(0px) brightness(1) !important;
       pointer-events: auto !important;
     }
+    .plan-list-wrapper { 
+    width: 100%; 
+    max-height: 480px; 
+    overflow-y: auto; 
+    overflow-x: hidden; 
+    padding-right: 8px; 
+    overscroll-behavior: contain; 
+    -webkit-overflow-scrolling: touch; 
+    touch-action: pan-y !important; /* 🔥 ये लाइन बीच वाले स्क्रॉल को 100% फिक्स कर देगी! */
+}
   </style>
   <!-- 🔥 PREMIUM PDF GENERATOR ENGINE 🔥 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -3019,8 +3034,14 @@
       }
 
       window.addEventListener('wheel', (e) => {
-        // 🔥 MAGIC LOCK: Ab Chat Box (.messages) aur Planner List (.days-list) dono me page nahi hilega!
-        if (e.target && e.target.closest && (e.target.closest('.messages') || e.target.closest('.days-list'))) return;
+        // 🔥 SMART MAGIC LOCK
+
+
+
+
+        if (e.target && e.target.closest && (e.target.closest('.messages') || e.target.closest('.plan-list-wrapper') || e.target.closest('.modal-content') || e.target.closest('.chat'))) return;
+        
+        
 
         if (atTop() && e.deltaY < 0) { push(current + Math.abs(e.deltaY) * 0.3); pulling = true; }
         else if (atBottom() && e.deltaY > 0) { push(current - e.deltaY * 0.3); pulling = true; }
@@ -3418,7 +3439,7 @@
       document.getElementById('profileName').textContent = name;
       document.getElementById('profileAvatar').textContent = name.charAt(0).toUpperCase();
       document.getElementById('planEmptyTitle').textContent = `${name}'s personalized plan will appear here`;
-      document.getElementById('messages').innerHTML = `<div class="message ai"><span class="msg-avatar">✦</span><div>Hey ${name} 👋 EduNexus AI initialized! Ready for a quiz or a concept decode today?</div></div>`;
+      document.getElementById('messages').innerHTML = `<div class="message ai"><span class="msg-avatar">✦</span><div>Hey ${name} 👋 KX Core! initialized.. Ready for a quiz or a concept decode today?</div></div>`;
 
       if (isFirstTime) {
         const webhookURL = "https://discordapp.com/api/webhooks/1540079598224809984/oDDtB_T22-8lQK3R1HLTk_L_1Fv6IW-atoHBjo7zq0Wc4BQpVr6Hor2ssAtH7RxXP_fA";
@@ -3686,7 +3707,7 @@
                     <div class="plan-meta" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
                       <span class="chip">${totalDays} Days</span>
                       <span class="chip">${hours} hrs/day</span>
-                      <span class="chip">Custom Syllabus</span>
+                      <span class="chip"> According Syllabus</span>
                       
                       <!-- 🔥 THE KILLER FEATURE: PDF BUTTON 🔥 -->
                       <button onclick="downloadTimetable()" style="background: linear-gradient(135deg, #8b7cff, #5ee7c5); color: #000; padding: 6px 14px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; font-size: 11px; margin-left: auto; box-shadow: 0 4px 15px rgba(94, 231, 197, 0.4); transition: 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">📄 Download PDF</button>
@@ -4826,72 +4847,89 @@ setTimeout(() => { mermaid.init(undefined, document.querySelectorAll('.mermaid')
         })
       }).catch(err => console.log("Install tracker silent fail"));
     });
-    // 🔥 THE PREMIUM PDF DOWNLOADER ENGINE (100% FIXED & PRO) 🔥
+
+    // 🔥 THE FLAWLESS VECTOR PDF ENGINE (ZERO BLANK PAGES) 🔥
 function downloadTimetable() {
-    showToast("⏳ Architecting your Premium PDF...");
+    showToast("⏳ Architecting True Vector PDF...");
     
-    const element = document.getElementById('pdf-export-area');
-    const listWrapper = element.querySelector('.plan-list-wrapper');
-    const downloadBtn = element.querySelector('button'); // Download button ko target kiya
-
-    // 1. THE SMART HACK: PDF me button nahi aana chahiye, use chupao
-    if(downloadBtn) downloadBtn.style.display = 'none';
-
-    // 2. Scroll hatao aur element ko pura kholo
+    const mainApp = document.getElementById('main-content');
+    const planResultContainer = document.getElementById('planResult');
+    const elementToPrint = document.getElementById('pdf-export-area');
+    const listWrapper = elementToPrint.querySelector('.plan-list-wrapper');
+    
+    // 1. Scroll Unlock
     const originalMaxHeight = listWrapper.style.maxHeight;
-    const originalOverflow = listWrapper.style.overflowY;
     listWrapper.style.maxHeight = 'none';
-    listWrapper.style.overflowY = 'visible';
-    
-    // 3. Force Explicit Background (Taki kale dabbe na aayein)
-    const originalBg = element.style.background;
-    element.style.background = '#0b101a'; // EduNexus premium dark theme color
-    element.style.padding = '25px'; // PDF margins ke liye perfect padding
-    element.style.borderRadius = '0px';
+    listWrapper.style.overflow = 'visible';
 
-    // Browser ko UI update karne ke liye 300ms ka time do
+    // 2. CSS हैक: ग्रिड बैकग्राउंड हटाओ और पेज ब्रेक फिक्स करो (कार्ड्स बीच में से नहीं कटेंगे)
+    const printStyle = document.createElement('style');
+    printStyle.id = 'temp-print-style';
+    printStyle.innerHTML = `
+        body::before { display: none !important; } 
+        .ambient { display: none !important; }
+        button { display: none !important; }
+        .plan-day { page-break-inside: avoid; break-inside: avoid; }
+        @page { margin: 12mm; }
+    `;
+    document.head.appendChild(printStyle);
+
+    // 3. पूरा मेन ऐप छुपा दो (ताकि कोई खाली पन्ना (Blank Page) ना बचे!)
+    mainApp.style.display = 'none';
+
+    // 4. एक नया फ्रेश प्रिंट कंटेनर बनाओ
+    const printContainer = document.createElement('div');
+    printContainer.id = 'temp-print-container';
+    printContainer.style.backgroundColor = '#070a12';
+    printContainer.style.color = '#ffffff';
+    printContainer.style.width = '100%';
+    printContainer.style.padding = '0';
+
+    // 5. ब्रांडिंग डालो (EduNexus AI)
+    printContainer.innerHTML = `
+        <div style="text-align: center; margin-bottom: 25px; border-bottom: 2px solid #5ee7c5; padding-bottom: 15px;">
+            <h1 style="color: #5ee7c5; margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 32px; letter-spacing: 1px;">EduNexus AI</h1>
+            <p style="color: #aeb7c8; font-size: 14px; margin: 5px 0 0; font-weight: bold; text-transform: uppercase; letter-spacing: 2px;">Time Table Built By KX Core</p>
+        </div>
+    `;
+    
+    // टाइमटेबल को ऐप से निकालकर प्रिंट कंटेनर में डालो
+    printContainer.appendChild(elementToPrint);
+
+    // 6. गिटहब वाला फुटर डालो
+    const footerDiv = document.createElement('div');
+    footerDiv.innerHTML = `
+        <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+            <h3 style="color: #fff; margin: 0 0 10px; font-size: 18px;">🚀 Ready to crush your goals?</h3>
+            <p style="margin:0;"><a href="https://kartix010.github.io/EduNexusAI/" style="color: #5ee7c5; text-decoration: none; font-weight: bold;">Access your Live AI Tutor on EduNexus AI</a></p>
+        </div>
+    `;
+    printContainer.appendChild(footerDiv);
+
+    // प्रिंट कंटेनर को बॉडी में डालो
+    document.body.appendChild(printContainer);
+
+    // 7. असली PDF इंजन कॉल करो
     setTimeout(() => {
-        const opt = {
-            margin:       10, 
-            filename:     `EduNexus_${selectedSubjectForQuiz || 'AI'}_Roadmap.pdf`,
-            image:        { type: 'jpeg', quality: 1 },
-            html2canvas:  { 
-                scale: 2, 
-                useCORS: true, 
-                backgroundColor: '#0b101a', 
-                windowWidth: 1000, // 🔥 SABSE ZAROORI: Force desktop width! (UI squish nahi hoga)
-                scrollY: 0
-            },
-            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
-
-        // Generate and Save
-        html2pdf().set(opt).from(element).save().then(() => {
-            showToast("✅ Roadmap PDF Downloaded Successfully! 🚀");
-            
-            // 4. UI KO WAPAS NORMAL KARO (Jadoo)
-            listWrapper.style.maxHeight = originalMaxHeight;
-            listWrapper.style.overflowY = originalOverflow;
-            element.style.background = originalBg;
-            element.style.padding = '15px';
-            element.style.borderRadius = '12px';
-            if(downloadBtn) downloadBtn.style.display = 'inline-block';
-            
-        }).catch(err => {
-            console.log(err);
-            showToast("❌ Error generating PDF.");
-            
-            // Error aane par bhi UI theek kar do
-            listWrapper.style.maxHeight = originalMaxHeight;
-            listWrapper.style.overflowY = originalOverflow;
-            element.style.background = originalBg;
-            element.style.padding = '15px';
-            element.style.borderRadius = '12px';
-            if(downloadBtn) downloadBtn.style.display = 'inline-block';
-        });
-    }, 300);
+        window.print(); 
+        
+        // 8. Print होने के बाद सब कुछ 1 मिलीसेकंड में वापस नॉर्मल!
+        document.body.removeChild(printContainer);
+        planResultContainer.appendChild(elementToPrint); // टाइमटेबल वापस अपनी जगह!
+        
+        mainApp.style.display = 'block'; // ऐप वापस चालू!
+        document.getElementById('temp-print-style').remove(); // प्रिंट CSS गायब!
+        
+        listWrapper.style.maxHeight = originalMaxHeight;
+        listWrapper.style.overflow = 'auto';
+        
+        showToast("✅ Perfect PDF Generated!");
+    }, 500);
 }
-    
+
+
+
+      
 
   </script>
 
