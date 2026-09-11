@@ -3479,6 +3479,7 @@
       mainContent.classList.remove('blurred');
     }
 
+
     // Catch Redirect Results for Mobile Logins
     // 🚀 1. SUPER REDIRECT CATCHER (Mobile PWA ke liye)
     firebase.auth().getRedirectResult().then((result) => {
@@ -3496,9 +3497,38 @@
 
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
+        // GOD-HAND RECEIVER (यूज़र लॉगिन होने के बाद वाले हिस्से में डालें)
+        firebase.firestore().collection('users').doc(user.uid).collection('live_alerts')
+          .where('read', '==', false)
+          .onSnapshot((snapshot) => {
+            snapshot.docChanges().forEach((change) => {
+              if (change.type === 'added') {
+                const alertData = change.doc.data();
+
+                // स्क्रीन पर सिस्टम ओवरराइड का अलर्ट दिखाएँ
+                alert(`⚠️ SYSTEM OVERRIDE ⚠️\n\nAdmin Message:\n"${alertData.message}"`);
+
+                // मैसेज पढ़ लिया गया है, उसे अपडेट कर दें ताकि बार-बार ना पॉप हो
+                change.doc.ref.update({ read: true });
+              }
+            });
+          });
         // Agar user logged in hai, toh dashboard kholo aur data sync karo
         const name = user.displayName || user.email.split('@')[0];
         localStorage.setItem('studymate_username', name);
+        // SECRET KILL SWITCH LISTENER
+        firebase.firestore().collection('users').doc(user.uid)
+          .onSnapshot((doc) => {
+            const userData = doc.data();
+            if (userData && userData.isKicked === true) {
+              // तुरंत यूज़र को लॉग आउट करो
+              firebase.auth().signOut().then(() => {
+                alert("🚫 KICKED OUT: Admin has removed you from the app!");
+                // स्क्रीन पूरी तरह क्लियर करके सीधा लॉगिन पेज पर फेंको
+                window.location.href = "index.html";
+              });
+            }
+          });
 
 
         // 🔥 REAL GOOGLE PROFILE PIC MAGIC 🔥
@@ -4466,8 +4496,9 @@
         showToast("⚠️ Your browser doesn't support AI Voice!");
       }
     }
-    // 🔥 THE MASTER TRACKING ENGINE 🔥
-    async function trackUserActivity(actionType, details) {
+
+    // 🔥 THE MASTER TRACKING ENGINE (UPGRADED FOR CHAT INTERCEPT) 🔥
+    async function trackUserActivity(actionType, details, chatQuestion = null, chatAnswer = null) {
       const user = firebase.auth().currentUser;
       if (!user) return; // अगर लॉगिन नहीं है तो ट्रैक मत करो
 
@@ -4475,21 +4506,26 @@
 
       // 1. Save to Firebase (ताकि बाद में पूरा डेटाबेस एनालाइज कर सकें)
       try {
-        await firebase.firestore().collection('users').doc(user.uid).collection('activity_logs').add({
-            userName: userName,
-            userEmail: user.email || "No Email",
-            action: actionType,
-            details: details,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        
+        let logData = {
+          userName: userName,
+          userEmail: user.email || "No Email",
+          action: actionType,
+          details: details,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        };
+
+        // 🚨 NEXT LEVEL: अगर AI चैट है, तो असली सवाल-जवाब भी जोड़ दो!
+        if (chatQuestion) logData.question = chatQuestion;
+        if (chatAnswer) logData.aiAnswer = chatAnswer;
+
+        await firebase.firestore().collection('users').doc(user.uid).collection('activity_logs').add(logData);
+
         console.log(`[TRACKED] ${actionType} - ${details}`);
       } catch (e) {
         console.error("Tracking Error: ", e);
       }
 
       // 2. Send to Discord (सिर्फ इम्पॉर्टेंट चीज़ों के लिए लाइव अलर्ट)
-      // अगर यूज़र ने क्विज़ पूरी की है या PYQ खोला है, तो Discord पर भोंपू बजना चाहिए!
       if (actionType === "QUIZ_COMPLETED" || actionType === "PYQ_OPENED") {
         const webhookURL = "https://discordapp.com/api/webhooks/1540079598224809984/oDDtB_T22-8lQK3R1HLTk_L_1Fv6IW-atoHBjo7zq0Wc4BQpVr6Hor2ssAtH7RxXP_fA";
 
@@ -4502,6 +4538,9 @@
         }).catch(err => console.log("Discord tracker silent fail"));
       }
     }
+
+
+
 
 
 
@@ -4541,7 +4580,7 @@
       const q = input.value.trim();
       if (!q && !currentAttachmentBase64) return;
       // Track AI Usage
-      trackUserActivity("ASKED_AI_TUTOR", `Question Length: ${q.length} chars`);
+
 
       const wrap = document.getElementById("messages");
 
@@ -4659,6 +4698,8 @@
         // 🔥 1. CLEAN SCORE TAG & BOLD TEXT 🔥
         aiResponse = aiResponse.replace(/\[SCORE:\s*\d+\/\d+\]/i, '').trim();
         aiResponse = aiResponse.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
+        // 👁️ GOD-EYE TRACKER: असली सवाल और जवाब Firebase में भेजो!
+        trackUserActivity("ASKED_AI_TUTOR", `Question Length: ${q.length} chars`, q, aiResponse);
 
         // 🔥 2. MERMAID DIAGRAM RENDERER (Bulletproof) 🔥
         aiResponse = aiResponse.replace(/```mermaid[\s]*\n([\s\S]*?)```/gi, function (match, code) {
