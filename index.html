@@ -1233,26 +1233,43 @@
       align-items: center;
       min-width: 0;
     }
+   /* 🔥 PREMIUM AUTO-GROW TEXTAREA (INVISIBLE SCROLLBAR) 🔥 */
+.chat-input textarea {
+  width: 100%;
+  font-size: 14px;
+  padding: 14px 45px 14px 18px;
+  border-radius: 24px;
+  background: #ffffff05;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: white;
+  outline: none;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  margin: 0;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+  resize: none; 
+  overflow-y: auto; /* 🔥 स्क्रॉल ऑन कर दिया ताकि 10,000 लाइन भी पढ़ सके 🔥 */
+  min-height: 48px; /* 🔥 कम से कम इतना बड़ा रहेगा 🔥 */
+  max-height: 150px; /* 🔥 डब्बा 150px से ज़्यादा बड़ा नहीं होगा, उसके बाद अंदर स्क्रॉल होगा 🔥 */
+  font-family: inherit;
+  line-height: 1.4;
+  
+  /* 🔥 Firefox & IE के लिए स्क्रॉलबार गायब 🔥 */
+  scrollbar-width: none; 
+  -ms-overflow-style: none; 
+}
 
-    .chat-input input {
-      width: 100%;
-      font-size: 14px;
-      padding: 14px 45px 14px 18px;
-      border-radius: 30px;
-      background: #ffffff05;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      color: white;
-      outline: none;
-      transition: 0.3s;
-      margin: 0;
-      box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
-    }
+/* 🔥 Chrome/Safari/Edge के लिए वो गंदा वाइट स्क्रॉलबार एकदम गायब 🔥 */
+.chat-input textarea::-webkit-scrollbar {
+  display: none; 
+}
 
-    .chat-input input:focus {
-      border-color: var(--accent);
-      background: #ffffff0a;
-      box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2), 0 0 15px rgba(139, 124, 255, 0.15);
-    }
+.chat-input textarea:focus {
+  border-color: var(--accent);
+  background: #ffffff0a;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2), 0 0 15px rgba(139, 124, 255, 0.15);
+}
+
+   
 
     #mic-btn {
       position: absolute;
@@ -2203,9 +2220,19 @@
       .message {
         max-width: 98% !important; /* AI को पूरा फैलने की आज़ादी दे दी */
       }
-      .message > div {
-        padding: 12px 14px !important;
-      }
+      /* 🔥 MESSAGE BOX FIX (LAMBE TEXT KE LIYE) 🔥 */
+.message > div {
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: #ffffff07;
+  border: 1px solid #ffffff08;
+  word-wrap: break-word;
+  overflow-wrap: anywhere; /* 🔥 कोई भी शब्द डब्बे से बाहर नहीं जाएगा */
+  word-break: break-word;  /* 🔥 लम्बे शब्द टूट कर नीचे आ जाएंगे */
+  white-space: pre-wrap;
+  max-width: 100%;
+}
+      
       .chat-input {
         padding: 10px !important; 
       }
@@ -2235,13 +2262,14 @@
     overflow-y: auto; 
     overflow-x: hidden; 
     padding-right: 8px; 
-    overscroll-behavior: contain; 
+    overscroll-behavior: auto; 
     -webkit-overflow-scrolling: touch; 
     touch-action: pan-y !important; /* 🔥 ये लाइन बीच वाले स्क्रॉल को 100% फिक्स कर देगी! */
 }
   </style>
   <!-- 🔥 PREMIUM PDF GENERATOR ENGINE 🔥 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  
 
 </head>
 
@@ -2722,54 +2750,69 @@
         <!-- 🔥 YE GRID WALA DIV HAI JISSE SIDE-BY-SIDE AAYEGA (Pehle ye delete ho gya tha) 🔥 -->
         <div class="planner-grid">
 
-         <!-- LEFT SIDE: FORM -->
-          <form class="panel glass tilt-panel" id="plannerForm">
-            <div class="panel-title">
-              <span class="icon">✦</span>
-              <div>
-                <h3 class="gradient-title">Build your study plan</h3>
-                <p>Innovative Timetable Generator</p>
-              </div>
-            </div>
+          <!-- LEFT SIDE: FORM -->
+<form class="panel glass tilt-panel" id="plannerForm">
+  <div class="panel-title">
+    <span class="icon">✦</span>
+    <div>
+      <h3 class="gradient-title">Build your study plan</h3>
+      <p>Innovative Timetable Generator</p>
+    </div>
+  </div>
 
-            <label>CLASS / PROFESSION
-              <input type="text" id="planClass" placeholder="e.g., Class 12, 10th..." autocomplete="off" required>
-            </label>
+  <!-- 🔥 ROW 1: Class aur Exam side-by-side 🔥 -->
+  <div style="display: flex; gap: 12px;">
+    <div style="flex: 1;">
+      <label>CLASS / GRADE
+        <input type="text" id="planClass" placeholder="e.g., Class 12" autocomplete="off" required>
+      </label>
+    </div>
+    <div style="flex: 1;">
+      <label>TARGET EXAM
+        <input type="text" id="goal" placeholder="e.g., JEE, Boards" autocomplete="off" required>
+      </label>
+    </div>
+  </div>
 
-            <label>TARGET EXAM / GOAL
-              <input type="text" id="goal" placeholder="e.g., Board Exams, JEE..." autocomplete="off" required>
-            </label>
-            <label>SUBJECT
-              <input type="text" id="planSubject" placeholder="e.g., Physics, Chemistry, History..." autocomplete="off" required>
-            </label>
+  <!-- 🔥 ROW 2: Subject aur Date side-by-side 🔥 -->
+  <div style="display: flex; gap: 12px; margin-top: 4px;">
+    <div style="flex: 1;">
+      <label>SUBJECT
+        <input type="text" id="planSubject" placeholder="e.g., Physics" autocomplete="off" required>
+      </label>
+    </div>
+    <div style="flex: 1;">
+      <label>TARGET DATE
+        <input id="date" type="date" required>
+      </label>
+    </div>
+  </div>
 
-            <!-- 🔥 NAYA: SYLLABUS UPLOAD UI 🔥 -->
-            <label>PASTE SYLLABUS OR UPLOAD FILE 📎
-              <div style="position: relative; margin-top: 8px;">
-                <textarea id="planSyllabus" rows="3" placeholder="Type topics or upload syllabus photo..." style="color: #f4f7ff; background: #0d1421; border: 1px solid rgba(255, 255, 255, 0.15); width: 100%; border-radius: 10px; padding: 11px; padding-right: 50px; outline: none; font-family: inherit; resize: none; transition: 0.3s;" onfocus="this.style.borderColor='var(--accent)';" onblur="this.style.borderColor='rgba(255,255,255,0.15)';"></textarea>
-                
-                <!-- Hidden File Input -->
-                <input type="file" id="syllabusFile" accept="image/*,.pdf" style="display: none;">
-                
-                <!-- Premium Attachment Button -->
-                <button type="button" onclick="document.getElementById('syllabusFile').click()" style="position: absolute; right: 8px; top: 8px; background: rgba(94, 231, 197, 0.1); border: 1px solid rgba(94, 231, 197, 0.3); color: var(--accent2); border-radius: 8px; width: 36px; height: 36px; cursor: pointer; display: grid; place-items: center; transition: 0.3s;" onmouseover="this.style.background='var(--accent2)'; this.style.color='#000';" onmouseout="this.style.background='rgba(94, 231, 197, 0.1)'; this.style.color='var(--accent2)';">
-                  <svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: currentColor;"><path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5a2.5 2.5 0 0 1 5 0v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5a2.5 2.5 0 0 0 5 0V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.31 2.69 6 6 6s6-2.69 6-6V6h-1.5z"/></svg>
-                </button>
-              </div>
-              <div id="syllabusFileName" style="font-size: 10px; color: var(--accent2); margin-top: 6px; display: none; font-weight: bold;"></div>
-            </label>
+  <!-- 🔥 ROW 3: Syllabus Upload (थोड़ा छोटा किया: rows="2") 🔥 -->
+  <label style="margin-top: 4px;">PASTE SYLLABUS OR UPLOAD FILE 📎
+    <div style="position: relative; margin-top: 8px;">
+      <textarea id="planSyllabus" rows="2" placeholder="Type topics or upload syllabus photo..." style="color: #f4f7ff; background: #0d1421; border: 1px solid rgba(255, 255, 255, 0.15); width: 100%; border-radius: 10px; padding: 11px; padding-right: 50px; outline: none; font-family: inherit; resize: none; transition: 0.3s;" onfocus="this.style.borderColor='var(--accent)';" onblur="this.style.borderColor='rgba(255,255,255,0.15)';"></textarea>
+      
+      <!-- Hidden File Input -->
+      <input type="file" id="syllabusFile" accept="image/*,.pdf" style="display: none;">
+      
+      <!-- Premium Attachment Button -->
+      <button type="button" onclick="document.getElementById('syllabusFile').click()" style="position: absolute; right: 8px; top: 8px; background: rgba(94, 231, 197, 0.1); border: 1px solid rgba(94, 231, 197, 0.3); color: var(--accent2); border-radius: 8px; width: 36px; height: 36px; cursor: pointer; display: grid; place-items: center; transition: 0.3s;" onmouseover="this.style.background='var(--accent2)'; this.style.color='#000';" onmouseout="this.style.background='rgba(94, 231, 197, 0.1)'; this.style.color='var(--accent2)';">
+        <svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: currentColor;"><path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5a2.5 2.5 0 0 1 5 0v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5a2.5 2.5 0 0 0 5 0V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.31 2.69 6 6 6s6-2.69 6-6V6h-1.5z"/></svg>
+      </button>
+    </div>
+    <div id="syllabusFileName" style="font-size: 10px; color: var(--accent2); margin-top: 6px; display: none; font-weight: bold;"></div>
+  </label>
 
-            <label>DAILY STUDY TIME
-              <input id="hours" type="range" min="1" max="12" value="4" oninput="document.getElementById('hoursValue').textContent=this.value+' hours'">
-              <span class="range-value" id="hoursValue">4 hours</span>
-            </label>
+  <!-- 🔥 ROW 4: Range Slider 🔥 -->
+  <label style="margin-top: 4px;">DAILY STUDY TIME
+    <input id="hours" type="range" min="1" max="12" value="4" oninput="document.getElementById('hoursValue').textContent=this.value+' hours'">
+    <span class="range-value" id="hoursValue">4 hours</span>
+  </label>
 
-            <label>EXAM / TARGET DATE
-              <input id="date" type="date" required>
-            </label>
+  <button class="btn primary full" type="submit" style="margin-top: 15px;">Generate AI Study Plan <span>✦</span></button>
+</form>
 
-            <button class="btn primary full" type="submit" style="margin-top: 8px;">Generate AI Study Plan <span>✦</span></button>
-          </form>
           <!-- RIGHT SIDE: RESULT PANEL -->
           <div class="panel result-panel glass tilt-panel" id="planResult">
             <div class="result-empty">
@@ -2781,37 +2824,56 @@
 
         </div>
       </section>
-      <!-- 🔥 PLANNER SECTION END 🔥 -->
-      <!-- 🔥 PLANNER SECTION END 🔥 -->
-
+      <!-- 🔥 DOUBT SOLVER SECTION START 🔥 -->
       <section class="section reveal" id="doubt">
         <div class="section-heading">
           <div>
             <span class="eyebrow">04 • LIVE AI TUTOR</span>
             <h2 class="gradient-title">Ask. Understand. Master.</h2>
           </div>
-          <p>A real-time intelligence engine designed to decode Class 12 Science, CS, and English concepts instantly.
-          </p>
+          <p>A real-time intelligence engine designed to decode Class 12 Science, CS, and English concepts instantly.</p>
         </div>
 
         <div class="tutor panel glass">
+          
+          <!-- LEFT SIDE: TUTOR SUGGESTIONS -->
           <div class="tutor-side">
             <img src="https://i.ibb.co/Kz0LvSg9/logo.png" class="tutor-logo" alt="EduNexus AI">
-            <h3 class="gradient-title">EduNexus Tutor</h3>
+            <h3 class="gradient-title">KX Neural Core</h3>
             <p>From Physics derivations to Python logic—decode complex concepts instantly, then test your mastery.</p>
             <div class="suggestions">
               <button onclick="askDemo('Analyze my handwriting step by step')">Analyze my handwriting step</button>
               <button onclick="askDemo('Analyze this Physics circuit diagram')">Analyze this Physics circuit</button>
-              <button onclick="askDemo('Summarize key points from this PDF')">Summarize key points from this
-                PDF</button>
+              <button onclick="askDemo('Summarize key points from this PDF')">Summarize key points from this PDF</button>
             </div>
           </div>
+          
+          <!-- RIGHT SIDE: THE CHAT AREA -->
           <div class="chat">
-            <div class="chat-head">
-              <span class="online-dot"></span> AI Tutor <span class="tiny">Online</span>
+        <!-- 1. Premium Neon Header (Purple Gradient Name + Online Badge) -->
+            <div class="chat-head" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); background: rgba(14, 20, 33, 0.4);">
+              
+              <!-- Left Side: Icon & PURPLE GRADIENT Name -->
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(139, 124, 255, 0.15); border: 1px solid rgba(139, 124, 255, 0.3); display: grid; place-items: center; color: #8b7cff; box-shadow: 0 0 15px rgba(139, 124, 255, 0.1);">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;"><path d="M12 2a2 2 0 0 1 2 2c0 1.1-.9 2-2 2s-2-.9-2-2c0-1.1.9-2 2-2zM4.5 10A1.5 1.5 0 0 1 6 8.5h12A1.5 1.5 0 0 1 19.5 10v9A1.5 1.5 0 0 1 18 20.5H6A1.5 1.5 0 0 1 4.5 19v-9zM2 13h2.5M19.5 13H22"/></svg>
+                </div>
+                <!-- 🔥 YAHAN TERA GRADIENT A GAYA 🔥 -->
+                <h3 class="gradient-title" style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 16px; letter-spacing: 0.5px;">KX Core!</h3>
+              </div>
+              
+              <!-- Right Side: Online Badge -->
+              <div style="display: flex; align-items: center; gap: 8px; background: rgba(94, 231, 197, 0.1); padding: 5px 12px; border-radius: 20px; border: 1px solid rgba(94, 231, 197, 0.25); box-shadow: 0 4px 15px rgba(94, 231, 197, 0.1);">
+                <div class="pulse" style="width: 8px; height: 8px; margin: 0; background: var(--accent2); animation-duration: 1.5s;"></div>
+                <span style="color: var(--accent2); font-size: 10px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase;">Online</span>
+              </div>
+              
             </div>
-            <div class="messages" id="messages" data-lenis-prevent="true" style="-webkit-overflow-scrolling: touch; overscroll-behavior: contain;"></div>
 
+            <!-- 2. MESSAGES AREA -->
+            <div class="messages" id="messages"></div>
+
+            <!-- 3. Attachment Preview -->
             <div id="attachment-preview" class="preview-pane" style="display: none;">
               <img id="preview-img" class="preview-thumb" src="" style="display:none;">
               <div id="preview-doc" class="preview-thumb" style="display:none;">📄</div>
@@ -2822,42 +2884,31 @@
               <button type="button" class="preview-close" onclick="clearAttachment()" title="Remove file">×</button>
             </div>
 
+            <!-- 4. Chat Input Box -->
             <form class="chat-input" onsubmit="sendQuestion(event)">
-              <input type="file" id="image-upload" accept="image/*" capture="environment" style="display:none;"
-                onchange="handleAttachment(event, 'image')">
-              <input type="file" id="file-upload" accept=".pdf,.txt,.doc,.docx" style="display:none;"
-                onchange="handleAttachment(event, 'file')">
+              <input type="file" id="image-upload" accept="image/*" capture="environment" style="display:none;" onchange="handleAttachment(event, 'image')">
+              <input type="file" id="file-upload" accept=".pdf,.txt,.doc,.docx" style="display:none;" onchange="handleAttachment(event, 'file')">
 
-              <button type="button" class="attach-btn" onclick="document.getElementById('file-upload').click()"
-                title="Attach File">
-                <svg viewBox="0 0 24 24">
-                  <path
-                    d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5a2.5 2.5 0 0 1 5 0v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5a2.5 2.5 0 0 0 5 0V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.31 2.69 6 6 6s6-2.69 6-6V6h-1.5z" />
-                </svg>
+              <button type="button" class="attach-btn" onclick="document.getElementById('file-upload').click()" title="Attach File">
+                <svg viewBox="0 0 24 24"><path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5a2.5 2.5 0 0 1 5 0v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5a2.5 2.5 0 0 0 5 0V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.31 2.69 6 6 6s6-2.69 6-6V6h-1.5z" /></svg>
               </button>
 
-              <button type="button" class="attach-btn" onclick="document.getElementById('image-upload').click()"
-                title="Upload Image">
-                <svg viewBox="0 0 24 24">
-                  <path
-                    d="M4 4h3l2-2h6l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm8 3a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0 2a3 3 0 1 1 0 6 3 3 0 0 1 0-6z" />
-                </svg>
+              <button type="button" class="attach-btn" onclick="document.getElementById('image-upload').click()" title="Upload Image">
+                <svg viewBox="0 0 24 24"><path d="M4 4h3l2-2h6l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm8 3a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0 2a3 3 0 1 1 0 6 3 3 0 0 1 0-6z" /></svg>
               </button>
 
               <div class="input-wrapper">
-                <input id="question" placeholder="Ask KX Core..." autocomplete="off">
+                <textarea id="question" placeholder="Ask KX Core..." rows="1"></textarea>
                 <button type="button" id="mic-btn" onclick="toggleMic()" title="Click to speak">
                   <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z" />
-                    <path
-                      d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z" />
+                    <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z" />
                   </svg>
                 </button>
               </div>
 
               <button type="submit" title="Send message">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
-                  stroke-linejoin="round">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                   <line x1="12" y1="19" x2="12" y2="5"></line>
                   <polyline points="5 12 12 5 19 12"></polyline>
                 </svg>
@@ -2866,6 +2917,8 @@
           </div>
         </div>
       </section>
+      <!-- 🔥 DOUBT SOLVER SECTION END 🔥 -->
+
 
       <section class="section reveal" id="progress">
         <div class="section-heading">
@@ -3004,6 +3057,7 @@
     
     // Consistent premium smooth-scroll feel across phone, tablet and desktop
     const lenis = new Lenis({ autoRaf: true });
+    
   </script>
   <script>
     // Elastic edge-bounce: same rubber-band feel at top AND bottom, on every device
@@ -3701,8 +3755,9 @@
 
               <div class="generated-plan" id="pdf-export-area" style="animation: popIn 0.5s ease-out; text-align: left;">
                 <div>
-                    <span class="eyebrow" style="color: var(--accent2);">✦ ${totalDays}-DAY TRUE AI ROADMAP FOR ${currentUser.toUpperCase()}</span>
-                    <h3 style="margin-top:10px; font-size: 26px; color: #fff;">Your ${planSubject} Roadmap</h3>
+                    <span class="eyebrow" style="color: var(--accent2);">✦ ${totalDays}-DAY Ultimate AI ROADMAP FOR ${currentUser.toUpperCase()}</span>
+                    <h3 class="gradient-title" style="margin-top:10px; font-size: 26px;">Your ${planSubject} Roadmap</h3>
+
                     
                     <div class="plan-meta" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
                       <span class="chip">${totalDays} Days</span>
@@ -3719,7 +3774,8 @@
 
                     <div class="plan-container">
                         <!-- 🔥 SCROLL TRAP FIX: Added data-lenis-prevent="true" back 🔥 -->
-                        <div class="plan-list-wrapper days-list-premium" data-lenis-prevent="true">
+                        <div class="plan-list-wrapper days-list-premium">
+                        
                           ${daysHtml}
                         </div>
                     </div>
@@ -4847,8 +4903,7 @@ setTimeout(() => { mermaid.init(undefined, document.querySelectorAll('.mermaid')
         })
       }).catch(err => console.log("Install tracker silent fail"));
     });
-
-    // 🔥 THE FLAWLESS VECTOR PDF ENGINE (ZERO BLANK PAGES) 🔥
+    // 🔥 THE FLAWLESS VECTOR PDF ENGINE (WITH PERFECT ALIGNED HEADER) 🔥
 function downloadTimetable() {
     showToast("⏳ Architecting True Vector PDF...");
     
@@ -4862,7 +4917,7 @@ function downloadTimetable() {
     listWrapper.style.maxHeight = 'none';
     listWrapper.style.overflow = 'visible';
 
-    // 2. CSS हैक: ग्रिड बैकग्राउंड हटाओ और पेज ब्रेक फिक्स करो (कार्ड्स बीच में से नहीं कटेंगे)
+    // 2. CSS हैक (ब्राउज़र का टेढ़ा-मेढ़ा हेडर बंद रखने के लिए)
     const printStyle = document.createElement('style');
     printStyle.id = 'temp-print-style';
     printStyle.innerHTML = `
@@ -4870,30 +4925,40 @@ function downloadTimetable() {
         .ambient { display: none !important; }
         button { display: none !important; }
         .plan-day { page-break-inside: avoid; break-inside: avoid; }
-        @page { margin: 12mm; }
+        @page { margin: 0; } 
     `;
     document.head.appendChild(printStyle);
 
-    // 3. पूरा मेन ऐप छुपा दो (ताकि कोई खाली पन्ना (Blank Page) ना बचे!)
+    // 3. पूरा मेन ऐप छुपा दो
     mainApp.style.display = 'none';
 
-    // 4. एक नया फ्रेश प्रिंट कंटेनर बनाओ
+    // 4. नया फ्रेश प्रिंट कंटेनर बनाओ
     const printContainer = document.createElement('div');
     printContainer.id = 'temp-print-container';
     printContainer.style.backgroundColor = '#070a12';
     printContainer.style.color = '#ffffff';
     printContainer.style.width = '100%';
-    printContainer.style.padding = '0';
+    printContainer.style.padding = '40px'; 
 
-    // 5. ब्रांडिंग डालो (EduNexus AI)
+    // 5. 🔥 LIVE DATE, TIME & PERFECTLY ALIGNED HEADER 🔥
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('en-US'); // आज की डेट
+    const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }); // अभी का टाइम
+
     printContainer.innerHTML = `
+        <!-- एकदम परफेक्ट अलाइन किया हुआ Date, Time और Tagline -->
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #aeb7c8; margin-bottom: 20px; font-family: 'Inter', sans-serif;">
+            <span style="font-weight: 500;">${dateStr}, ${timeStr}</span>
+            <span style="font-weight: 600;">EduNexus AI — The Ultimate AI-Powered Learning Companion</span>
+        </div>
+
+        <!-- मेन EduNexus ब्रांडिंग -->
         <div style="text-align: center; margin-bottom: 25px; border-bottom: 2px solid #5ee7c5; padding-bottom: 15px;">
             <h1 style="color: #5ee7c5; margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 32px; letter-spacing: 1px;">EduNexus AI</h1>
             <p style="color: #aeb7c8; font-size: 14px; margin: 5px 0 0; font-weight: bold; text-transform: uppercase; letter-spacing: 2px;">Time Table Built By KX Core</p>
         </div>
     `;
     
-    // टाइमटेबल को ऐप से निकालकर प्रिंट कंटेनर में डालो
     printContainer.appendChild(elementToPrint);
 
     // 6. गिटहब वाला फुटर डालो
@@ -4906,19 +4971,18 @@ function downloadTimetable() {
     `;
     printContainer.appendChild(footerDiv);
 
-    // प्रिंट कंटेनर को बॉडी में डालो
     document.body.appendChild(printContainer);
 
     // 7. असली PDF इंजन कॉल करो
     setTimeout(() => {
         window.print(); 
         
-        // 8. Print होने के बाद सब कुछ 1 मिलीसेकंड में वापस नॉर्मल!
+        // 8. Print होने के बाद 1 मिलीसेकंड में सब वापस नॉर्मल
         document.body.removeChild(printContainer);
-        planResultContainer.appendChild(elementToPrint); // टाइमटेबल वापस अपनी जगह!
+        planResultContainer.appendChild(elementToPrint); 
         
-        mainApp.style.display = 'block'; // ऐप वापस चालू!
-        document.getElementById('temp-print-style').remove(); // प्रिंट CSS गायब!
+        mainApp.style.display = 'block'; 
+        document.getElementById('temp-print-style').remove(); 
         
         listWrapper.style.maxHeight = originalMaxHeight;
         listWrapper.style.overflow = 'auto';
@@ -4927,11 +4991,55 @@ function downloadTimetable() {
     }, 500);
 }
 
-
-
-      
-
+   
   </script>
+  <!-- 🔥 THE GOD-TIER SCROLL CHAIN ENGINE (FIXES TRAPPING AT DAY 15) 🔥 -->
+<script>
+    let touchStartY = 0;
+    window.addEventListener('touchstart', e => { touchStartY = e.touches[0].clientY; }, { passive: true });
+
+    const handleSmartScroll = (e) => {
+        const innerBox = e.target.closest('.messages, .plan-list-wrapper');
+        if (!innerBox) return; 
+
+        const atTop = innerBox.scrollTop <= 0;
+        const atBottom = Math.ceil(innerBox.scrollTop + innerBox.clientHeight) >= innerBox.scrollHeight - 1;
+
+        let isScrollingUp = false;
+        let isScrollingDown = false;
+
+        if (e.type === 'wheel') {
+            isScrollingUp = e.deltaY < 0;
+            isScrollingDown = e.deltaY > 0;
+        } else if (e.type === 'touchmove') {
+            const currentY = e.touches[0].clientY;
+            isScrollingUp = currentY > touchStartY;
+            isScrollingDown = currentY < touchStartY;
+            touchStartY = currentY; 
+        }
+
+        if ((atTop && isScrollingUp) || (atBottom && isScrollingDown)) {
+            return; // लिस्ट खत्म? मेन पेज को स्क्रॉल करने दो!
+        }
+        e.stopPropagation(); // वरना लिस्ट के अंदर स्क्रॉल करो
+    };
+
+    window.addEventListener('wheel', handleSmartScroll, { capture: true, passive: true });
+    window.addEventListener('touchmove', handleSmartScroll, { capture: true, passive: true });
+</script><!-- 🔥 SMART CHAT INPUT ENGINE (FIXED HEIGHT) 🔥 -->
+<script>
+  const chatBox = document.getElementById('question');
+  
+  // 1. Enter = Send Message | Shift + Enter = New Line
+  chatBox.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault(); // नई लाइन बनने से रोको
+          sendQuestion(new Event("submit")); // मैसेज सेंड करो
+      }
+  });
+  
+</script>
+</script>
 
 
 
