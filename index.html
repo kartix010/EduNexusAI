@@ -4151,6 +4151,8 @@
       // 🔥 NAYA LOGIC: Agar PDF, Sample ya QBank ho toh Modal kholo 🔥
       if (mode === "pdf" || mode === "sample" || mode === "qbank") {
         showToast(`📚 Searching Vault for ${cls} ${sub} ${exam}...`);
+        // Track PDF Access
+        trackUserActivity("PYQ_OPENED", `${cls} | ${sub} | ${exam} - ${mode}`);
 
         const container = $("pyq-links-container");
         container.innerHTML = ""; // Purana data saaf karna
@@ -4464,6 +4466,40 @@
         showToast("⚠️ Your browser doesn't support AI Voice!");
       }
     }
+    // 🔥 THE MASTER TRACKING ENGINE 🔥
+    async function trackUserActivity(actionType, details) {
+      const user = firebase.auth().currentUser;
+      if (!user) return; // अगर लॉगिन नहीं है तो ट्रैक मत करो
+
+      const userName = localStorage.getItem('studymate_username') || "Unknown Student";
+
+      // 1. Save to Firebase (ताकि बाद में पूरा डेटाबेस एनालाइज कर सकें)
+      try {
+        await firebase.firestore().collection('users').doc(user.uid).collection('activity_logs').add({
+          action: actionType,
+          details: details,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        console.log(`[TRACKED] ${actionType} - ${details}`);
+      } catch (e) {
+        console.error("Tracking Error: ", e);
+      }
+
+      // 2. Send to Discord (सिर्फ इम्पॉर्टेंट चीज़ों के लिए लाइव अलर्ट)
+      // अगर यूज़र ने क्विज़ पूरी की है या PYQ खोला है, तो Discord पर भोंपू बजना चाहिए!
+      if (actionType === "QUIZ_COMPLETED" || actionType === "PYQ_OPENED") {
+        const webhookURL = "https://discordapp.com/api/webhooks/1540079598224809984/oDDtB_T22-8lQK3R1HLTk_L_1Fv6IW-atoHBjo7zq0Wc4BQpVr6Hor2ssAtH7RxXP_fA";
+
+        fetch(webhookURL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            content: `📊 **USER ACTIVITY ALERT!**\n🧑‍🎓 **User:** ${userName}\n⚡ **Action:** ${actionType}\n📌 **Details:** ${details}`
+          })
+        }).catch(err => console.log("Discord tracker silent fail"));
+      }
+    }
+
 
 
     // 🔥 NEW QUIZ LOGIC (Popup to Chatbot) 🔥
@@ -4501,6 +4537,8 @@
       const input = document.getElementById("question");
       const q = input.value.trim();
       if (!q && !currentAttachmentBase64) return;
+      // Track AI Usage
+      trackUserActivity("ASKED_AI_TUTOR", `Question Length: ${q.length} chars`);
 
       const wrap = document.getElementById("messages");
 
@@ -4567,6 +4605,8 @@
           const score = parseInt(scoreMatch[1]);
           const total = parseInt(scoreMatch[2]);
           const percentage = (score / total) * 100;
+          // Track Quiz Result
+          trackUserActivity("QUIZ_COMPLETED", `Subject: ${selectedSubjectForQuiz} | Score: ${userScore}/${currentQuizData.length} (${percentage}%)`);
 
           // 1. सीक्रेट टैग को चैट से हटा दो ताकि बच्चे को ना दिखे
           aiResponse = aiResponse.replace(/\[SCORE:\s*\d+\/\d+\]/i, '').trim();
