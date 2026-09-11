@@ -2316,7 +2316,7 @@
     .chat-input textarea,
     .messages,
     .chat-history {
-      overscroll-behavior-y: contain;
+      overscroll-behavior-y: auto;
     }
   </style>
 
@@ -2344,10 +2344,8 @@
       overflow-y: auto;
       overflow-x: hidden;
       padding-right: 8px;
-      overscroll-behavior: auto;
-      -webkit-overflow-scrolling: touch;
-      touch-action: pan-y !important;
-      /* 🔥 ये लाइन बीच वाले स्क्रॉल को 100% फिक्स कर देगी! */
+      overscroll-behavior-y: auto !important;
+      -webkit-overflow-scrolling: touch !important;
     }
   </style>
   <!-- 🔥 PREMIUM PDF GENERATOR ENGINE 🔥 -->
@@ -3211,22 +3209,15 @@
         el.style.transform = 'translateY(0)';
         pulling = false;
       }
+      window.addEventListener('touchmove', (e) => {
+        // 🔥 MAGIC LOCK MOBILE KE LIYE BHI (FIXED) 🔥
+        if (e.target && e.target.closest && (e.target.closest('.messages') || e.target.closest('.plan-list-wrapper') || e.target.closest('.modal-content') || e.target.closest('.chat') || e.target.closest('.chat-input textarea'))) return;
 
-      window.addEventListener('wheel', (e) => {
-        // 🔥 SMART MAGIC LOCK
-
-
-
-
-        if (e.target && e.target.closest && (e.target.closest('.messages') || e.target.closest('.plan-list-wrapper') || e.target.closest('.modal-content') || e.target.closest('.chat'))) return;
-
-
-
-        if (atTop() && e.deltaY < 0) { push(current + Math.abs(e.deltaY) * 0.3); pulling = true; }
-        else if (atBottom() && e.deltaY > 0) { push(current - e.deltaY * 0.3); pulling = true; }
-        clearTimeout(wheelTimer);
-        wheelTimer = setTimeout(() => { if (pulling) release(); }, 120);
+        const dy = e.touches[0].clientY - startY;
+        if (atTop() && dy > 0) { push(dy * 0.4); pulling = true; }
+        else if (atBottom() && dy < 0) { push(dy * 0.4); pulling = true; }
       }, { passive: true });
+
 
       let startY = 0;
       window.addEventListener('touchstart', (e) => { startY = e.touches[0].clientY; }, { passive: true });
@@ -5118,40 +5109,8 @@
 
 
   </script>
-  <!-- 🔥 THE GOD-TIER SCROLL CHAIN ENGINE (FIXES TRAPPING AT DAY 15) 🔥 -->
-  <script>
-    let touchStartY = 0;
-    window.addEventListener('touchstart', e => { touchStartY = e.touches[0].clientY; }, { passive: true });
 
-    const handleSmartScroll = (e) => {
-      const innerBox = e.target.closest('.messages, .plan-list-wrapper');
-      if (!innerBox) return;
 
-      const atTop = innerBox.scrollTop <= 0;
-      const atBottom = Math.ceil(innerBox.scrollTop + innerBox.clientHeight) >= innerBox.scrollHeight - 1;
-
-      let isScrollingUp = false;
-      let isScrollingDown = false;
-
-      if (e.type === 'wheel') {
-        isScrollingUp = e.deltaY < 0;
-        isScrollingDown = e.deltaY > 0;
-      } else if (e.type === 'touchmove') {
-        const currentY = e.touches[0].clientY;
-        isScrollingUp = currentY > touchStartY;
-        isScrollingDown = currentY < touchStartY;
-        touchStartY = currentY;
-      }
-
-      if ((atTop && isScrollingUp) || (atBottom && isScrollingDown)) {
-        return; // लिस्ट खत्म? मेन पेज को स्क्रॉल करने दो!
-      }
-      e.stopPropagation(); // वरना लिस्ट के अंदर स्क्रॉल करो
-    };
-
-    window.addEventListener('wheel', handleSmartScroll, { capture: true, passive: true });
-    window.addEventListener('touchmove', handleSmartScroll, { capture: true, passive: true });
-  </script><!-- 🔥 SMART CHAT INPUT ENGINE (FIXED HEIGHT) 🔥 -->
   <script>
     const chatBox = document.getElementById('question');
 
@@ -5162,8 +5121,6 @@
         sendQuestion(new Event("submit")); // मैसेज सेंड करो
       }
     });
-
-  </script>
   </script>
 
 
