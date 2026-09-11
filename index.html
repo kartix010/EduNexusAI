@@ -1061,22 +1061,24 @@
       color: #616c80;
       font-weight: 500;
     }
+
     .messages {
-  padding: 22px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  flex: 1;
-  overflow-y: auto;
-  scroll-behavior: smooth;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
-  touch-action: pan-y !important; /* 🔥 ये है वो मैजिक लाइन जो बीच का स्क्रॉल फिक्स करेगी! */
-}
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex: 1;
+      overflow-y: auto;
+      scroll-behavior: smooth;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-y !important;
+      /* 🔥 ये है वो मैजिक लाइन जो बीच का स्क्रॉल फिक्स करेगी! */
+    }
 
-   
 
-    
+
+
 
     .message {
       display: flex;
@@ -1233,43 +1235,47 @@
       align-items: center;
       min-width: 0;
     }
-   /* 🔥 PREMIUM AUTO-GROW TEXTAREA (INVISIBLE SCROLLBAR) 🔥 */
-.chat-input textarea {
-  width: 100%;
-  font-size: 14px;
-  padding: 14px 45px 14px 18px;
-  border-radius: 24px;
-  background: #ffffff05;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: white;
-  outline: none;
-  transition: border-color 0.3s, box-shadow 0.3s;
-  margin: 0;
-  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
-  resize: none; 
-  overflow-y: auto; /* 🔥 स्क्रॉल ऑन कर दिया ताकि 10,000 लाइन भी पढ़ सके 🔥 */
-  min-height: 48px; /* 🔥 कम से कम इतना बड़ा रहेगा 🔥 */
-  max-height: 150px; /* 🔥 डब्बा 150px से ज़्यादा बड़ा नहीं होगा, उसके बाद अंदर स्क्रॉल होगा 🔥 */
-  font-family: inherit;
-  line-height: 1.4;
-  
-  /* 🔥 Firefox & IE के लिए स्क्रॉलबार गायब 🔥 */
-  scrollbar-width: none; 
-  -ms-overflow-style: none; 
-}
 
-/* 🔥 Chrome/Safari/Edge के लिए वो गंदा वाइट स्क्रॉलबार एकदम गायब 🔥 */
-.chat-input textarea::-webkit-scrollbar {
-  display: none; 
-}
+    /* 🔥 PREMIUM AUTO-GROW TEXTAREA (INVISIBLE SCROLLBAR) 🔥 */
+    .chat-input textarea {
+      width: 100%;
+      font-size: 14px;
+      padding: 14px 45px 14px 18px;
+      border-radius: 24px;
+      background: #ffffff05;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: white;
+      outline: none;
+      transition: border-color 0.3s, box-shadow 0.3s;
+      margin: 0;
+      box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+      resize: none;
+      overflow-y: auto;
+      /* 🔥 स्क्रॉल ऑन कर दिया ताकि 10,000 लाइन भी पढ़ सके 🔥 */
+      min-height: 48px;
+      /* 🔥 कम से कम इतना बड़ा रहेगा 🔥 */
+      max-height: 150px;
+      /* 🔥 डब्बा 150px से ज़्यादा बड़ा नहीं होगा, उसके बाद अंदर स्क्रॉल होगा 🔥 */
+      font-family: inherit;
+      line-height: 1.4;
 
-.chat-input textarea:focus {
-  border-color: var(--accent);
-  background: #ffffff0a;
-  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2), 0 0 15px rgba(139, 124, 255, 0.15);
-}
+      /* 🔥 Firefox & IE के लिए स्क्रॉलबार गायब 🔥 */
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
 
-   
+    /* 🔥 Chrome/Safari/Edge के लिए वो गंदा वाइट स्क्रॉलबार एकदम गायब 🔥 */
+    .chat-input textarea::-webkit-scrollbar {
+      display: none;
+    }
+
+    .chat-input textarea:focus {
+      border-color: var(--accent);
+      background: #ffffff0a;
+      box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2), 0 0 15px rgba(139, 124, 255, 0.15);
+    }
+
+
 
     #mic-btn {
       position: absolute;
@@ -2122,75 +2128,114 @@
     .no-scroll {
       overflow: hidden !important;
     }
+
     /* 🔥 EXACT GEMINI AI BUBBLE LOADER (NO WOBBLE, ONLY CORNER LIGHT) 🔥 */
-.ai-thinking {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  width: 56px;
-  height: 42px;
-  /* Ye hai wo magic shape: Top-Left nukila, baaki sab gol! */
-  border-radius: 4px 20px 20px 20px; 
-  /* Ye line light ko bahar failne se rokegi (No Wobble) */
-  overflow: hidden; 
-  z-index: 1;
-}
+    .ai-thinking {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      width: 56px;
+      height: 42px;
+      /* Ye hai wo magic shape: Top-Left nukila, baaki sab gol! */
+      border-radius: 4px 20px 20px 20px;
+      /* Ye line light ko bahar failne se rokegi (No Wobble) */
+      overflow: hidden;
+      z-index: 1;
+    }
 
-/* Ye hai wo ghumne wali 'Laser Light' jo sirf edges par aayegi */
-.ai-thinking::before {
-  content: '';
-  position: absolute;
-  width: 200%;
-  height: 200%;
-  /* 70% transparent rakha hai, taaki light sirf ek hisse mein chamke aur ghoome */
-  background: conic-gradient(transparent 70%, #5ee7c5 85%, #8b7cff 100%);
-  animation: aiBorderRotate 1.5s linear infinite;
-  z-index: -2;
-}
+    /* Ye hai wo ghumne wali 'Laser Light' jo sirf edges par aayegi */
+    .ai-thinking::before {
+      content: '';
+      position: absolute;
+      width: 200%;
+      height: 200%;
+      /* 70% transparent rakha hai, taaki light sirf ek hisse mein chamke aur ghoome */
+      background: conic-gradient(transparent 70%, #5ee7c5 85%, #8b7cff 100%);
+      animation: aiBorderRotate 1.5s linear infinite;
+      z-index: -2;
+    }
 
-/* Andar ka solid dark core, jiske bahar light ghumegi */
-.ai-thinking::after {
-  content: '';
-  position: absolute;
-  inset: 1.5px; /* Ye border ki thickness set karega */
-  border-radius: 3px 18.5px 18.5px 18.5px; /* Perfect inner curve */
-  background: #0e1421; /* Tere dark mode ka base color */
-  z-index: -1;
-}
+    /* Andar ka solid dark core, jiske bahar light ghumegi */
+    .ai-thinking::after {
+      content: '';
+      position: absolute;
+      inset: 1.5px;
+      /* Ye border ki thickness set karega */
+      border-radius: 3px 18.5px 18.5px 18.5px;
+      /* Perfect inner curve */
+      background: #0e1421;
+      /* Tere dark mode ka base color */
+      z-index: -1;
+    }
 
-@keyframes aiBorderRotate {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
+    @keyframes aiBorderRotate {
+      0% {
+        transform: rotate(0deg);
+      }
 
-/* ✦ Andar ke 3 clean dots ✦ */
-.ai-dots-container {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
+      100% {
+        transform: rotate(360deg);
+      }
+    }
 
-.typing-dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: #ffffff;
-  animation: aiBounce 1.4s infinite ease-in-out both;
-}
+    /* ✦ Andar ke 3 clean dots ✦ */
+    .ai-dots-container {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
 
-.typing-dot:nth-child(1) { animation-delay: -0.32s; }
-.typing-dot:nth-child(2) { animation-delay: -0.16s; }
+    .typing-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #ffffff;
+      animation: aiBounce 1.4s infinite ease-in-out both;
+    }
 
-@keyframes aiBounce {
-  0%, 80%, 100% { transform: scale(0.6); opacity: 0.3; }
-  40% { transform: scale(1.2); opacity: 1; background: #5ee7c5; }
-}
-/* 🔥 PREMIUM SCROLLBAR FIX 🔥 */
-    .messages::-webkit-scrollbar { width: 8px; }
-    .messages::-webkit-scrollbar-track { background: transparent; }
-    .messages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
-    .messages::-webkit-scrollbar-thumb:hover { background: var(--accent2); }
+    .typing-dot:nth-child(1) {
+      animation-delay: -0.32s;
+    }
+
+    .typing-dot:nth-child(2) {
+      animation-delay: -0.16s;
+    }
+
+    @keyframes aiBounce {
+
+      0%,
+      80%,
+      100% {
+        transform: scale(0.6);
+        opacity: 0.3;
+      }
+
+      40% {
+        transform: scale(1.2);
+        opacity: 1;
+        background: #5ee7c5;
+      }
+    }
+
+    /* 🔥 PREMIUM SCROLLBAR FIX 🔥 */
+    .messages::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .messages::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .messages::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+    }
+
+    .messages::-webkit-scrollbar-thumb:hover {
+      background: var(--accent2);
+    }
+
     /* 🔥 MOBILE RESPONSIVENESS FIX FOR PLANNER 🔥 */
     @media(max-width: 850px) {
       .section-heading {
@@ -2198,46 +2243,81 @@
         flex-direction: column !important;
         align-items: flex-start !important;
       }
+
       .section-heading h2 {
         font-size: 32px !important;
         word-wrap: break-word;
       }
-      .section-heading > p {
+
+      .section-heading>p {
         margin-top: 10px !important;
         max-width: 100% !important;
       }
+
       .planner-grid {
         display: flex !important;
         flex-direction: column !important;
       }
     }
+
     /* 🔥 CHAT BUBBLE MOBILE FIX 🔥 */
     @media(max-width: 850px) {
       .messages {
-        padding: 15px 10px !important; /* फालतू पैडिंग हटा दी */
+        padding: 15px 10px !important;
+        /* फालतू पैडिंग हटा दी */
         width: 100% !important;
       }
+
       .message {
-        max-width: 98% !important; /* AI को पूरा फैलने की आज़ादी दे दी */
+        max-width: 98% !important;
+        /* AI को पूरा फैलने की आज़ादी दे दी */
       }
+
       /* 🔥 MESSAGE BOX FIX (LAMBE TEXT KE LIYE) 🔥 */
-.message > div {
-  padding: 12px 16px;
-  border-radius: 12px;
-  background: #ffffff07;
-  border: 1px solid #ffffff08;
-  word-wrap: break-word;
-  overflow-wrap: anywhere; /* 🔥 कोई भी शब्द डब्बे से बाहर नहीं जाएगा */
-  word-break: break-word;  /* 🔥 लम्बे शब्द टूट कर नीचे आ जाएंगे */
-  white-space: pre-wrap;
-  max-width: 100%;
-}
-      
+      .message>div {
+        padding: 12px 16px;
+        border-radius: 12px;
+        background: #ffffff07;
+        border: 1px solid #ffffff08;
+        word-wrap: break-word;
+        overflow-wrap: anywhere;
+        /* 🔥 कोई भी शब्द डब्बे से बाहर नहीं जाएगा */
+        word-break: break-word;
+        /* 🔥 लम्बे शब्द टूट कर नीचे आ जाएंगे */
+        white-space: pre-wrap;
+        max-width: 100%;
+      }
+
       .chat-input {
-        padding: 10px !important; 
+        padding: 10px !important;
       }
     }
-    
+
+
+    /* =========================================
+   🔥 ULTIMATE MOBILE SCROLL MASTER FIX 🔥
+   ========================================= */
+
+    /* 1. Touch Hijacking Fix: ये लाइन किसी भी डब्बे (Cards, Chat) को पेज स्क्रॉल रोकने से मना करेगी */
+    * {
+      touch-action: pan-y !important;
+    }
+
+    /* 2. Smooth Momentum Scrolling: Apple/Android का नेटिव मक्खन स्क्रॉल इनेबल करने के लिए */
+    .chat-history,
+    .messages,
+    .planner-container,
+    .message>div,
+    [data-tilt] {
+      -webkit-overflow-scrolling: touch !important;
+    }
+
+    /* 3. Scroll Chaining: जब चैट बॉक्स के अंदर का स्क्रॉल खत्म हो जाए, तो पेज अटकने के बजाय पूरा पेज स्क्रॉल हो */
+    .chat-input textarea,
+    .messages,
+    .chat-history {
+      overscroll-behavior-y: contain;
+    }
   </style>
 
   <!-- 🔥 THE ZERO-FLICKER MAGIC (LOGIN FLASH FIX) 🔥 -->
@@ -2252,24 +2332,27 @@
       opacity: 0 !important;
       visibility: hidden !important;
     }
+
     html.already-logged-in #main-content {
       filter: blur(0px) brightness(1) !important;
       pointer-events: auto !important;
     }
-    .plan-list-wrapper { 
-    width: 100%; 
-    max-height: 480px; 
-    overflow-y: auto; 
-    overflow-x: hidden; 
-    padding-right: 8px; 
-    overscroll-behavior: auto; 
-    -webkit-overflow-scrolling: touch; 
-    touch-action: pan-y !important; /* 🔥 ये लाइन बीच वाले स्क्रॉल को 100% फिक्स कर देगी! */
-}
+
+    .plan-list-wrapper {
+      width: 100%;
+      max-height: 480px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding-right: 8px;
+      overscroll-behavior: auto;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-y !important;
+      /* 🔥 ये लाइन बीच वाले स्क्रॉल को 100% फिक्स कर देगी! */
+    }
   </style>
   <!-- 🔥 PREMIUM PDF GENERATOR ENGINE 🔥 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-  
+
 
 </head>
 
@@ -2737,88 +2820,104 @@
         </div>
       </section>
 
-<!-- 🔥 PLANNER SECTION START 🔥 -->
+      <!-- 🔥 PLANNER SECTION START 🔥 -->
       <section class="section reveal" id="planner">
         <div class="section-heading">
           <div>
             <span class="eyebrow">03 • PERSONALIZED PLANNING</span>
             <h2 class="gradient-title">Your plan, built by AI.</h2>
           </div>
-          <p>Input your goals and custom syllabus. The KX Core will instantly architect your personalized study roadmap.</p>
+          <p>Input your goals and custom syllabus. The KX Core will instantly architect your personalized study roadmap.
+          </p>
         </div>
 
         <!-- 🔥 YE GRID WALA DIV HAI JISSE SIDE-BY-SIDE AAYEGA (Pehle ye delete ho gya tha) 🔥 -->
         <div class="planner-grid">
 
           <!-- LEFT SIDE: FORM -->
-<form class="panel glass tilt-panel" id="plannerForm">
-  <div class="panel-title">
-    <span class="icon">✦</span>
-    <div>
-      <h3 class="gradient-title">Build your study plan</h3>
-      <p>Innovative Timetable Generator</p>
-    </div>
-  </div>
+          <form class="panel glass tilt-panel" id="plannerForm">
+            <div class="panel-title">
+              <span class="icon">✦</span>
+              <div>
+                <h3 class="gradient-title">Build your study plan</h3>
+                <p>Innovative Timetable Generator</p>
+              </div>
+            </div>
 
-  <!-- 🔥 ROW 1: Class aur Exam side-by-side 🔥 -->
-  <div style="display: flex; gap: 12px;">
-    <div style="flex: 1;">
-      <label>CLASS / GRADE
-        <input type="text" id="planClass" placeholder="e.g., Class 12" autocomplete="off" required>
-      </label>
-    </div>
-    <div style="flex: 1;">
-      <label>TARGET EXAM
-        <input type="text" id="goal" placeholder="e.g., JEE, Boards" autocomplete="off" required>
-      </label>
-    </div>
-  </div>
+            <!-- 🔥 ROW 1: Class aur Exam side-by-side 🔥 -->
+            <div style="display: flex; gap: 12px;">
+              <div style="flex: 1;">
+                <label>CLASS / GRADE
+                  <input type="text" id="planClass" placeholder="e.g., Class 12" autocomplete="off" required>
+                </label>
+              </div>
+              <div style="flex: 1;">
+                <label>TARGET EXAM
+                  <input type="text" id="goal" placeholder="e.g., JEE, Boards" autocomplete="off" required>
+                </label>
+              </div>
+            </div>
 
-  <!-- 🔥 ROW 2: Subject aur Date side-by-side 🔥 -->
-  <div style="display: flex; gap: 12px; margin-top: 4px;">
-    <div style="flex: 1;">
-      <label>SUBJECT
-        <input type="text" id="planSubject" placeholder="e.g., Physics" autocomplete="off" required>
-      </label>
-    </div>
-    <div style="flex: 1;">
-      <label>TARGET DATE
-        <input id="date" type="date" required>
-      </label>
-    </div>
-  </div>
+            <!-- 🔥 ROW 2: Subject aur Date side-by-side 🔥 -->
+            <div style="display: flex; gap: 12px; margin-top: 4px;">
+              <div style="flex: 1;">
+                <label>SUBJECT
+                  <input type="text" id="planSubject" placeholder="e.g., Physics" autocomplete="off" required>
+                </label>
+              </div>
+              <div style="flex: 1;">
+                <label>TARGET DATE
+                  <input id="date" type="date" required>
+                </label>
+              </div>
+            </div>
 
-  <!-- 🔥 ROW 3: Syllabus Upload (थोड़ा छोटा किया: rows="2") 🔥 -->
-  <label style="margin-top: 4px;">PASTE SYLLABUS OR UPLOAD FILE 📎
-    <div style="position: relative; margin-top: 8px;">
-      <textarea id="planSyllabus" rows="2" placeholder="Type topics or upload syllabus photo..." style="color: #f4f7ff; background: #0d1421; border: 1px solid rgba(255, 255, 255, 0.15); width: 100%; border-radius: 10px; padding: 11px; padding-right: 50px; outline: none; font-family: inherit; resize: none; transition: 0.3s;" onfocus="this.style.borderColor='var(--accent)';" onblur="this.style.borderColor='rgba(255,255,255,0.15)';"></textarea>
-      
-      <!-- Hidden File Input -->
-      <input type="file" id="syllabusFile" accept="image/*,.pdf" style="display: none;">
-      
-      <!-- Premium Attachment Button -->
-      <button type="button" onclick="document.getElementById('syllabusFile').click()" style="position: absolute; right: 8px; top: 8px; background: rgba(94, 231, 197, 0.1); border: 1px solid rgba(94, 231, 197, 0.3); color: var(--accent2); border-radius: 8px; width: 36px; height: 36px; cursor: pointer; display: grid; place-items: center; transition: 0.3s;" onmouseover="this.style.background='var(--accent2)'; this.style.color='#000';" onmouseout="this.style.background='rgba(94, 231, 197, 0.1)'; this.style.color='var(--accent2)';">
-        <svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: currentColor;"><path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5a2.5 2.5 0 0 1 5 0v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5a2.5 2.5 0 0 0 5 0V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.31 2.69 6 6 6s6-2.69 6-6V6h-1.5z"/></svg>
-      </button>
-    </div>
-    <div id="syllabusFileName" style="font-size: 10px; color: var(--accent2); margin-top: 6px; display: none; font-weight: bold;"></div>
-  </label>
+            <!-- 🔥 ROW 3: Syllabus Upload (थोड़ा छोटा किया: rows="2") 🔥 -->
+            <label style="margin-top: 4px;">PASTE SYLLABUS OR UPLOAD FILE 📎
+              <div style="position: relative; margin-top: 8px;">
+                <textarea id="planSyllabus" rows="2" placeholder="Type topics or upload syllabus photo..."
+                  style="color: #f4f7ff; background: #0d1421; border: 1px solid rgba(255, 255, 255, 0.15); width: 100%; border-radius: 10px; padding: 11px; padding-right: 50px; outline: none; font-family: inherit; resize: none; transition: 0.3s;"
+                  onfocus="this.style.borderColor='var(--accent)';"
+                  onblur="this.style.borderColor='rgba(255,255,255,0.15)';"></textarea>
 
-  <!-- 🔥 ROW 4: Range Slider 🔥 -->
-  <label style="margin-top: 4px;">DAILY STUDY TIME
-    <input id="hours" type="range" min="1" max="12" value="4" oninput="document.getElementById('hoursValue').textContent=this.value+' hours'">
-    <span class="range-value" id="hoursValue">4 hours</span>
-  </label>
+                <!-- Hidden File Input -->
+                <input type="file" id="syllabusFile" accept="image/*,.pdf" style="display: none;">
 
-  <button class="btn primary full" type="submit" style="margin-top: 15px;">Generate AI Study Plan <span>✦</span></button>
-</form>
+                <!-- Premium Attachment Button -->
+                <button type="button" onclick="document.getElementById('syllabusFile').click()"
+                  style="position: absolute; right: 8px; top: 8px; background: rgba(94, 231, 197, 0.1); border: 1px solid rgba(94, 231, 197, 0.3); color: var(--accent2); border-radius: 8px; width: 36px; height: 36px; cursor: pointer; display: grid; place-items: center; transition: 0.3s;"
+                  onmouseover="this.style.background='var(--accent2)'; this.style.color='#000';"
+                  onmouseout="this.style.background='rgba(94, 231, 197, 0.1)'; this.style.color='var(--accent2)';">
+                  <svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: currentColor;">
+                    <path
+                      d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5a2.5 2.5 0 0 1 5 0v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5a2.5 2.5 0 0 0 5 0V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.31 2.69 6 6 6s6-2.69 6-6V6h-1.5z" />
+                  </svg>
+                </button>
+              </div>
+              <div id="syllabusFileName"
+                style="font-size: 10px; color: var(--accent2); margin-top: 6px; display: none; font-weight: bold;">
+              </div>
+            </label>
+
+            <!-- 🔥 ROW 4: Range Slider 🔥 -->
+            <label style="margin-top: 4px;">DAILY STUDY TIME
+              <input id="hours" type="range" min="1" max="12" value="4"
+                oninput="document.getElementById('hoursValue').textContent=this.value+' hours'">
+              <span class="range-value" id="hoursValue">4 hours</span>
+            </label>
+
+            <button class="btn primary full" type="submit" style="margin-top: 15px;">Generate AI Study Plan
+              <span>✦</span></button>
+          </form>
 
           <!-- RIGHT SIDE: RESULT PANEL -->
           <div class="panel result-panel glass tilt-panel" id="planResult">
             <div class="result-empty">
-              <img src="https://i.ibb.co/Kz0LvSg9/logo.png" style="width: 50px; height: 50px; border-radius: 12px; object-fit: contain; margin-bottom: 18px; box-shadow: 0 10px 30px rgba(139,124,255,0.3); animation: float 3s ease-in-out infinite;">
+              <img src="https://i.ibb.co/Kz0LvSg9/logo.png"
+                style="width: 50px; height: 50px; border-radius: 12px; object-fit: contain; margin-bottom: 18px; box-shadow: 0 10px 30px rgba(139,124,255,0.3); animation: float 3s ease-in-out infinite;">
               <h3 id="planEmptyTitle" class="gradient-title">Your personalized plan will appear here</h3>
-              <p style="margin-top: 10px;">EduNexus will prioritize weak areas, distribute revision and protect time for practice.</p>
+              <p style="margin-top: 10px;">EduNexus will prioritize weak areas, distribute revision and protect time for
+                practice.</p>
             </div>
           </div>
 
@@ -2831,11 +2930,12 @@
             <span class="eyebrow">04 • LIVE AI TUTOR</span>
             <h2 class="gradient-title">Ask. Understand. Master.</h2>
           </div>
-          <p>A real-time intelligence engine designed to decode Class 12 Science, CS, and English concepts instantly.</p>
+          <p>A real-time intelligence engine designed to decode Class 12 Science, CS, and English concepts instantly.
+          </p>
         </div>
 
         <div class="tutor panel glass">
-          
+
           <!-- LEFT SIDE: TUTOR SUGGESTIONS -->
           <div class="tutor-side">
             <img src="https://i.ibb.co/Kz0LvSg9/logo.png" class="tutor-logo" alt="EduNexus AI">
@@ -2844,30 +2944,43 @@
             <div class="suggestions">
               <button onclick="askDemo('Analyze my handwriting step by step')">Analyze my handwriting step</button>
               <button onclick="askDemo('Analyze this Physics circuit diagram')">Analyze this Physics circuit</button>
-              <button onclick="askDemo('Summarize key points from this PDF')">Summarize key points from this PDF</button>
+              <button onclick="askDemo('Summarize key points from this PDF')">Summarize key points from this
+                PDF</button>
             </div>
           </div>
-          
+
           <!-- RIGHT SIDE: THE CHAT AREA -->
           <div class="chat">
-        <!-- 1. Premium Neon Header (Purple Gradient Name + Online Badge) -->
-            <div class="chat-head" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); background: rgba(14, 20, 33, 0.4);">
-              
+            <!-- 1. Premium Neon Header (Purple Gradient Name + Online Badge) -->
+            <div class="chat-head"
+              style="display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); background: rgba(14, 20, 33, 0.4);">
+
               <!-- Left Side: Icon & PURPLE GRADIENT Name -->
               <div style="display: flex; align-items: center; gap: 10px;">
-                <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(139, 124, 255, 0.15); border: 1px solid rgba(139, 124, 255, 0.3); display: grid; place-items: center; color: #8b7cff; box-shadow: 0 0 15px rgba(139, 124, 255, 0.1);">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;"><path d="M12 2a2 2 0 0 1 2 2c0 1.1-.9 2-2 2s-2-.9-2-2c0-1.1.9-2 2-2zM4.5 10A1.5 1.5 0 0 1 6 8.5h12A1.5 1.5 0 0 1 19.5 10v9A1.5 1.5 0 0 1 18 20.5H6A1.5 1.5 0 0 1 4.5 19v-9zM2 13h2.5M19.5 13H22"/></svg>
+                <div
+                  style="width: 32px; height: 32px; border-radius: 8px; background: rgba(139, 124, 255, 0.15); border: 1px solid rgba(139, 124, 255, 0.3); display: grid; place-items: center; color: #8b7cff; box-shadow: 0 0 15px rgba(139, 124, 255, 0.1);">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    style="width: 16px; height: 16px;">
+                    <path
+                      d="M12 2a2 2 0 0 1 2 2c0 1.1-.9 2-2 2s-2-.9-2-2c0-1.1.9-2 2-2zM4.5 10A1.5 1.5 0 0 1 6 8.5h12A1.5 1.5 0 0 1 19.5 10v9A1.5 1.5 0 0 1 18 20.5H6A1.5 1.5 0 0 1 4.5 19v-9zM2 13h2.5M19.5 13H22" />
+                  </svg>
                 </div>
                 <!-- 🔥 YAHAN TERA GRADIENT A GAYA 🔥 -->
-                <h3 class="gradient-title" style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 16px; letter-spacing: 0.5px;">KX Core!</h3>
+                <h3 class="gradient-title"
+                  style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 16px; letter-spacing: 0.5px;">
+                  KX Core!</h3>
               </div>
-              
+
               <!-- Right Side: Online Badge -->
-              <div style="display: flex; align-items: center; gap: 8px; background: rgba(94, 231, 197, 0.1); padding: 5px 12px; border-radius: 20px; border: 1px solid rgba(94, 231, 197, 0.25); box-shadow: 0 4px 15px rgba(94, 231, 197, 0.1);">
-                <div class="pulse" style="width: 8px; height: 8px; margin: 0; background: var(--accent2); animation-duration: 1.5s;"></div>
-                <span style="color: var(--accent2); font-size: 10px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase;">Online</span>
+              <div
+                style="display: flex; align-items: center; gap: 8px; background: rgba(94, 231, 197, 0.1); padding: 5px 12px; border-radius: 20px; border: 1px solid rgba(94, 231, 197, 0.25); box-shadow: 0 4px 15px rgba(94, 231, 197, 0.1);">
+                <div class="pulse"
+                  style="width: 8px; height: 8px; margin: 0; background: var(--accent2); animation-duration: 1.5s;">
+                </div>
+                <span
+                  style="color: var(--accent2); font-size: 10px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase;">Online</span>
               </div>
-              
+
             </div>
 
             <!-- 2. MESSAGES AREA -->
@@ -2886,15 +2999,25 @@
 
             <!-- 4. Chat Input Box -->
             <form class="chat-input" onsubmit="sendQuestion(event)">
-              <input type="file" id="image-upload" accept="image/*" capture="environment" style="display:none;" onchange="handleAttachment(event, 'image')">
-              <input type="file" id="file-upload" accept=".pdf,.txt,.doc,.docx" style="display:none;" onchange="handleAttachment(event, 'file')">
+              <input type="file" id="image-upload" accept="image/*" capture="environment" style="display:none;"
+                onchange="handleAttachment(event, 'image')">
+              <input type="file" id="file-upload" accept=".pdf,.txt,.doc,.docx" style="display:none;"
+                onchange="handleAttachment(event, 'file')">
 
-              <button type="button" class="attach-btn" onclick="document.getElementById('file-upload').click()" title="Attach File">
-                <svg viewBox="0 0 24 24"><path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5a2.5 2.5 0 0 1 5 0v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5a2.5 2.5 0 0 0 5 0V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.31 2.69 6 6 6s6-2.69 6-6V6h-1.5z" /></svg>
+              <button type="button" class="attach-btn" onclick="document.getElementById('file-upload').click()"
+                title="Attach File">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5a2.5 2.5 0 0 1 5 0v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5a2.5 2.5 0 0 0 5 0V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.31 2.69 6 6 6s6-2.69 6-6V6h-1.5z" />
+                </svg>
               </button>
 
-              <button type="button" class="attach-btn" onclick="document.getElementById('image-upload').click()" title="Upload Image">
-                <svg viewBox="0 0 24 24"><path d="M4 4h3l2-2h6l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm8 3a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0 2a3 3 0 1 1 0 6 3 3 0 0 1 0-6z" /></svg>
+              <button type="button" class="attach-btn" onclick="document.getElementById('image-upload').click()"
+                title="Upload Image">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M4 4h3l2-2h6l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm8 3a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0 2a3 3 0 1 1 0 6 3 3 0 0 1 0-6z" />
+                </svg>
               </button>
 
               <div class="input-wrapper">
@@ -2902,13 +3025,15 @@
                 <button type="button" id="mic-btn" onclick="toggleMic()" title="Click to speak">
                   <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z" />
-                    <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z" />
+                    <path
+                      d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z" />
                   </svg>
                 </button>
               </div>
 
               <button type="submit" title="Send message">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                  stroke-linejoin="round">
                   <line x1="12" y1="19" x2="12" y2="5"></line>
                   <polyline points="5 12 12 5 19 12"></polyline>
                 </svg>
@@ -3043,21 +3168,21 @@
   <!-- 🔥 JS FOR PARTICLES BACKGROUND (LIVE CONSTELLATION) 🔥 -->
   <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
   <!-- JS FOR PARTICLES BACKGROUND (LIVE CONSTELLATION) -->
-<script src="https://cdn.jsdelivr.net/npm/tsparticles..."></script>
+  <script src="https://cdn.jsdelivr.net/npm/tsparticles..."></script>
 
-<!-- 👇👇 YAHAN PAR PASTE KARNA HAI (Line 2910) 👇👇 -->
-<!-- 🔥 MERMAID JS FOR DYNAMIC AI DIAGRAMS 🔥 -->
-<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
-<script>
+  <!-- 👇👇 YAHAN PAR PASTE KARNA HAI (Line 2910) 👇👇 -->
+  <!-- 🔥 MERMAID JS FOR DYNAMIC AI DIAGRAMS 🔥 -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>
     mermaid.initialize({ startOnLoad: false, theme: 'dark' });
-</script>
-<!-- 👆👆 YAHAN TAK 👆👆 -->
- <script>
+  </script>
+  <!-- 👆👆 YAHAN TAK 👆👆 -->
+  <script>
 
-    
+
     // Consistent premium smooth-scroll feel across phone, tablet and desktop
     const lenis = new Lenis({ autoRaf: true });
-    
+
   </script>
   <script>
     // Elastic edge-bounce: same rubber-band feel at top AND bottom, on every device
@@ -3094,8 +3219,8 @@
 
 
         if (e.target && e.target.closest && (e.target.closest('.messages') || e.target.closest('.plan-list-wrapper') || e.target.closest('.modal-content') || e.target.closest('.chat'))) return;
-        
-        
+
+
 
         if (atTop() && e.deltaY < 0) { push(current + Math.abs(e.deltaY) * 0.3); pulling = true; }
         else if (atBottom() && e.deltaY > 0) { push(current - e.deltaY * 0.3); pulling = true; }
@@ -3621,29 +3746,29 @@
     }
     // 🔥 1. MULTIMODAL FILE UPLOAD LOGIC (PHOTO KHEENCHNE WALA CODE) 🔥
     let uploadedSyllabusBase64 = null;
-    
-    document.addEventListener('change', function(e) {
-        if(e.target && e.target.id === 'syllabusFile') {
-            const file = e.target.files[0];
-            if(!file) return;
-            
-            // UI me file ka naam dikhane ke liye
-            $("syllabusFileName").style.display = "block";
-            $("syllabusFileName").innerText = "📎 Attached: " + file.name;
-            
-            // Photo ko Base64 format me convert karna taaki AI padh sake
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                uploadedSyllabusBase64 = event.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
+
+    document.addEventListener('change', function (e) {
+      if (e.target && e.target.id === 'syllabusFile') {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // UI me file ka naam dikhane ke liye
+        $("syllabusFileName").style.display = "block";
+        $("syllabusFileName").innerText = "📎 Attached: " + file.name;
+
+        // Photo ko Base64 format me convert karna taaki AI padh sake
+        const reader = new FileReader();
+        reader.onload = function (event) {
+          uploadedSyllabusBase64 = event.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
     });
 
     // 🔥 2. KX NEURAL CORE: TRUE AI PLANNER ENGINE (MICROSERVICE API) 🔥
     $("plannerForm").addEventListener("submit", async e => {
       e.preventDefault();
-      
+
       const examDateVal = $("date").value;
       const examDate = new Date(examDateVal);
       const today = new Date();
@@ -3666,8 +3791,8 @@
 
       // Agar text bhi khali hai aur photo bhi nahi daali
       if (!customSyllabus && !uploadedSyllabusBase64) {
-          showToast("⚠️ Please type syllabus topics or upload a photo!");
-          return;
+        showToast("⚠️ Please type syllabus topics or upload a photo!");
+        return;
       }
 
       // 🔥 PREMIUM LOADING UI 🔥
@@ -3677,62 +3802,62 @@
             <h3 class="gradient-title">KX Core is analyzing your syllabus...</h3>
             <p>Scanning documents & architecting a personalized ${totalDays}-day timetable.</p>
         </div>`;
-      
+
       setTimeout(() => { $("planResult").scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
 
       try {
-          // 🔥 CALL THE NEW RENDER API SERVER (WITH IMAGE SUPPORT) 🔥
-          const response = await fetch("https://edunexusai-planner.onrender.com/generate_plan", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                  class_grade: userClass,
-                  exam: goal,
-                  subject: planSubject,
-                  hours: parseInt(hours),
-                  days: totalDays,
-                  syllabus: customSyllabus,
-                  file_data: uploadedSyllabusBase64 // PHOTO YAHAN SE JAYEGI!
-              })
-          });
+        // 🔥 CALL THE NEW RENDER API SERVER (WITH IMAGE SUPPORT) 🔥
+        const response = await fetch("https://edunexusai-planner.onrender.com/generate_plan", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            class_grade: userClass,
+            exam: goal,
+            subject: planSubject,
+            hours: parseInt(hours),
+            days: totalDays,
+            syllabus: customSyllabus,
+            file_data: uploadedSyllabusBase64 // PHOTO YAHAN SE JAYEGI!
+          })
+        });
 
-          if (!response.ok) throw new Error("API Server Down");
-          
-          const data = await response.json();
-          if (data.status === "success" && data.plan) {
-              
-              // 🔥 NAYA CODE: ANTI-SPAM CHECKER 🔥
-              if (data.plan[0] && data.plan[0].error === "invalid") {
-                  showToast("⚠️ Invalid Input! Please enter a real subject or syllabus.");
-                  $("planResult").innerHTML = `
+        if (!response.ok) throw new Error("API Server Down");
+
+        const data = await response.json();
+        if (data.status === "success" && data.plan) {
+
+          // 🔥 NAYA CODE: ANTI-SPAM CHECKER 🔥
+          if (data.plan[0] && data.plan[0].error === "invalid") {
+            showToast("⚠️ Invalid Input! Please enter a real subject or syllabus.");
+            $("planResult").innerHTML = `
                     <div class="result-empty">
                         <h3 class="gradient-title" style="color: #ff4757;">Oops! That doesn't look like a real syllabus.</h3>
                         <p>Please enter proper topics or upload a clear photo of your index/syllabus.</p>
                     </div>`;
-                  return; // Yahan se code aage nahi jayega
-              }
-              // 🔥 ANTI-SPAM END 🔥
+            return; // Yahan se code aage nahi jayega
+          }
+          // 🔥 ANTI-SPAM END 🔥
 
-              let daysHtml = "";
-              // ... iske niche tera purana data.plan.forEach wala code rahega ...
+          let daysHtml = "";
+          // ... iske niche tera purana data.plan.forEach wala code rahega ...
 
-          
-            
-              
 
-              
-              // 🔥 RENDER THE REAL AI JSON PLAN 🔥
-              data.plan.forEach((item, index) => {
-                  let status = index === 0 ? "Start Session ✦" : "Planned";
-                  
-                  let safeTopic = item.topic.replace(/'/g, "\\'"); 
-                  let onclickAttr = index === 0 ? `onclick="startSession('${planSubject}', '${safeTopic}')" style="cursor: pointer; border: 1px solid rgba(94, 231, 197, 0.4); background: rgba(94, 231, 197, 0.08); box-shadow: 0 0 15px rgba(94, 231, 197, 0.1);"` : '';
-                  
-                  let btnSpan = index === 0
-                      ? `<span style="background: var(--accent2); color: #000; padding: 6px 14px; border-radius: 8px; font-weight: 800; font-size: 11px; box-shadow: 0 4px 10px rgba(94,231,197,0.3);">${status}</span>`
-                      : `<span style="color: #5ee7c5; font-size: 11px; font-weight: 600;">${status}</span>`;
 
-                  daysHtml += `
+
+
+
+          // 🔥 RENDER THE REAL AI JSON PLAN 🔥
+          data.plan.forEach((item, index) => {
+            let status = index === 0 ? "Start Session ✦" : "Planned";
+
+            let safeTopic = item.topic.replace(/'/g, "\\'");
+            let onclickAttr = index === 0 ? `onclick="startSession('${planSubject}', '${safeTopic}')" style="cursor: pointer; border: 1px solid rgba(94, 231, 197, 0.4); background: rgba(94, 231, 197, 0.08); box-shadow: 0 0 15px rgba(94, 231, 197, 0.1);"` : '';
+
+            let btnSpan = index === 0
+              ? `<span style="background: var(--accent2); color: #000; padding: 6px 14px; border-radius: 8px; font-weight: 800; font-size: 11px; box-shadow: 0 4px 10px rgba(94,231,197,0.3);">${status}</span>`
+              : `<span style="color: #5ee7c5; font-size: 11px; font-weight: 600;">${status}</span>`;
+
+            daysHtml += `
                     <div class="plan-day" ${onclickAttr}>
                       <div style="display: flex; justify-content: space-between; align-items: center;">
                           <b style="font-size: 15px; color: #fff;">${item.day_label}</b>
@@ -3740,9 +3865,9 @@
                       </div>
                       <p style="margin-top: 8px; font-size: 12px; color: #7f8a9e;"><span style="color:#8f86ff; font-weight:bold;">${item.topic}</span> • ${item.task_type} • ${item.time_mins} min</p>
                     </div>`;
-              });
-// 🔥 4. DISPLAY THE BEAUTIFUL UI (WITH PDF EXPORT & SCROLL FIX) 🔥
-              $("planResult").innerHTML = `
+          });
+          // 🔥 4. DISPLAY THE BEAUTIFUL UI (WITH PDF EXPORT & SCROLL FIX) 🔥
+          $("planResult").innerHTML = `
               <style>
                 .days-list-premium::-webkit-scrollbar { width: 5px; }
                 .days-list-premium::-webkit-scrollbar-track { background: transparent; }
@@ -3782,21 +3907,21 @@
                 </div>
               </div>`;
 
-            
-              showToast("✅ True AI Timetable Generated!");
-              
-              // Sab hone ke baad purani photo clear kar do
-              uploadedSyllabusBase64 = null;
-              $("syllabusFileName").style.display = "none";
-              $("syllabusFile").value = "";
 
-          } else {
-              throw new Error("AI couldn't generate the format.");
-          }
+          showToast("✅ True AI Timetable Generated!");
+
+          // Sab hone ke baad purani photo clear kar do
+          uploadedSyllabusBase64 = null;
+          $("syllabusFileName").style.display = "none";
+          $("syllabusFile").value = "";
+
+        } else {
+          throw new Error("AI couldn't generate the format.");
+        }
       } catch (err) {
-          console.error(err);
-          showToast("❌ AI Servers are busy. Try again.");
-          $("planResult").innerHTML = `<div class="result-empty">
+        console.error(err);
+        showToast("❌ AI Servers are busy. Try again.");
+        $("planResult").innerHTML = `<div class="result-empty">
             <h3 class="gradient-title">Oops! AI Timetable server is warming up.</h3>
             <p>Give it a minute and try again. (It takes 50 seconds to wake up on the first try!)</p>
           </div>`;
@@ -3829,7 +3954,7 @@
       "Class 12": {
         "Mid-Term": {
           "Computer Science": [
-            { year: "2023-24 & 2024-25", name: "CS DoE Mid-Term Papers with MS", link: "https://drive.google.com/file/d/1JmRAG4hsgLHyWAzG6ee8ekBXtUDuAT7I/view?usp=drivesdk"}
+            { year: "2023-24 & 2024-25", name: "CS DoE Mid-Term Papers with MS", link: "https://drive.google.com/file/d/1JmRAG4hsgLHyWAzG6ee8ekBXtUDuAT7I/view?usp=drivesdk" }
           ],
           "Physics": [
 
@@ -3851,7 +3976,7 @@
               name: "Physics DoE Mid-Term Papers",
               link: "https://drive.google.com/file/d/1KU5HgWAqFbMNvjSSCWAH7cmJcHA_FluE/view?usp=sharing"
             },
-              {
+            {
 
               year: "2026-2027",
               name: "Physics Mid-Term Papers",
@@ -3908,51 +4033,51 @@
       "Class 11": {
         "Mid-Term": {
           "Physics": [
-            { 
-              year: "2024-2025", 
-              name: "Class 11 DoE Physics Mid-Term", 
-              link: "https://drive.google.com/file/d/1Z5UtA0W9mc8_wws7C3YaGfN0LPd3GNxO/view" 
+            {
+              year: "2024-2025",
+              name: "Class 11 DoE Physics Mid-Term",
+              link: "https://drive.google.com/file/d/1Z5UtA0W9mc8_wws7C3YaGfN0LPd3GNxO/view"
             },
             {
-              
+
               year: "2023-2024",
               name: "Physics CBSE Mid-Term Papers",
               link: "https://drive.google.com/file/d/1EmSRC64NnKBTpo3M9IQWu-FNeeQ3aMtw/view"
-            
+
 
             },
           ],
           "Chemistry": [
-            { 
-              year: "2024-2025", 
-              name: "Class 11 DoE Chemistry Mid-Term", 
-              link: "https://drive.google.com/file/d/1ZSeauaV17Hq1Z2yQrPNGIhMgF270LbLT/view" 
+            {
+              year: "2024-2025",
+              name: "Class 11 DoE Chemistry Mid-Term",
+              link: "https://drive.google.com/file/d/1ZSeauaV17Hq1Z2yQrPNGIhMgF270LbLT/view"
             },
             {
-              year: "2023-2024", 
-              name: "Class 11 CBSE Chemistry Mid-Term", 
-              link: "https://drive.google.com/file/d/14yMQBjpsseJaUQxNzdr7p3PBLjDsnhAr/view" 
+              year: "2023-2024",
+              name: "Class 11 CBSE Chemistry Mid-Term",
+              link: "https://drive.google.com/file/d/14yMQBjpsseJaUQxNzdr7p3PBLjDsnhAr/view"
 
             },
-            
-              { 
-              year: "2025-2026", 
-              name: "Class 11 DoE Chemistry Mid-Term", 
-              link: "https://drive.google.com/file/d/1d5C5c5GfNvgIl1C_jgHxlVnmdx61xlNi/view?usp=drivesdk" 
+
+            {
+              year: "2025-2026",
+              name: "Class 11 DoE Chemistry Mid-Term",
+              link: "https://drive.google.com/file/d/1d5C5c5GfNvgIl1C_jgHxlVnmdx61xlNi/view?usp=drivesdk"
             },
-            
+
           ],
           "Mathematics": [
-            { 
-              year: "2023-2024", 
-              name: "Class 11  DoE Maths Mid-Term", 
-              link: "https://drive.google.com/file/d/1_ChYADMOAhrt7g8vr7bj9rTi36NCvZv4/view" 
+            {
+              year: "2023-2024",
+              name: "Class 11  DoE Maths Mid-Term",
+              link: "https://drive.google.com/file/d/1_ChYADMOAhrt7g8vr7bj9rTi36NCvZv4/view"
             },
             {
-              year: "2023-2024", 
-              name: "Class 11  CBSE Maths Mid-Term", 
-              link: "https://drive.google.com/file/d/1v3-IQpc2Xq1UEAGN_ofyupXw1A0gVLY5/view" 
-            
+              year: "2023-2024",
+              name: "Class 11  CBSE Maths Mid-Term",
+              link: "https://drive.google.com/file/d/1v3-IQpc2Xq1UEAGN_ofyupXw1A0gVLY5/view"
+
             },
 
           ],
@@ -4459,9 +4584,9 @@
           userStats.totalQuizzes += 1;
           userStats.totalScorePerc += percentage;
           if (percentage >= 80) {
-              userStats.topicsMastered += 1; // 80% se upar aaya toh master ban gaya!
+            userStats.topicsMastered += 1; // 80% se upar aaya toh master ban gaya!
           }
-          
+
           // Browser ki memory me save karo aur UI update karo
           localStorage.setItem('edunexus_stats', JSON.stringify(userStats));
           if (typeof updateStatsUI === 'function') updateStatsUI();
@@ -4502,15 +4627,15 @@
         aiResponse = aiResponse.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
 
         // 🔥 2. MERMAID DIAGRAM RENDERER (Bulletproof) 🔥
-        aiResponse = aiResponse.replace(/```mermaid[\s]*\n([\s\S]*?)```/gi, function(match, code) {
-            return `<div class="mermaid" style="background: #0e1421; padding: 15px; border-radius: 8px; border: 1px solid #5ee7c5; margin: 10px 0;">
+        aiResponse = aiResponse.replace(/```mermaid[\s]*\n([\s\S]*?)```/gi, function (match, code) {
+          return `<div class="mermaid" style="background: #0e1421; padding: 15px; border-radius: 8px; border: 1px solid #5ee7c5; margin: 10px 0;">
                 ${code.trim()}
             </div>`;
         });
 
         // 🔥 3. PREMIUM CODE BLOCK (EduNexus Theme Matched) 🔥
-        aiResponse = aiResponse.replace(/(?:```|'''|""")[^\n]*\n([\s\S]*?)(?:```|'''|""")/gi, function(match, code) {
-            return `<div style="background: #090d16; border-radius: 12px; margin: 15px 0; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 5px 20px rgba(0,0,0,0.3);">
+        aiResponse = aiResponse.replace(/(?:```|'''|""")[^\n]*\n([\s\S]*?)(?:```|'''|""")/gi, function (match, code) {
+          return `<div style="background: #090d16; border-radius: 12px; margin: 15px 0; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 5px 20px rgba(0,0,0,0.3);">
                 <div style="background: #111826; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
                     <span style="color: #727d91; font-size: 11px; font-family: 'Space Grotesk', sans-serif; letter-spacing: 1px; font-weight: 700;">&lt; / &gt; SOURCE CODE</span>
                     <button onclick="navigator.clipboard.writeText(this.parentElement.nextElementSibling.innerText); this.innerText='✔ COPIED!'; this.style.background='rgba(94, 231, 197, 0.2)'; setTimeout(() => {this.innerText='📋 COPY'; this.style.background='rgba(94, 231, 197, 0.08)';}, 2000);" style="background: rgba(94, 231, 197, 0.08); border: 1px solid rgba(94, 231, 197, 0.2); color: #5ee7c5; cursor: pointer; font-size: 10px; font-weight: 800; padding: 5px 12px; border-radius: 6px; transition: 0.3s; letter-spacing: 0.5px;">📋 COPY</button>
@@ -4528,7 +4653,7 @@
         // 🔥 Render the diagrams on screen 🔥
         setTimeout(() => { mermaid.init(undefined, document.querySelectorAll('.mermaid')); }, 100);
 
-       
+
       } catch (error) {
         document.getElementById(loadingId).innerHTML = `<span class="msg-avatar">🚨</span><div style="color:#ff4757; font-size:11px; line-height:1.5;"><b>Connection Blocked!</b><br>Browser blocked the request (CORS) because the server is offline or sleeping.</div>`;
       }
@@ -4561,8 +4686,8 @@
           headers: { "Content-Type": "application/json", "Accept": "application/json" },
           body: JSON.stringify(payload)
         });
-     
-        
+
+
 
         if (!res.ok) throw new Error("Server sleeping");
         const data = await res.json();
@@ -4572,15 +4697,15 @@
         aiResponse = aiResponse.replace(/\[SCORE:\s*\d+\/\d+\]/i, '').trim();
         aiResponse = aiResponse.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
         // 🔥 1. MERMAID DIAGRAM RENDERER (Bulletproof) 🔥
-        aiResponse = aiResponse.replace(/```mermaid[\s]*\n([\s\S]*?)```/gi, function(match, code) {
-            return `<div class="mermaid" style="background: #0e1421; padding: 15px; border-radius: 8px; border: 1px solid #5ee7c5; margin: 10px 0;">
+        aiResponse = aiResponse.replace(/```mermaid[\s]*\n([\s\S]*?)```/gi, function (match, code) {
+          return `<div class="mermaid" style="background: #0e1421; padding: 15px; border-radius: 8px; border: 1px solid #5ee7c5; margin: 10px 0;">
                 ${code.trim()}
             </div>`;
         });
 
-// 🔥 3. PREMIUM CODE BLOCK (EduNexus Theme Matched) 🔥
-        aiResponse = aiResponse.replace(/(?:```|'''|""")[^\n]*\n([\s\S]*?)(?:```|'''|""")/gi, function(match, code) {
-            return `<div style="background: #090d16; border-radius: 12px; margin: 15px 0; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 5px 20px rgba(0,0,0,0.3);">
+        // 🔥 3. PREMIUM CODE BLOCK (EduNexus Theme Matched) 🔥
+        aiResponse = aiResponse.replace(/(?:```|'''|""")[^\n]*\n([\s\S]*?)(?:```|'''|""")/gi, function (match, code) {
+          return `<div style="background: #090d16; border-radius: 12px; margin: 15px 0; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 5px 20px rgba(0,0,0,0.3);">
                 <div style="background: #111826; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
                     <span style="color: #727d91; font-size: 11px; font-family: 'Space Grotesk', sans-serif; letter-spacing: 1px; font-weight: 700;">&lt; / &gt; SOURCE CODE</span>
                     <button onclick="navigator.clipboard.writeText(this.parentElement.nextElementSibling.innerText); this.innerText='✔ COPIED!'; this.style.background='rgba(94, 231, 197, 0.2)'; setTimeout(() => {this.innerText='📋 COPY'; this.style.background='rgba(94, 231, 197, 0.08)';}, 2000);" style="background: rgba(94, 231, 197, 0.08); border: 1px solid rgba(94, 231, 197, 0.2); color: #5ee7c5; cursor: pointer; font-size: 10px; font-weight: 800; padding: 5px 12px; border-radius: 6px; transition: 0.3s; letter-spacing: 0.5px;">📋 COPY</button>
@@ -4598,7 +4723,7 @@
       }
       wrap.scrollTop = wrap.scrollHeight;
       // Render the diagrams on screen
-setTimeout(() => { mermaid.init(undefined, document.querySelectorAll('.mermaid')); }, 100);
+      setTimeout(() => { mermaid.init(undefined, document.querySelectorAll('.mermaid')); }, 100);
     }
 
 
@@ -4904,48 +5029,48 @@ setTimeout(() => { mermaid.init(undefined, document.querySelectorAll('.mermaid')
       }).catch(err => console.log("Install tracker silent fail"));
     });
     // 🔥 THE FLAWLESS VECTOR PDF ENGINE (WITH PERFECT ALIGNED HEADER) 🔥
-function downloadTimetable() {
-    showToast("⏳ Architecting True Vector PDF...");
-    
-    const mainApp = document.getElementById('main-content');
-    const planResultContainer = document.getElementById('planResult');
-    const elementToPrint = document.getElementById('pdf-export-area');
-    const listWrapper = elementToPrint.querySelector('.plan-list-wrapper');
-    
-    // 1. Scroll Unlock
-    const originalMaxHeight = listWrapper.style.maxHeight;
-    listWrapper.style.maxHeight = 'none';
-    listWrapper.style.overflow = 'visible';
+    function downloadTimetable() {
+      showToast("⏳ Architecting True Vector PDF...");
 
-    // 2. CSS हैक (ब्राउज़र का टेढ़ा-मेढ़ा हेडर बंद रखने के लिए)
-    const printStyle = document.createElement('style');
-    printStyle.id = 'temp-print-style';
-    printStyle.innerHTML = `
+      const mainApp = document.getElementById('main-content');
+      const planResultContainer = document.getElementById('planResult');
+      const elementToPrint = document.getElementById('pdf-export-area');
+      const listWrapper = elementToPrint.querySelector('.plan-list-wrapper');
+
+      // 1. Scroll Unlock
+      const originalMaxHeight = listWrapper.style.maxHeight;
+      listWrapper.style.maxHeight = 'none';
+      listWrapper.style.overflow = 'visible';
+
+      // 2. CSS हैक (ब्राउज़र का टेढ़ा-मेढ़ा हेडर बंद रखने के लिए)
+      const printStyle = document.createElement('style');
+      printStyle.id = 'temp-print-style';
+      printStyle.innerHTML = `
         body::before { display: none !important; } 
         .ambient { display: none !important; }
         button { display: none !important; }
         .plan-day { page-break-inside: avoid; break-inside: avoid; }
         @page { margin: 0; } 
     `;
-    document.head.appendChild(printStyle);
+      document.head.appendChild(printStyle);
 
-    // 3. पूरा मेन ऐप छुपा दो
-    mainApp.style.display = 'none';
+      // 3. पूरा मेन ऐप छुपा दो
+      mainApp.style.display = 'none';
 
-    // 4. नया फ्रेश प्रिंट कंटेनर बनाओ
-    const printContainer = document.createElement('div');
-    printContainer.id = 'temp-print-container';
-    printContainer.style.backgroundColor = '#070a12';
-    printContainer.style.color = '#ffffff';
-    printContainer.style.width = '100%';
-    printContainer.style.padding = '40px'; 
+      // 4. नया फ्रेश प्रिंट कंटेनर बनाओ
+      const printContainer = document.createElement('div');
+      printContainer.id = 'temp-print-container';
+      printContainer.style.backgroundColor = '#070a12';
+      printContainer.style.color = '#ffffff';
+      printContainer.style.width = '100%';
+      printContainer.style.padding = '40px';
 
-    // 5. 🔥 LIVE DATE, TIME & PERFECTLY ALIGNED HEADER 🔥
-    const now = new Date();
-    const dateStr = now.toLocaleDateString('en-US'); // आज की डेट
-    const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }); // अभी का टाइम
+      // 5. 🔥 LIVE DATE, TIME & PERFECTLY ALIGNED HEADER 🔥
+      const now = new Date();
+      const dateStr = now.toLocaleDateString('en-US'); // आज की डेट
+      const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }); // अभी का टाइम
 
-    printContainer.innerHTML = `
+      printContainer.innerHTML = `
         <!-- एकदम परफेक्ट अलाइन किया हुआ Date, Time और Tagline -->
         <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #aeb7c8; margin-bottom: 20px; font-family: 'Inter', sans-serif;">
             <span style="font-weight: 500;">${dateStr}, ${timeStr}</span>
@@ -4958,88 +5083,88 @@ function downloadTimetable() {
             <p style="color: #aeb7c8; font-size: 14px; margin: 5px 0 0; font-weight: bold; text-transform: uppercase; letter-spacing: 2px;">Time Table Built By KX Core</p>
         </div>
     `;
-    
-    printContainer.appendChild(elementToPrint);
 
-    // 6. गिटहब वाला फुटर डालो
-    const footerDiv = document.createElement('div');
-    footerDiv.innerHTML = `
+      printContainer.appendChild(elementToPrint);
+
+      // 6. गिटहब वाला फुटर डालो
+      const footerDiv = document.createElement('div');
+      footerDiv.innerHTML = `
         <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
             <h3 style="color: #fff; margin: 0 0 10px; font-size: 18px;">🚀 Ready to crush your goals?</h3>
             <p style="margin:0;"><a href="https://kartix010.github.io/EduNexusAI/" style="color: #5ee7c5; text-decoration: none; font-weight: bold;">Access your Live AI Tutor on EduNexus AI</a></p>
         </div>
     `;
-    printContainer.appendChild(footerDiv);
+      printContainer.appendChild(footerDiv);
 
-    document.body.appendChild(printContainer);
+      document.body.appendChild(printContainer);
 
-    // 7. असली PDF इंजन कॉल करो
-    setTimeout(() => {
-        window.print(); 
-        
+      // 7. असली PDF इंजन कॉल करो
+      setTimeout(() => {
+        window.print();
+
         // 8. Print होने के बाद 1 मिलीसेकंड में सब वापस नॉर्मल
         document.body.removeChild(printContainer);
-        planResultContainer.appendChild(elementToPrint); 
-        
-        mainApp.style.display = 'block'; 
-        document.getElementById('temp-print-style').remove(); 
-        
+        planResultContainer.appendChild(elementToPrint);
+
+        mainApp.style.display = 'block';
+        document.getElementById('temp-print-style').remove();
+
         listWrapper.style.maxHeight = originalMaxHeight;
         listWrapper.style.overflow = 'auto';
-        
-        showToast("✅ Perfect PDF Generated!");
-    }, 500);
-}
 
-   
+        showToast("✅ Perfect PDF Generated!");
+      }, 500);
+    }
+
+
   </script>
   <!-- 🔥 THE GOD-TIER SCROLL CHAIN ENGINE (FIXES TRAPPING AT DAY 15) 🔥 -->
-<script>
+  <script>
     let touchStartY = 0;
     window.addEventListener('touchstart', e => { touchStartY = e.touches[0].clientY; }, { passive: true });
 
     const handleSmartScroll = (e) => {
-        const innerBox = e.target.closest('.messages, .plan-list-wrapper');
-        if (!innerBox) return; 
+      const innerBox = e.target.closest('.messages, .plan-list-wrapper');
+      if (!innerBox) return;
 
-        const atTop = innerBox.scrollTop <= 0;
-        const atBottom = Math.ceil(innerBox.scrollTop + innerBox.clientHeight) >= innerBox.scrollHeight - 1;
+      const atTop = innerBox.scrollTop <= 0;
+      const atBottom = Math.ceil(innerBox.scrollTop + innerBox.clientHeight) >= innerBox.scrollHeight - 1;
 
-        let isScrollingUp = false;
-        let isScrollingDown = false;
+      let isScrollingUp = false;
+      let isScrollingDown = false;
 
-        if (e.type === 'wheel') {
-            isScrollingUp = e.deltaY < 0;
-            isScrollingDown = e.deltaY > 0;
-        } else if (e.type === 'touchmove') {
-            const currentY = e.touches[0].clientY;
-            isScrollingUp = currentY > touchStartY;
-            isScrollingDown = currentY < touchStartY;
-            touchStartY = currentY; 
-        }
+      if (e.type === 'wheel') {
+        isScrollingUp = e.deltaY < 0;
+        isScrollingDown = e.deltaY > 0;
+      } else if (e.type === 'touchmove') {
+        const currentY = e.touches[0].clientY;
+        isScrollingUp = currentY > touchStartY;
+        isScrollingDown = currentY < touchStartY;
+        touchStartY = currentY;
+      }
 
-        if ((atTop && isScrollingUp) || (atBottom && isScrollingDown)) {
-            return; // लिस्ट खत्म? मेन पेज को स्क्रॉल करने दो!
-        }
-        e.stopPropagation(); // वरना लिस्ट के अंदर स्क्रॉल करो
+      if ((atTop && isScrollingUp) || (atBottom && isScrollingDown)) {
+        return; // लिस्ट खत्म? मेन पेज को स्क्रॉल करने दो!
+      }
+      e.stopPropagation(); // वरना लिस्ट के अंदर स्क्रॉल करो
     };
 
     window.addEventListener('wheel', handleSmartScroll, { capture: true, passive: true });
     window.addEventListener('touchmove', handleSmartScroll, { capture: true, passive: true });
-</script><!-- 🔥 SMART CHAT INPUT ENGINE (FIXED HEIGHT) 🔥 -->
-<script>
-  const chatBox = document.getElementById('question');
-  
-  // 1. Enter = Send Message | Shift + Enter = New Line
-  chatBox.addEventListener('keydown', function(e) {
+  </script><!-- 🔥 SMART CHAT INPUT ENGINE (FIXED HEIGHT) 🔥 -->
+  <script>
+    const chatBox = document.getElementById('question');
+
+    // 1. Enter = Send Message | Shift + Enter = New Line
+    chatBox.addEventListener('keydown', function (e) {
       if (e.key === 'Enter' && !e.shiftKey) {
-          e.preventDefault(); // नई लाइन बनने से रोको
-          sendQuestion(new Event("submit")); // मैसेज सेंड करो
+        e.preventDefault(); // नई लाइन बनने से रोको
+        sendQuestion(new Event("submit")); // मैसेज सेंड करो
       }
-  });
-  
-</script>
-</script>
+    });
+
+  </script>
+  </script>
 
 
 
