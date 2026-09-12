@@ -391,6 +391,7 @@
                     <th>Email</th>
                     <th>Action</th>
                     <th>Details</th>
+                    <th>Notification Status</th>
                 </tr>
             </thead>
             <tbody id="logsTableBody">
@@ -544,7 +545,7 @@
                     const userId = doc.ref.parent.parent.id; // User ID निकालो
                     detailsHTML += ` <button class="view-chat-btn" style="background:#ff4757; color:#fff; border:none; margin-left: 5px;" onclick="kickUser('${userId}', '${data.userName}')">KICK OUT</button>`;
                     detailsHTML += ` <button class="view-chat-btn" style="border-color:#ff4757; color:#ff4757; margin-left: 10px;" onclick="sendCustomAlert('${userId}', '${data.userName}')">Push Alert 🚀</button>`;
-
+                    // 🎯 SMART CHECK: टेबल की रो (Row) बनाओ और स्टेटस के लिए एक खाली डब्बा (Checking...) रख दो
                     const row = `
                         <tr>
                             <td style="color: #fff; font-weight: bold;">${timeString}</td>
@@ -552,9 +553,26 @@
                             <td>${data.userEmail || "N/A"}</td>
                             <td><span class="action-badge">${data.action}</span></td>
                             <td>${detailsHTML}</td>
+                            <td id="status-${docId}">Checking... ⏳</td> <!-- 👈 नया कॉलम -->
                         </tr>
                     `;
                     tableBody.innerHTML += row;
+
+                    // 🎯 BACKROUND CHECK: फायरबेस से पूछो कि इस बच्चे के पास टोकन है या नहीं
+                    db.collection('users').doc(userId).get().then((userDoc) => {
+                        const statusCell = document.getElementById(`status-${docId}`);
+                        if (statusCell) {
+                            if (userDoc.exists && userDoc.data().fcmToken) {
+                                // अगर टोकन मिल गया, तो हरा सिग्नल दे दो!
+                                statusCell.innerHTML = '<span style="color: #00ff00; font-weight: bold;">🟢 ARMED</span>';
+                            } else {
+                                // अगर टोकन नहीं है, तो लाल सिग्नल दे दो!
+                                statusCell.innerHTML = '<span style="color: #ff4757; font-weight: bold;">🔴 PENDING</span>';
+                            }
+                        }
+                    });
+
+                    
                 });
 
                 // UPDATE STAT CARDS
