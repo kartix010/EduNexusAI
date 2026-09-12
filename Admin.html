@@ -661,29 +661,7 @@
 }
         
         
-        // Ye code API ko signal bhejta hai
-async function fireMissileFromAdmin(userToken, messageText) {
-    try {
-        const response = await fetch("https://edunexusai.onrender.com/send-alert", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                token: userToken, // Yahan user ka actual token daalna
-                body: messageText // Yahan tera custom message
-            })
-        });
-        const data = await response.json();
-        
-        if (data.status === "success") {
-            console.log("✅ Target Destroyed!");
-            // Yahan tu screen par apna neon 'Hacker Toast' dikha sakta hai
-        } else {
-            console.error("❌ Misfire: ", data.message);
-        }
-    } catch (error) {
-        console.error("Server Down: ", error);
-    }
-}
+
         // 👁️ GOD-MODE PROFILE FETCHER
         firebase.auth().onAuthStateChanged((user) => {
             const loginBtn = document.getElementById('godLoginBtn');
