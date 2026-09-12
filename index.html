@@ -3266,7 +3266,7 @@
                     console.log('Notification permission granted! System Armed.');
                     
                     // 🛠️ FIX: पहले सर्विस वर्कर को ज़िंदा करो (Register), फिर टोकन मांगो!
-                    navigator.serviceWorker.register('/firebase-messaging-sw.js')
+                    navigator.serviceWorker.register('./firebase-messaging-sw.js')
                     .then((registration) => {
                         console.log('✅ Service Worker Registered Successfully!');
                         
