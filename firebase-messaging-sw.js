@@ -1,4 +1,4 @@
-// 🔥 EDUNEXUS BACKGROUND NOTIFICATION ENGINE 🔥
+// 🔥 EDUNEXUS BACKGROUND NOTIFICATION ENGINE (GOD-LEVEL CLEAN) 🔥
 importScripts('https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.8.1/firebase-messaging-compat.js');
 
@@ -14,17 +14,7 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-// जब ऐप बंद होगा या बैकग्राउंड में होगा, तब ये लिसनर काम करेगा
-messaging.onBackgroundMessage((payload) => {
-  console.log('[EduNexus SW] Background Message Received: ', payload);
-  // Yahan payload.notification ki jagah payload.data aayega!
-    const notificationTitle = payload.data.title;
-    const notificationOptions = {
-      body: payload.data.body,
-      icon: payload.data.icon, // tera EduNexus ka logo
-      badge: 'https://i.ibb.co/Kz0LvSg9/logo.png',
-      requireInteraction: true // jab tak click nahi karega, notification hatega nahi
-    };
-  
-  self.registration.showNotification(notificationTitle, notificationOptions);
-});
+// 🚨 B00M! BAS ITNA HI KUD HAI! 🚨
+// Humne 'onBackgroundMessage' wala kachra hamesha ke liye uda diya hai.
+// Ab Google FCM aur tera Python server dono milkar direct screen par 1 single notification bhejenge.
+// Koi duplicate nahi, koi 'undefined' nahi!
