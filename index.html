@@ -3241,6 +3241,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-messaging-compat.js"></script>
 
   <!-- 🔥 STEP 2: FIREBASE CONFIGURATION & INITIALIZATION 🔥 -->
   <script>
@@ -3256,6 +3257,62 @@
 
     firebase.initializeApp(firebaseConfig);
     const analytics = firebase.analytics();
+    // 🚀 FCM PUSH NOTIFICATION ENGINE (ULTIMATE GOD TIER) 🚀
+        const messaging = firebase.messaging();
+
+        function requestNotificationPermission() {
+            Notification.requestPermission().then((permission) => {
+                if (permission === 'granted') {
+                    console.log('Notification permission granted! System Armed.');
+                    
+                    // 🛠️ FIX: पहले सर्विस वर्कर को ज़िंदा करो (Register), फिर टोकन मांगो!
+                    navigator.serviceWorker.register('/firebase-messaging-sw.js')
+                    .then((registration) => {
+                        console.log('✅ Service Worker Registered Successfully!');
+                        
+                        // 🔑 TERI ASLI VAPID KEY YAHAN SET HAI!
+                        return messaging.getToken({ 
+                            vapidKey: 'BOY296o-qNkOwT7VBctRH-gIj20luet2JWbHz_Lmo3m9KeJxVc2hkyWpodd_4W7WAANiurfDRNjaQQH8xvYhQ2c',
+                            serviceWorkerRegistration: registration // वर्कर को टोकन के साथ जोड़ दिया
+                        });
+                    })
+                    .then((currentToken) => {
+                        if (currentToken) {
+                            console.log('🎯 Target Locked (Device Token):', currentToken);
+                            
+                            // इस टोकन को फायरबेस डेटाबेस में सेव कर लो 
+                            const user = firebase.auth().currentUser;
+                            if(user) {
+                                firebase.firestore().collection('users').doc(user.uid).set({
+                                    fcmToken: currentToken
+                                }, { merge: true });
+                            }
+                        } else {
+                            console.log('No token available. Request permission to generate one.');
+                        }
+                    }).catch((err) => {
+                        console.log('Error while retrieving token: ', err);
+                    });
+                } else {
+                    console.log('User denied notification permission.');
+                }
+            });
+        }
+
+        // जैसे ही बच्चा लॉगिन हो, 3 सेकंड बाद उससे परमिशन मांग लो!
+        firebase.auth().onAuthStateChanged((user) => {
+            if(user) {
+                setTimeout(requestNotificationPermission, 3000); 
+            }
+        });
+   
+
+        // जैसे ही बच्चा लॉगिन हो, 3 सेकंड बाद उससे परमिशन मांग लो!
+        firebase.auth().onAuthStateChanged((user) => {
+            if(user) {
+                setTimeout(requestNotificationPermission, 3000); 
+            }
+        });
 
     let isSignUp = false;
 
@@ -3497,7 +3554,7 @@
 
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
-        // GOD-HAND RECEIVER (यूज़र लॉगिन होने के बाद वाले हिस्से में डालें)
+        // 🎯 1. SMART PERSONAL TARGET RECEIVER (NO UGLY POPUPS)
         firebase.firestore().collection('users').doc(user.uid).collection('live_alerts')
           .where('read', '==', false)
           .onSnapshot((snapshot) => {
@@ -3505,14 +3562,29 @@
               if (change.type === 'added') {
                 const alertData = change.doc.data();
 
-                // स्क्रीन पर सिस्टम ओवरराइड का अलर्ट दिखाएँ
-                alert(`⚠️ SYSTEM OVERRIDE ⚠️\n\nAdmin Message:\n"${alertData.message}"`);
+                // एकदम हैकर लेवल लाल रंग का स्लीक UI
+                const notif = document.createElement('div');
+                notif.style.cssText = `position: fixed; bottom: 30px; right: -400px; width: 320px; background: rgba(14, 20, 33, 0.95); backdrop-filter: blur(15px); border-left: 4px solid #ff4757; border-radius: 12px; padding: 16px 20px; color: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 20px rgba(255,71,87,0.2); z-index: 10000; font-family: 'Inter', sans-serif; transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; gap: 12px; align-items: start;`;
+                
+                notif.innerHTML = `
+                  <div style="background: rgba(255, 71, 87, 0.2); color: #ff4757; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font-size: 16px; flex-shrink: 0; box-shadow: 0 0 10px rgba(255,71,87,0.2);">⚠️</div>
+                  <div style="flex: 1;">
+                    <b style="color: #ff4757; font-size: 11px; letter-spacing: 1px; text-transform: uppercase;">Direct Admin Alert</b>
+                    <p style="margin: 4px 0 0; font-size: 13px; line-height: 1.4; color: #dce2ee;">${alertData.message}</p>
+                  </div>
+                  <button onclick="this.parentElement.style.transform='translateX(0)'; setTimeout(()=>this.parentElement.remove(), 500);" style="background: transparent; border: none; color: #727d91; cursor: pointer; font-size: 16px; padding: 0; transition: 0.3s;" onmouseover="this.style.color='#ff4757'" onmouseout="this.style.color='#727d91'">×</button>
+                `;
+                document.body.appendChild(notif);
 
-                // मैसेज पढ़ लिया गया है, उसे अपडेट कर दें ताकि बार-बार ना पॉप हो
-                change.doc.ref.update({ read: true });
+                // मक्खन एनीमेशन
+                requestAnimationFrame(() => notif.style.transform = 'translateX(-430px)');
+                setTimeout(() => { if(document.body.contains(notif)) { notif.style.transform = 'translateX(0)'; setTimeout(() => notif.remove(), 500); } }, 10000); 
+
+                change.doc.ref.update({ read: true }); // फायरबेस में मार्क कर दो कि पढ़ लिया
               }
             });
           });
+     
         // Agar user logged in hai, toh dashboard kholo aur data sync karo
         const name = user.displayName || user.email.split('@')[0];
         localStorage.setItem('studymate_username', name);
@@ -3529,6 +3601,45 @@
               });
             }
           });
+          // 📢 2. SMART SILENT GLOBAL BROADCAST (WITH CLASS FILTER)
+        firebase.firestore().collection('server_controls').doc('broadcast')
+          .onSnapshot((doc) => {
+            if (doc.exists) {
+              const data = doc.data();
+              const now = new Date().getTime();
+              const msgTime = data.timestamp ? data.timestamp.toDate().getTime() : now;
+              
+              if (data.active && (now - msgTime < 60000)) {
+                let msg = data.message;
+                const userClass = localStorage.getItem('edunexus_class') || "";
+
+                // 🔥 THE GOD-TIER SMART FILTER LOGIC 🔥
+                if (msg.startsWith('[Class 11]') && !userClass.includes('11')) return; 
+                if (msg.startsWith('[Class 12]') && !userClass.includes('12')) return; 
+
+                // नोटिफिकेशन में दिखाने से पहले [Class 11] वाला टैग गायब कर दो (Magic 🪄)
+                msg = msg.replace('[Class 11]', '').replace('[Class 12]', '').trim();
+
+                // पर्पल रंग का प्रीमियम UI
+                const notif = document.createElement('div');
+                notif.style.cssText = `position: fixed; bottom: 30px; right: -400px; width: 320px; background: rgba(14, 20, 33, 0.95); backdrop-filter: blur(15px); border-left: 4px solid #8b7cff; border-radius: 12px; padding: 16px 20px; color: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 20px rgba(139,124,255,0.2); z-index: 10000; font-family: 'Inter', sans-serif; transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; gap: 12px; align-items: start;`;
+                
+                notif.innerHTML = `
+                  <div style="background: rgba(139, 124, 255, 0.2); color: #8b7cff; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font-size: 16px; flex-shrink: 0; box-shadow: 0 0 10px rgba(139,124,255,0.2);">🔔</div>
+                  <div style="flex: 1;">
+                    <b style="color: #8b7cff; font-size: 11px; letter-spacing: 1px; text-transform: uppercase;">System Update</b>
+                    <p style="margin: 4px 0 0; font-size: 13px; line-height: 1.4; color: #dce2ee;">${msg}</p>
+                  </div>
+                  <button onclick="this.parentElement.style.transform='translateX(0)'; setTimeout(()=>this.parentElement.remove(), 500);" style="background: transparent; border: none; color: #727d91; cursor: pointer; font-size: 16px; padding: 0; transition: 0.3s;" onmouseover="this.style.color='#ff4757'" onmouseout="this.style.color='#727d91'">×</button>
+                `;
+                document.body.appendChild(notif);
+
+                requestAnimationFrame(() => notif.style.transform = 'translateX(-430px)');
+                setTimeout(() => { if(document.body.contains(notif)) { notif.style.transform = 'translateX(0)'; setTimeout(() => notif.remove(), 500); } }, 8000);
+              }
+            }
+          });
+
 
 
         // 🔥 REAL GOOGLE PROFILE PIC MAGIC 🔥
