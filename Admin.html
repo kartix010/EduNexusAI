@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduNexus - Admin Control Room</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;600&display=swap"
+        rel="stylesheet">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
+
+    <style>
+        body {
+            background-color: #070a12;
+            color: #f4f7ff;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 40px;
+        }
+
+        h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            color: #5ee7c5;
+            font-size: 32px;
+            border-bottom: 2px solid rgba(94, 231, 197, 0.2);
+            padding-bottom: 15px;
+        }
+
+        .dashboard-container {
+            background: #0e1421;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            overflow-x: auto;
+            margin-bottom: 30px;
+        }
+
+        /* Stats Cards CSS */
+        .stats-grid {
+            display: flex;
+            gap: 20px;
+            max-width: 1000px;
+            margin: 0 auto 30px auto;
+        }
+
+        .stat-card {
+            flex: 1;
+            background: #0e1421;
+            padding: 25px 20px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-title {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #727d91;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 42px;
+            font-weight: bold;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            background: rgba(139, 124, 255, 0.1);
+            color: #8b7cff;
+            padding: 15px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 13px;
+            color: #aeb7c8;
+        }
+
+        tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .action-badge {
+            background: rgba(94, 231, 197, 0.1);
+            color: #5ee7c5;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 11px;
+        }
+
+        .live-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            background: #ff4757;
+            border-radius: 50%;
+            margin-right: 12px;
+            box-shadow: 0 0 12px #ff4757;
+            animation: blink 1s infinite alternate;
+        }
+
+        @keyframes blink {
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0.3;
+            }
+        }
+
+        /* 🚨 GOD-EYE TOAST NOTIFICATION CSS 🚨 */
+        #toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .hacker-toast {
+            background: rgba(14, 20, 33, 0.95);
+            border-left: 4px solid #5ee7c5;
+            color: #fff;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            font-size: 14px;
+            transform: translateX(150%);
+            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 250px;
+        }
+
+        .hacker-toast.show {
+            transform: translateX(0);
+        }
+
+        .toast-icon {
+            background: rgba(94, 231, 197, 0.2);
+            color: #5ee7c5;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        /* 🚨 GOD-EYE CHAT INTERCEPTOR MODAL CSS 🚨 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(7, 10, 18, 0.85);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: #0e1421;
+            margin: 5% auto;
+            padding: 25px;
+            border: 1px solid #5ee7c5;
+            border-radius: 12px;
+            width: 80%;
+            max-width: 700px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 0 40px rgba(94, 231, 197, 0.2);
+            color: #f4f7ff;
+            position: relative;
+            animation: modalIn 0.3s ease-out;
+        }
+
+        @keyframes modalIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .close-btn {
+            color: #ff4757;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close-btn:hover {
+            color: #ff6b81;
+        }
+
+        .chat-bubble {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        .user-bubble {
+            background: rgba(139, 124, 255, 0.1);
+            border-left: 4px solid #8b7cff;
+        }
+
+        .ai-bubble {
+            background: rgba(94, 231, 197, 0.1);
+            border-left: 4px solid #5ee7c5;
+        }
+
+        .view-chat-btn {
+            background: transparent;
+            border: 1px solid #5ee7c5;
+            color: #5ee7c5;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            font-weight: bold;
+            transition: all 0.2s;
+            box-shadow: 0 0 10px rgba(94, 231, 197, 0.2);
+        }
+
+        .view-chat-btn:hover {
+            background: #5ee7c5;
+            color: #0e1421;
+            box-shadow: 0 0 20px rgba(94, 231, 197, 0.6);
+            transform: scale(1.05);
+        }
+
+        /* 🚨 TARGET LOCK SEARCH ENGINE CSS 🚨 */
+        .search-container {
+            margin: 0 auto 20px auto;
+            position: relative;
+            max-width: 1000px;
+        }
+
+        .hacker-search {
+            width: 100%;
+            background: rgba(14, 20, 33, 0.6);
+            border: 1px solid rgba(94, 231, 197, 0.3);
+            color: #5ee7c5;
+            padding: 16px 20px 16px 50px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-family: 'Space Grotesk', monospace;
+            outline: none;
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+            letter-spacing: 0.5px;
+        }
+
+        .hacker-search::placeholder {
+            color: #4a5568;
+        }
+
+        .hacker-search:focus {
+            border-color: #5ee7c5;
+            background: rgba(14, 20, 33, 0.9);
+            box-shadow: 0 0 25px rgba(94, 231, 197, 0.2), inset 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 🔑 GOD LOGIN BUTTON -->
+    <!-- 🔑 GOD LOGIN BUTTON -->
+    <button id="godLoginBtn" onclick="firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider())"
+        style="position:absolute; top:35px; right:40px; background:linear-gradient(135deg, #8b7cff, #5ee7c5); color:#000; font-weight:800; border:none; padding:10px 20px; border-radius:8px; cursor:pointer; z-index:9999; box-shadow: 0 0 20px rgba(94, 231, 197, 0.4); display: flex; align-items: center; gap: 8px;">🔑
+        SYSTEM LOGIN</button>
+    <!-- 📢 GLOBAL MEGAPHONE BUTTON -->
+    <button onclick="globalBroadcast()"
+        style="position:fixed; bottom:40px; right:40px; background:linear-gradient(135deg, #ff4757, #ff6b81); color:#fff; font-weight:800; border:none; padding:15px 30px; border-radius:50px; cursor:pointer; z-index:9999; box-shadow: 0 10px 30px rgba(255, 71, 87, 0.4); font-size: 16px; transition: 0.3s;"
+        onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">📢 GLOBAL
+        BROADCAST</button>
+
+    <!-- 🔥 HACKER TOAST CONTAINER 🔥 -->
+    <div id="toast-container"></div>
+
+    <!-- 🔥 CHAT INTERCEPTOR MODAL (NEW) 🔥 -->
+    <div id="chatModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeChatModal()">&times;</span>
+            <h2
+                style="color: #5ee7c5; font-family: 'Space Grotesk'; margin-top: 0; display: flex; align-items: center; gap: 10px;">
+                👁️ AI Tutor Intercept
+            </h2>
+            <div class="chat-bubble user-bubble">
+                <b style="color: #8b7cff; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">Student
+                    Asked:</b><br><br>
+                <span id="modalQuestion">Loading...</span>
+            </div>
+            <div class="chat-bubble ai-bubble">
+                <b style="color: #5ee7c5; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">AI
+                    Answered:</b><br><br>
+                <span id="modalAnswer">Loading...</span>
+            </div>
+        </div>
+    </div>
+
+    <h1><span class="live-indicator"></span>EduNexus Live Radar</h1>
+    <p style="color: #727d91; margin-bottom: 30px;">Tracking all user activities in real-time...</p>
+
+    <!-- 🔥 LIVE STATS CARDS 🔥 -->
+    <div class="stats-grid">
+        <div class="stat-card" style="border: 1px solid rgba(94, 231, 197, 0.3);">
+            <div class="stat-title">Total Radar Hits</div>
+            <div id="totalHits" class="stat-value" style="color: #5ee7c5;">0</div>
+        </div>
+        <div class="stat-card" style="border: 1px solid rgba(139, 124, 255, 0.3);">
+            <div class="stat-title">Unique Active Users</div>
+            <div id="uniqueUsers" class="stat-value" style="color: #8b7cff;">0</div>
+        </div>
+        <div class="stat-card" style="border: 1px solid rgba(255, 71, 87, 0.3);">
+            <div class="stat-title">System Status</div>
+            <div class="stat-value" style="color: #ff4757; font-size: 38px;">ONLINE <span
+                    style="font-size: 20px;">⚡</span></div>
+        </div>
+    </div>
+
+    <!-- GRAPH -->
+    <div class="dashboard-container" style="max-width: 1000px;">
+        <canvas id="activityChart" height="90"></canvas>
+    </div>
+    <!-- 🔥 TARGET LOCK SEARCH ENGINE 🔥 -->
+    <div class="search-container">
+        <span class="search-icon">🎯</span>
+        <input type="text" id="radarSearch" class="hacker-search"
+            placeholder="Enter User Name, Email, or Action to lock target..." onkeyup="filterRadar()">
+    </div>
+
+    <!-- TABLE -->
+    <div class="dashboard-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Time</th>
+                    <th>User Name</th>
+                    <th>Email</th>
+                    <th>Action</th>
+                    <th>Details</th>
+                </tr>
+            </thead>
+            <tbody id="logsTableBody">
+                <tr>
+                    <td colspan="5" style="text-align: center;">Fetching live data...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // FIREBASE CONFIG
+        const firebaseConfig = {
+            apiKey: "AIzaSyCNitBlQJg-m9sz0efnQ5k52Am5xIH-phk",
+            authDomain: "edunexusai-82f4e.firebaseapp.com",
+            projectId: "edunexusai-82f4e",
+            storageBucket: "edunexusai-82f4e.firebasestorage.app",
+            messagingSenderId: "12213943222",
+            appId: "1:12213943222:web:5fa5eafcc152f997749f17",
+            measurementId: "G-7ZYMJJD1XS"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // CHART SETUP
+        const ctx = document.getElementById('activityChart').getContext('2d');
+        const activityChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Loading...'],
+                datasets: [{
+                    label: 'Live Activity Pulse (Actions per minute)',
+                    data: [0],
+                    borderColor: '#5ee7c5',
+                    backgroundColor: 'rgba(94, 231, 197, 0.15)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: '#8b7cff',
+                    pointRadius: 4,
+                    pointHoverRadius: 7
+                }]
+            },
+            options: {
+                responsive: true,
+                animation: { duration: 800 },
+                plugins: { legend: { labels: { color: '#aeb7c8' } } },
+                scales: {
+                    x: { ticks: { color: '#727d91' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                    y: { ticks: { color: '#727d91', stepSize: 1 }, grid: { color: 'rgba(255,255,255,0.05)' }, beginAtZero: true }
+                }
+            }
+        });
+
+        // 🔥 NEXT LEVEL HACKER LOGIC (Toast Popups, Modal & Table) 🔥
+        const tableBody = document.getElementById('logsTableBody');
+        let isFirstLoad = true;
+
+        // 🚨 ग्लोबल डब्बा जहाँ हम चैट्स सेव करेंगे (Modal के लिए)
+        window.interceptedChats = {};
+
+        // पॉपअप खोलने और बंद करने का फंक्शन
+        function openChatModal(docId) {
+            const chat = window.interceptedChats[docId];
+            document.getElementById('modalQuestion').innerText = chat.q || "Waiting for question data...";
+            document.getElementById('modalAnswer').innerHTML = chat.a || "Waiting for AI response data...";
+            document.getElementById('chatModal').style.display = "block";
+        }
+
+        function closeChatModal() {
+            document.getElementById('chatModal').style.display = "none";
+        }
+
+        // अलर्ट बॉक्स बनाने वाला फंक्शन (Toast)
+        function fireHackerToast(userName, action) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'hacker-toast';
+            toast.innerHTML = `<div class="toast-icon">⚡</div> <div><b style="color:#5ee7c5;">${userName}</b> just triggered <br><span style="color:#aeb7c8; font-size:12px;">${action}</span></div>`;
+
+            container.appendChild(toast);
+
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 400);
+            }, 4000);
+        }
+
+        db.collectionGroup('activity_logs')
+            .orderBy('timestamp', 'desc')
+            .limit(50)
+            .onSnapshot((snapshot) => {
+
+                // 🚨 टोस्ट नोटिफिकेशन
+                if (!isFirstLoad) {
+                    snapshot.docChanges().forEach((change) => {
+                        if (change.type === 'added') {
+                            const newLog = change.doc.data();
+                            const uName = newLog.userName || "Unknown User";
+                            fireHackerToast(uName, newLog.action);
+                        }
+                    });
+                }
+                isFirstLoad = false;
+
+                tableBody.innerHTML = '';
+
+                let timeCounts = {};
+                let uniqueEmails = new Set();
+                let totalActions = 0;
+
+                if (snapshot.empty) {
+                    tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No activity found yet!</td></tr>';
+                    return;
+                }
+
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const docId = doc.id; // हर लॉग की यूनीक ID
+                    totalActions++;
+
+                    if (data.userEmail && data.userEmail !== "N/A") {
+                        uniqueEmails.add(data.userEmail);
+                    }
+
+                    let timeString = "Just now";
+                    let chartTimeSlot = "Now";
+
+                    if (data.timestamp) {
+                        const date = data.timestamp.toDate();
+                        timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                        chartTimeSlot = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    }
+
+                    timeCounts[chartTimeSlot] = (timeCounts[chartTimeSlot] || 0) + 1;
+
+                    // 🔥 NEXT LEVEL LOGIC: अगर एक्शन AI_TUTOR है, तो बटन दिखाओ! 🔥
+                    let detailsHTML = data.details;
+
+                    if (data.action === 'ASKED_AI_TUTOR') {
+                        // डेटा को डब्बे में सेव कर लो ताकि बटन दबाने पर काम आये
+                        window.interceptedChats[docId] = { q: data.question, a: data.aiAnswer };
+                        // अगर असली सवाल आ गया है, तो 'View Chat' बटन दिखाओ
+                        if (data.question && data.aiAnswer) {
+                            detailsHTML = `<button class="view-chat-btn" onclick="openChatModal('${docId}')">View Chat 👁️</button>`;
+                        } else {
+                            detailsHTML = `<span style="color: #727d91; font-size: 11px;">Waiting for payload...</span>`;
+                        }
+                    }
+                    const userId = doc.ref.parent.parent.id; // User ID निकालो
+                    detailsHTML += ` <button class="view-chat-btn" style="background:#ff4757; color:#fff; border:none; margin-left: 5px;" onclick="kickUser('${userId}', '${data.userName}')">KICK OUT</button>`;
+                    detailsHTML += ` <button class="view-chat-btn" style="border-color:#ff4757; color:#ff4757; margin-left: 10px;" onclick="sendCustomAlert('${userId}', '${data.userName}')">Push Alert 🚀</button>`;
+
+                    const row = `
+                        <tr>
+                            <td style="color: #fff; font-weight: bold;">${timeString}</td>
+                            <td style="color: #fff;">${data.userName || "Unknown"}</td>
+                            <td>${data.userEmail || "N/A"}</td>
+                            <td><span class="action-badge">${data.action}</span></td>
+                            <td>${detailsHTML}</td>
+                        </tr>
+                    `;
+                    tableBody.innerHTML += row;
+                });
+
+                // UPDATE STAT CARDS
+                document.getElementById('totalHits').innerText = totalActions;
+                document.getElementById('uniqueUsers').innerText = uniqueEmails.size;
+
+                // UPDATE GRAPH
+                const labels = Object.keys(timeCounts).reverse();
+                const counts = Object.values(timeCounts).reverse();
+                activityChart.data.labels = labels;
+                activityChart.data.datasets[0].data = counts;
+                activityChart.update();
+                // (तेरा पुराना कोड)
+                activityChart.update();
+
+                // 🚨 नया डेटा आते ही सर्च फ़िल्टर वापस लगाओ!
+                if (typeof filterRadar === 'function') filterRadar();
+            }, (error) => {
+                console.error("Error fetching logs: ", error);
+            });
+
+        // 🔥 4. TARGET LOCK SEARCH LOGIC 🔥
+        function filterRadar() {
+            const input = document.getElementById("radarSearch").value.toLowerCase();
+            const table = document.getElementById("logsTableBody");
+            const tr = table.getElementsByTagName("tr");
+
+            for (let i = 0; i < tr.length; i++) {
+                // अगर रो में डेटा नहीं है तो छोड़ दो
+                if (tr[i].innerText === "Fetching live data..." || tr[i].innerText === "No activity found yet!") continue;
+
+                const rowData = tr[i].innerText.toLowerCase();
+
+                // अगर सर्च किया हुआ वर्ड इस लाइन में है, तो दिखाओ, वरना गायब कर दो!
+                if (rowData.includes(input)) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+        // GOD-HAND ALERT SYSTEM
+        async function sendGodAlert(userId, userName) {
+            const msg = prompt(`⚠️ SEND LIVE ALERT TO ${userName}:\nType your warning message:`);
+            if (!msg) return;
+
+            try {
+                // यूज़र के डेटाबेस में एक नया 'live_alerts' डॉक्यूमेंट बनाएँ
+                await db.collection('users').doc(userId).collection('live_alerts').add({
+                    message: msg,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    read: false
+                });
+                alert(`Boom! Alert sent to ${userName}`);
+            } catch (error) {
+                console.error("Alert failed:", error);
+            }
+        }
+        async function kickUser(userId, userName) {
+    if (confirm(`⚠️ CAUTION: Do you really want to KICK OUT ${userName}?`)) {
+        try {
+            // 1. Database mein user ko kick out karo
+            await firebase.firestore().collection('users').doc(userId).set({
+                isKicked: true,
+                kickReason: "Violated AI Chat Rules",
+                email: "Banned User" 
+            }, { merge: true });
+
+            alert(`Boom! ${userName} is kicked out!`);
+
+            // 2. GOD-TIER MOVE: Database se token nikal kar API ko signal bhejo
+            const userDoc = await firebase.firestore().collection('users').doc(userId).get();
+            if (userDoc.exists && userDoc.data().fcmToken) {
+                // API ko fire karne ka command
+                fireMissileFromAdmin(userDoc.data().fcmToken, `BOOM! ${userName}, you have been KICKED OUT by Admin!`);
+            } else {
+                console.log("User is kicked, but no FCM token found for push notification.");
+            }
+
+        } catch (error) {
+            // 3. Agar koi error hoga to screen par laal alert aayega
+            alert("❌ KICK FAILED: " + error.message);
+            console.error("Kick Error: ", error);
+        }
+    }
+}
+        
+        
+        // Ye code API ko signal bhejta hai
+async function fireMissileFromAdmin(userToken, messageText) {
+    try {
+        const response = await fetch("http://127.0.0.1:5000/send-alert", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                token: userToken, // Yahan user ka actual token daalna
+                body: messageText // Yahan tera custom message
+            })
+        });
+        const data = await response.json();
+        
+        if (data.status === "success") {
+            console.log("✅ Target Destroyed!");
+            // Yahan tu screen par apna neon 'Hacker Toast' dikha sakta hai
+        } else {
+            console.error("❌ Misfire: ", data.message);
+        }
+    } catch (error) {
+        console.error("Server Down: ", error);
+    }
+}
+        // 👁️ GOD-MODE PROFILE FETCHER
+        firebase.auth().onAuthStateChanged((user) => {
+            const loginBtn = document.getElementById('godLoginBtn');
+            if (user && loginBtn) {
+                // जैसे ही गॉड लॉगिन होगा, उसकी असली फोटो और नाम निकाल लो
+                const pic = user.photoURL || "https://i.ibb.co/Kz0LvSg9/logo.png";
+                const name = user.displayName ? user.displayName.split(" ")[0].toUpperCase() : "GOD";
+
+                // बटन को बदलकर प्रीमियम एडमिन बैज बना दो
+                loginBtn.innerHTML = `<img src="${pic}" style="width: 26px; height: 26px; border-radius: 50%; border: 1px solid #5ee7c5; object-fit: cover;"> <span style="font-size:12px; font-weight:800;">${name} (ADMIN)</span>`;
+
+                // बटन का रंग बदलकर हैकर-थीम (Purple/Neon) कर दो
+                loginBtn.style.background = "rgba(139, 124, 255, 0.15)";
+                loginBtn.style.color = "#8b7cff";
+                loginBtn.style.border = "1px solid rgba(139, 124, 255, 0.5)";
+                loginBtn.style.boxShadow = "0 0 15px rgba(139, 124, 255, 0.2)";
+                loginBtn.onclick = null; // लॉगिन होने के बाद दोबारा क्लिक न हो
+            }
+        });
+        // 📢 PROJECT EMP BLAST (GLOBAL MEGAPHONE)
+        async function globalBroadcast() {
+            const msg = prompt("📢 ENTER GLOBAL ANNOUNCEMENT:\n(Warning: This will blast on ALL online students' screens instantly!)");
+            if (!msg) return;
+
+            try {
+                // 'server_controls' नाम का एक नया मास्टर फोल्डर बना रहे हैं
+                await db.collection('server_controls').doc('broadcast').set({
+                    message: msg,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    active: true
+                });
+                alert("💥 BOOM! Global Broadcast Sent to ALL Users Successfully!");
+            } catch (error) {
+                console.error("Broadcast failed:", error);
+                alert("❌ Failed to broadcast!");
+            }
+        }
+        // 1. PYTHON API KO SIGNAL BHEJNE WALA CODE
+        async function fireMissileFromAdmin(userToken, messageText) {
+            try {
+                const response = await fetch("http://127.0.0.1:5000/send-alert", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        token: userToken, 
+                        body: messageText 
+                    })
+                });
+                const data = await response.json();
+                if (data.status === "success") {
+                    console.log("✅ Target Destroyed! Notification Sent.");
+                }
+            } catch (error) {
+                console.error("Server Down: ", error);
+            }
+        }
+
+        // 2. BACHHE KO CUSTOM NOTIFICATION BHEJNE WALA CODE
+        async function sendCustomAlert(userId, userName) {
+            const customMsg = prompt(`Type message for ${userName} (e.g. Physics PYQs uploaded!):`);
+            if (customMsg) {
+                try {
+                    const userDoc = await firebase.firestore().collection('users').doc(userId).get();
+                    if (userDoc.exists && userDoc.data().fcmToken) {
+                        fireMissileFromAdmin(userDoc.data().fcmToken, customMsg);
+                        alert(`✅ Notification "${customMsg}" fired to ${userName}'s phone!`);
+                    } else {
+                        alert(`❌ ${userName} hasn't allowed notifications yet (No FCM Token).`);
+                    }
+                } catch (error) {
+                    console.error("Error fetching token:", error);
+                }
+            }
+        }
+
+    </script>
+</body>
+
+</html>
