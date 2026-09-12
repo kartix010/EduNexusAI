@@ -1,8 +1,7 @@
-// 🔥 EDUNEXUS BACKGROUND NOTIFICATION ENGINE (GOD-LEVEL CLEAN) 🔥
+// 🔥 EDUNEXUS BACKGROUND NOTIFICATION ENGINE 🔥
 importScripts('https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.8.1/firebase-messaging-compat.js');
 
-// 🔑 TERI ASLI FIREBASE CONFIG
 firebase.initializeApp({
     apiKey: "AIzaSyCNitBlQJg-m9sz0efnQ5k52Am5xIH-phk",
     authDomain: "edunexusai-82f4e.firebaseapp.com",
@@ -14,7 +13,16 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-// 🚨 B00M! BAS ITNA HI KUD HAI! 🚨
-// Humne 'onBackgroundMessage' wala kachra hamesha ke liye uda diya hai.
-// Ab Google FCM aur tera Python server dono milkar direct screen par 1 single notification bhejenge.
-// Koi duplicate nahi, koi 'undefined' nahi!
+// 🚨 MANUAL OVERRIDE (Forcing the phone to ring)
+messaging.onBackgroundMessage((payload) => {
+    console.log('[EduNexus SW] Incoming Missile:', payload);
+    const title = payload.data.title || "EduNexus Admin 🚨";
+    const options = {
+        body: payload.data.body || "System Alert!",
+        icon: payload.data.icon || "https://i.ibb.co/Kz0LvSg9/logo.png",
+        badge: "https://i.ibb.co/Kz0LvSg9/logo.png",
+        vibrate: [200, 100, 200, 100, 200], // 🔥 Phone ko vibrate karega!
+        requireInteraction: true
+    };
+    self.registration.showNotification(title, options);
+});
