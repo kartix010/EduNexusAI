@@ -721,10 +721,11 @@ async function fireMissileFromAdmin(userToken, messageText) {
                 alert("❌ Failed to broadcast!");
             }
         }
-        // 1. PYTHON API KO SIGNAL BHEJNE WALA CODE
+        // 1. PYTHON API KO SIGNAL BHEJNE WALA CODE (FIXED TO LIVE RENDER URL)
         async function fireMissileFromAdmin(userToken, messageText) {
             try {
-                const response = await fetch("http://127.0.0.1:5000/send-alert", {
+                // ⚠️ यहाँ अपना असली Render URL डालना, मैंने edunexusai.onrender.com डाला है
+                const response = await fetch("https://edunexusai.onrender.com/send-alert", { 
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
@@ -733,32 +734,45 @@ async function fireMissileFromAdmin(userToken, messageText) {
                     })
                 });
                 const data = await response.json();
+                
                 if (data.status === "success") {
                     console.log("✅ Target Destroyed! Notification Sent.");
+                    return true; // सफलता का सिग्नल
+                } else {
+                    console.error("❌ API Error: ", data.message);
+                    return false;
                 }
             } catch (error) {
                 console.error("Server Down: ", error);
+                return false;
             }
         }
 
-        // 2. BACHHE KO CUSTOM NOTIFICATION BHEJNE WALA CODE
+        // 2. BACHHE KO CUSTOM NOTIFICATION BHEJNE WALA CODE (SMART ALERT)
         async function sendCustomAlert(userId, userName) {
-            const customMsg = prompt(`Type message for ${userName} (e.g. Physics PYQs uploaded!):`);
-            if (customMsg) {
-                try {
-                    const userDoc = await firebase.firestore().collection('users').doc(userId).get();
-                    if (userDoc.exists && userDoc.data().fcmToken) {
-                        fireMissileFromAdmin(userDoc.data().fcmToken, customMsg);
-                        alert(`✅ Notification "${customMsg}" fired to ${userName}'s phone!`);
+            const customMsg = prompt(`Type message for ${userName}:`);
+            if (!customMsg) return;
+
+            try {
+                const userDoc = await firebase.firestore().collection('users').doc(userId).get();
+                if (userDoc.exists && userDoc.data().fcmToken) {
+                    
+                    // ⏳ पहले API का इंतज़ार करो, फिर Alert दिखाओ!
+                    const isFired = await fireMissileFromAdmin(userDoc.data().fcmToken, customMsg);
+                    
+                    if(isFired) {
+                        alert(`🚀 B00M! Notification "${customMsg}" successfully fired to ${userName}!`);
                     } else {
-                        alert(`❌ ${userName} hasn't allowed notifications yet (No FCM Token).`);
+                        alert(`❌ Misfire! Failed to send to ${userName}. Check Console for API error.`);
                     }
-                } catch (error) {
-                    console.error("Error fetching token:", error);
+                } else {
+                    alert(`❌ ${userName} hasn't allowed notifications yet (No FCM Token).`);
                 }
+            } catch (error) {
+                console.error("Error fetching token:", error);
             }
         }
-
+       
     </script>
 </body>
 
