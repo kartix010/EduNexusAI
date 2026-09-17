@@ -5183,70 +5183,66 @@
 
     // 🔥 FAIL-SAFE PWA INSTALL LOGIC 🔥
 
-    // 🔥 SMART PWA INSTALL LOGIC (NO ANNOYING POPUPS) 🔥
+
+    // 🔥 FINAL SMART PWA INSTALL ENGINE 🔥
     let deferredPrompt;
     const pwaCard = document.getElementById('pwa-install-card');
     const btnLater = document.getElementById('pwa-later');
     const btnInstall = document.getElementById('pwa-install');
 
-    // Check karo ki app pehle se install ho chuki hai ya PWA mode me chal rahi hai
     const isAppInstalled = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone || localStorage.getItem('pwa_installed') === 'true';
 
-    window.addEventListener('beforeinstallprompt', (e) => {
-      // Agar already installed hai ya user ne 'Later' dabaya tha, toh prompt mat dikhao!
-      if (isAppInstalled || localStorage.getItem('pwa_dismissed') === 'true') {
-        return;
-      }
+    // Register Service Worker Correctly
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('EduNexus PWA is Ready! 🚀', reg.scope))
+          .catch(err => console.error('PWA Registration Failed!', err));
+      });
+    }
 
-      console.log('PWA is ready to be installed! 🚀');
+    window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
-      // Agar user pehle se logged in hai (page reload par), toh 3 sec baad dikhao
-      if (!document.getElementById('main-content').classList.contains('blurred')) {
-        setTimeout(() => {
+      if (isAppInstalled || localStorage.getItem('pwa_dismissed') === 'true') return;
+      
+      console.log('PWA is ready to be installed! Prompt armed.');
+      setTimeout(() => {
+        const mainContent = document.getElementById('main-content');
+        if (mainContent && !mainContent.classList.contains('blurred')) {
           pwaCard.classList.add('show');
-        }, 3000);
-      }
-    });
-    // Agar user 'Later' dabata hai
-    btnLater.addEventListener('click', () => {
-      pwaCard.classList.remove('show');
-      localStorage.setItem('pwa_dismissed', 'true'); // Memory me save kar lo
-      showToast("You can install it later from the browser menu!");
-    });
-
-    // Agar user 'Install Now' dabata hai
-    btnInstall.addEventListener('click', async () => {
-      if (deferredPrompt) {
-        pwaCard.classList.remove('show');
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        if (outcome === 'accepted') {
-          localStorage.setItem('pwa_installed', 'true'); // Hamesha ke liye hide
         }
-        deferredPrompt = null;
-      }
+      }, 4000); 
     });
 
+    if (btnLater) {
+      btnLater.addEventListener('click', () => {
+        pwaCard.classList.remove('show');
+        localStorage.setItem('pwa_dismissed', 'true');
+      });
+    }
 
-    // Jab app successfully install ho jaye
+    if (btnInstall) {
+      btnInstall.addEventListener('click', async () => {
+        if (deferredPrompt) {
+          pwaCard.classList.remove('show');
+          deferredPrompt.prompt();
+          const { outcome } = await deferredPrompt.userChoice;
+          if (outcome === 'accepted') localStorage.setItem('pwa_installed', 'true');
+          deferredPrompt = null;
+        }
+      });
+    }
+
     window.addEventListener('appinstalled', () => {
       pwaCard.classList.remove('show');
-      localStorage.setItem('pwa_installed', 'true'); // Hamesha ke liye hide
-      showToast("✅ EduNexus AI successfully installed on your device!");
-
-      // 🔥 NAYA COD2E: DISCORD TRACKER FOR APP INSTALL 🔥
+      localStorage.setItem('pwa_installed', 'true');
       const name = localStorage.getItem('studymate_username') || "A Student";
       const webhookURL = "https://discordapp.com/api/webhooks/1540079598224809984/oDDtB_T22-8lQK3R1HLTk_L_1Fv6IW-atoHBjo7zq0Wc4BQpVr6Hor2ssAtH7RxXP_fA";
-
-      fetch(webhookURL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          content: `📲 **NEW APP INSTALL!** 🎉\n🧑‍🎓 **User:** ${name}\n🚀 **Action:** Downloaded EduNexus AI to their home screen!`
-        })
-      }).catch(err => console.log("Install tracker silent fail"));
+      fetch(webhookURL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ content: `📲 **NEW APP INSTALL!** 🎉\n🧑‍🎓 **User:** ${name}\n🚀 **Action:** Downloaded EduNexus AI to home screen!` }) }).catch(e => console.log("Tracker fail"));
     });
+
+    
     // 🔥 THE FLAWLESS VECTOR PDF ENGINE (WITH PERFECT ALIGNED HEADER) 🔥
     function downloadTimetable() {
       showToast("⏳ Architecting True Vector PDF...");
@@ -5350,8 +5346,6 @@
       }
     });
   </script>
-
-
 
 </body>
 
