@@ -2473,6 +2473,25 @@
         filter: blur(0px);
       }
     }
+    /* 🔥 PWA DOUBLE SPLASH KILLER (CSS LEVEL) 🔥 */
+    @media (display-mode: standalone) {
+      /* Agar app phone me install hoke khul rahi hai, toh custom splash ko render hi mat karo */
+      #kx-splash { 
+        display: none !important; 
+        opacity: 0 !important; 
+        visibility: hidden !important; 
+      }
+      /* Dashboard ko blur se turant hata do */
+      #main-content { 
+        filter: none !important; 
+        opacity: 1 !important; 
+      }
+      /* Login screen ko completely block karo taaki flash na ho */
+      #login-overlay {
+        display: none !important;
+        z-index: -100 !important;
+      }
+    }
   </style>
 
   <div id="kx-splash">
@@ -5492,51 +5511,42 @@
     const splashLogo = document.querySelector('.splash-logo-img');
     const splash = document.getElementById('kx-splash');
     const mainApp = document.getElementById('main-content');
-    const loginOverlay = document.getElementById('login-overlay');
+    
+    // Check if PWA
+    const isPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
 
     function removeSplashScreen() {
       if (splash && splash.style.display !== 'none') {
-        // 3D Apple Unlock Effect
         splash.style.transform = 'scale(1.2)';
         splash.style.opacity = '0';
         splash.style.visibility = 'hidden';
-
+        
         if (mainApp) {
           mainApp.classList.remove('blurred');
           mainApp.classList.add('apple-unlock-active');
         }
-
         setTimeout(() => splash.remove(), 1000);
       }
     }
 
-    // 🚀 THE ULTIMATE FIX 🚀
-    // 1. Check karo ki kya app Home Screen (PWA) se open hui hai?
-    const isPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-
+    // Agar PWA hai toh CSS ne already hide kar diya hai, hume bas animation start karni hai
     if (isPWA) {
-        // Agar app installed hai, toh Android/iOS apna native splash dikhata hai.
-        // Isliye custom wale ko INSTANT gayab kar do, taaki splash 2 baar na aaye!
-        if (splash) splash.style.display = 'none';
-        if (mainApp) {
-            mainApp.classList.remove('blurred');
-            mainApp.classList.add('apple-unlock-active');
-        }
+        firebase.auth().onAuthStateChanged((user) => {
+            if (mainApp) {
+                mainApp.classList.add('apple-unlock-active');
+            }
+        });
     } else {
-        // 2. Agar browser mein hai, toh Firebase Auth ke resolve hone ka wait karo.
-        // Isse login screen beech mein flash nahi karegi!
+        // Agar Web Browser me hai, toh normal Custom Splash dikhao
         let splashRemoved = false;
-        
-        // Wait for Firebase to make a decision
         firebase.auth().onAuthStateChanged((user) => {
             if (!splashRemoved) {
                 splashRemoved = true;
-                // Firebase ne decide kar liya, ab smooth tareeke se splash hatao
                 setTimeout(removeSplashScreen, 300); 
             }
         });
 
-        // FAIL-SAFE: Agar internet bohot slow hai, toh user ko atka ke mat rakho, 3 seconds me hata do
+        // Fail-safe
         setTimeout(() => {
             if (!splashRemoved) {
                 splashRemoved = true;
@@ -5545,6 +5555,7 @@
         }, 3000);
     }
   </script>
+  
 
 
 
