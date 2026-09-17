@@ -2331,6 +2331,7 @@
       display: none !important;
       opacity: 0 !important;
       visibility: hidden !important;
+      z-index: -100 !important; /* 🔥 Ganda Flash block karne ke liye */
     }
 
     html.already-logged-in #main-content {
@@ -5486,16 +5487,15 @@
       }
     });
   </script>
-  <!-- 🔥 SPLASH SCREEN REMOVER ENGINE (ULTRA SMART - NO BROKEN LOGOS) 🔥 -->
+  <!-- 🔥 SPLASH SCREEN REMOVER ENGINE (GOD-TIER - DOUBLE FLASH FIX) 🔥 -->
   <script>
-    // 1. सबसे पहले अपने लोगो को सेलेक्ट करो
     const splashLogo = document.querySelector('.splash-logo-img');
     const splash = document.getElementById('kx-splash');
     const mainApp = document.getElementById('main-content');
+    const loginOverlay = document.getElementById('login-overlay');
 
-    // 2. ये फंक्शन स्प्लैश स्क्रीन को 3D इफ़ेक्ट के साथ हटाएगा
     function removeSplashScreen() {
-      if (splash) {
+      if (splash && splash.style.display !== 'none') {
         // 3D Apple Unlock Effect
         splash.style.transform = 'scale(1.2)';
         splash.style.opacity = '0';
@@ -5510,21 +5510,42 @@
       }
     }
 
-    // 3. THE SMART LOGIC (इंटरनेट स्पीड के हिसाब से चलेगा)
-    // अगर लोगो पहले से ही कैश (Cache) में है या तुरंत लोड हो गया है:
-    if (splashLogo.complete) {
-      setTimeout(removeSplashScreen, 1000);
-    } else {
-      // अगर इंटरनेट स्लो है, तो लोगो लोड होने का वेट करेगा:
-      splashLogo.addEventListener('load', () => {
-        setTimeout(removeSplashScreen, 1000);
-      });
+    // 🚀 THE ULTIMATE FIX 🚀
+    // 1. Check karo ki kya app Home Screen (PWA) se open hui hai?
+    const isPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
 
-      // FAIL-SAFE: अगर लोगो 3 सेकंड तक भी लोड नहीं हुआ (इंटरनेट बहुत ही ख़राब है), 
-      // तो यूज़र को अटका कर मत रखो, ऐप खोल दो!
-      setTimeout(removeSplashScreen, 3000);
+    if (isPWA) {
+        // Agar app installed hai, toh Android/iOS apna native splash dikhata hai.
+        // Isliye custom wale ko INSTANT gayab kar do, taaki splash 2 baar na aaye!
+        if (splash) splash.style.display = 'none';
+        if (mainApp) {
+            mainApp.classList.remove('blurred');
+            mainApp.classList.add('apple-unlock-active');
+        }
+    } else {
+        // 2. Agar browser mein hai, toh Firebase Auth ke resolve hone ka wait karo.
+        // Isse login screen beech mein flash nahi karegi!
+        let splashRemoved = false;
+        
+        // Wait for Firebase to make a decision
+        firebase.auth().onAuthStateChanged((user) => {
+            if (!splashRemoved) {
+                splashRemoved = true;
+                // Firebase ne decide kar liya, ab smooth tareeke se splash hatao
+                setTimeout(removeSplashScreen, 300); 
+            }
+        });
+
+        // FAIL-SAFE: Agar internet bohot slow hai, toh user ko atka ke mat rakho, 3 seconds me hata do
+        setTimeout(() => {
+            if (!splashRemoved) {
+                splashRemoved = true;
+                removeSplashScreen();
+            }
+        }, 3000);
     }
   </script>
+
 
 
 
