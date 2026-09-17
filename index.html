@@ -2356,19 +2356,19 @@
 </head>
 
 <body>
-  <!-- 🔥 KX EDGE PREMIUM SPLASH SCREEN 🔥 -->
+  <!-- 🔥 KX EDGE PREMIUM SPLASH SCREEN (INSTAGRAM + APPLE UNLOCK) 🔥 -->
   <style>
     #kx-splash {
       position: fixed;
       inset: 0;
-      background-color: #04060a;
+      background-color: #04060a; 
       z-index: 1000000;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       align-items: center;
-      padding-bottom: 55px;
-      transition: opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1), visibility 0.6s;
+      padding-bottom: 45px;
+      transition: opacity 0.4s ease-out, visibility 0.4s;
     }
 
     .splash-center {
@@ -2379,39 +2379,22 @@
     }
 
     .splash-logo-img {
-      width: 120px;
-      border-radius: 25px;
-      box-shadow: 0 0 50px rgba(139, 124, 255, 0.4);
-      animation: pulseGlowSplash 2s infinite alternate;
-    }
-
-    @keyframes pulseGlowSplash {
-      0% {
-        transform: scale(1);
-        box-shadow: 0 0 30px rgba(94, 231, 197, 0.2);
-      }
-
-      100% {
-        transform: scale(1.05);
-        box-shadow: 0 0 70px rgba(139, 124, 255, 0.7);
-      }
+      width: 100px; /* Instagram jaisa perfect size */
+      border-radius: 22px;
+      /* Animation hata di taaki native screen se smooth overlap ho */
     }
 
     .splash-bottom {
       text-align: center;
-      animation: slideUpEdge 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-      opacity: 0;
-      transform: translateY(30px);
     }
 
     .from-text {
       color: #727d91;
-      font-size: 13px;
-      letter-spacing: 2px;
+      font-size: 13.5px;
+      letter-spacing: 1px;
       font-weight: 600;
       display: block;
       margin-bottom: 4px;
-      text-transform: lowercase;
     }
 
     .brand-text {
@@ -2421,41 +2404,10 @@
       font-family: 'Space Grotesk', sans-serif;
       font-weight: 800;
       font-size: 26px;
-      letter-spacing: 4px;
-      text-shadow: 0 0 20px rgba(139, 124, 255, 0.3);
+      letter-spacing: 3px;
     }
 
-    @keyframes slideUpEdge {
-      to {
-        transform: translateY(0);
-        opacity: 1;
-      }
-    }
-
-    /* 🔥 1. THE LAPTOP SCROLLBAR KILLER (APP VIBE) 🔥 */
-    ::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: #04060a;
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.15);
-      border-radius: 10px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-      background: #8b7cff;
-    }
-
-    /* 🔥 2. APPLE iOS UNLOCK ANIMATION 🔥 */
-    #kx-splash {
-      /* स्प्लैश को 3D सपोर्ट देने के लिए transition को अपडेट किया */
-      transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.7s !important;
-    }
-
+    /* 🍏 LAUT AAYI TERI APPLE iOS UNLOCK ANIMATION 🍏 */
     .apple-unlock-active {
       animation: iosUnlock 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
     }
@@ -2466,33 +2418,14 @@
         opacity: 0;
         filter: blur(15px);
       }
-
       100% {
         transform: scale(1);
         opacity: 1;
         filter: blur(0px);
       }
     }
-    /* 🔥 PWA DOUBLE SPLASH KILLER (CSS LEVEL) 🔥 */
-    @media (display-mode: standalone) {
-      /* Agar app phone me install hoke khul rahi hai, toh custom splash ko render hi mat karo */
-      #kx-splash { 
-        display: none !important; 
-        opacity: 0 !important; 
-        visibility: hidden !important; 
-      }
-      /* Dashboard ko blur se turant hata do */
-      #main-content { 
-        filter: none !important; 
-        opacity: 1 !important; 
-      }
-      /* Login screen ko completely block karo taaki flash na ho */
-      #login-overlay {
-        display: none !important;
-        z-index: -100 !important;
-      }
-    }
   </style>
+>
 
   <div id="kx-splash">
     <div class="splash-center">
@@ -5506,56 +5439,45 @@
       }
     });
   </script>
-  <!-- 🔥 SPLASH SCREEN REMOVER ENGINE (GOD-TIER - DOUBLE FLASH FIX) 🔥 -->
+  <!-- 🔥 SPLASH SCREEN REMOVER ENGINE (INSTAGRAM + APPLE SYNC) 🔥 -->
   <script>
-    const splashLogo = document.querySelector('.splash-logo-img');
     const splash = document.getElementById('kx-splash');
     const mainApp = document.getElementById('main-content');
-    
-    // Check if PWA
-    const isPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
 
     function removeSplashScreen() {
-      if (splash && splash.style.display !== 'none') {
-        splash.style.transform = 'scale(1.2)';
+      if (splash) {
+        // 1. Splash screen ko Instagram ki tarah fade out karo
         splash.style.opacity = '0';
-        splash.style.visibility = 'hidden';
+        setTimeout(() => {
+          splash.style.visibility = 'hidden';
+          splash.style.display = 'none'; 
+        }, 400); // CSS ke time se match kiya
         
+        // 2. Uske theek baad Dashboard ko Apple style me bahar nikalo
         if (mainApp) {
           mainApp.classList.remove('blurred');
           mainApp.classList.add('apple-unlock-active');
         }
-        setTimeout(() => splash.remove(), 1000);
       }
     }
 
-    // Agar PWA hai toh CSS ne already hide kar diya hai, hume bas animation start karni hai
-    if (isPWA) {
-        firebase.auth().onAuthStateChanged((user) => {
-            if (mainApp) {
-                mainApp.classList.add('apple-unlock-active');
-            }
-        });
-    } else {
-        // Agar Web Browser me hai, toh normal Custom Splash dikhao
-        let splashRemoved = false;
-        firebase.auth().onAuthStateChanged((user) => {
-            if (!splashRemoved) {
-                splashRemoved = true;
-                setTimeout(removeSplashScreen, 300); 
-            }
-        });
+    // 🔥 THE MAGIC: Firebase check hone tak Splash screen hategi nahi! (No double flash)
+    let splashRemoved = false;
+    firebase.auth().onAuthStateChanged((user) => {
+        if (!splashRemoved) {
+            splashRemoved = true;
+            setTimeout(removeSplashScreen, 400); 
+        }
+    });
 
-        // Fail-safe
-        setTimeout(() => {
-            if (!splashRemoved) {
-                splashRemoved = true;
-                removeSplashScreen();
-            }
-        }, 3000);
-    }
+    // FAIL-SAFE (Agar net slow ho)
+    setTimeout(() => {
+        if (!splashRemoved) {
+            splashRemoved = true;
+            removeSplashScreen();
+        }
+    }, 3000);
   </script>
-  
 
 
 
