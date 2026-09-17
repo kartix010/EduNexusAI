@@ -8,11 +8,11 @@
   <title>EduNexus AI — The Ultimate AI-Powered Learning Companion</title>
 
   <!-- Tera purana icon wala link -->
-  <link rel="icon" type="image/png" href="https://i.ibb.co/Kz0LvSg9/logo.png">
+  <link rel="icon" type="image/png" href="https://ibb.co/JRtp47JK/KXEDGE.PNG">
 
   <!-- 🔥 YAHAN PASTE KARNA HAI (PWA Links) 🔥 -->
   <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="https://i.ibb.co/Kz0LvSg9/logo.png">
+  <link rel="apple-touch-icon" href="https://ibb.co/JRtp47JK/KXEDGE.PNG">
 
   <!-- Iske niche tere baaki ke font wale links rahenge -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2331,7 +2331,6 @@
       display: none !important;
       opacity: 0 !important;
       visibility: hidden !important;
-      z-index: -100 !important; /* 🔥 Ganda Flash block karne ke liye */
     }
 
     html.already-logged-in #main-content {
@@ -2356,7 +2355,8 @@
 </head>
 
 <body>
- 
+
+
   <!-- 🔥 YAHAN TERA NAYA PREMIUM UI AAYA HAI 🔥 -->
   <div id="login-overlay">
 
@@ -3258,61 +3258,61 @@
     firebase.initializeApp(firebaseConfig);
     const analytics = firebase.analytics();
     // 🚀 FCM PUSH NOTIFICATION ENGINE (ULTIMATE GOD TIER) 🚀
-    const messaging = firebase.messaging();
+        const messaging = firebase.messaging();
 
-    function requestNotificationPermission() {
-      Notification.requestPermission().then((permission) => {
-        if (permission === 'granted') {
-          console.log('Notification permission granted! System Armed.');
-
-          // 🛠️ FIX: पहले सर्विस वर्कर को ज़िंदा करो (Register), फिर टोकन मांगो!
-          navigator.serviceWorker.register('./edunexus-sw.js')
-            .then((registration) => {
-              console.log('✅ Service Worker Registered Successfully!');
-
-              // 🔑 TERI ASLI VAPID KEY YAHAN SET HAI!
-              return messaging.getToken({
-                vapidKey: 'BOY296o-qNkOwT7VBctRH-gIj20luet2JWbHz_Lmo3m9KeJxVc2hkyWpodd_4W7WAANiurfDRNjaQQH8xvYhQ2c',
-                serviceWorkerRegistration: registration // वर्कर को टोकन के साथ जोड़ दिया
-              });
-            })
-            .then((currentToken) => {
-              if (currentToken) {
-                console.log('🎯 Target Locked (Device Token):', currentToken);
-
-                // इस टोकन को फायरबेस डेटाबेस में सेव कर लो 
-                const user = firebase.auth().currentUser;
-                if (user) {
-                  firebase.firestore().collection('users').doc(user.uid).set({
-                    fcmToken: currentToken
-                  }, { merge: true });
+        function requestNotificationPermission() {
+            Notification.requestPermission().then((permission) => {
+                if (permission === 'granted') {
+                    console.log('Notification permission granted! System Armed.');
+                    
+                    // 🛠️ FIX: पहले सर्विस वर्कर को ज़िंदा करो (Register), फिर टोकन मांगो!
+                    navigator.serviceWorker.register('./edunexus-sw.js')
+                    .then((registration) => {
+                        console.log('✅ Service Worker Registered Successfully!');
+                        
+                        // 🔑 TERI ASLI VAPID KEY YAHAN SET HAI!
+                        return messaging.getToken({ 
+                            vapidKey: 'BOY296o-qNkOwT7VBctRH-gIj20luet2JWbHz_Lmo3m9KeJxVc2hkyWpodd_4W7WAANiurfDRNjaQQH8xvYhQ2c',
+                            serviceWorkerRegistration: registration // वर्कर को टोकन के साथ जोड़ दिया
+                        });
+                    })
+                    .then((currentToken) => {
+                        if (currentToken) {
+                            console.log('🎯 Target Locked (Device Token):', currentToken);
+                            
+                            // इस टोकन को फायरबेस डेटाबेस में सेव कर लो 
+                            const user = firebase.auth().currentUser;
+                            if(user) {
+                                firebase.firestore().collection('users').doc(user.uid).set({
+                                    fcmToken: currentToken
+                                }, { merge: true });
+                            }
+                        } else {
+                            console.log('No token available. Request permission to generate one.');
+                        }
+                    }).catch((err) => {
+                        console.log('Error while retrieving token: ', err);
+                    });
+                } else {
+                    console.log('User denied notification permission.');
                 }
-              } else {
-                console.log('No token available. Request permission to generate one.');
-              }
-            }).catch((err) => {
-              console.log('Error while retrieving token: ', err);
             });
-        } else {
-          console.log('User denied notification permission.');
         }
-      });
-    }
 
-    // जैसे ही बच्चा लॉगिन हो, 3 सेकंड बाद उससे परमिशन मांग लो!
-    firebase.auth().onAuthStateChanged((user) => {
-      if (user) {
-        setTimeout(requestNotificationPermission, 3000);
-      }
-    });
+        // जैसे ही बच्चा लॉगिन हो, 3 सेकंड बाद उससे परमिशन मांग लो!
+        firebase.auth().onAuthStateChanged((user) => {
+            if(user) {
+                setTimeout(requestNotificationPermission, 3000); 
+            }
+        });
+   
 
-
-    // जैसे ही बच्चा लॉगिन हो, 3 सेकंड बाद उससे परमिशन मांग लो!
-    firebase.auth().onAuthStateChanged((user) => {
-      if (user) {
-        setTimeout(requestNotificationPermission, 3000);
-      }
-    });
+        // जैसे ही बच्चा लॉगिन हो, 3 सेकंड बाद उससे परमिशन मांग लो!
+        firebase.auth().onAuthStateChanged((user) => {
+            if(user) {
+                setTimeout(requestNotificationPermission, 3000); 
+            }
+        });
 
     let isSignUp = false;
 
@@ -3509,19 +3509,12 @@
     const textToType = "Study smarter. ";
     const typeTarget = $("typing-text");
     let typeIndex = 0;
+
     function startTyping() {
       typeTarget.innerHTML = "";
       typeIndex = 0;
-
-      // 🔥 BUG FIX: अगर Splash Screen अभी है, तो उसके हटने का वेट करो!
-      const splash = document.getElementById('kx-splash');
-      if (splash && splash.style.opacity !== '0') {
-        setTimeout(typeEffect, 1200); // स्प्लैश हटने के साथ टाइपिंग शुरू होगी!
-      } else {
-        typeEffect(); // अगर बिना स्प्लैश के खुला है, तो तुरंत टाइप करो
-      }
+      typeEffect();
     }
-
 
     function typeEffect() {
       if (typeIndex < textToType.length) {
@@ -3572,7 +3565,7 @@
                 // एकदम हैकर लेवल लाल रंग का स्लीक UI
                 const notif = document.createElement('div');
                 notif.style.cssText = `position: fixed; bottom: 30px; right: -400px; width: 320px; background: rgba(14, 20, 33, 0.95); backdrop-filter: blur(15px); border-left: 4px solid #ff4757; border-radius: 12px; padding: 16px 20px; color: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 20px rgba(255,71,87,0.2); z-index: 10000; font-family: 'Inter', sans-serif; transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; gap: 12px; align-items: start;`;
-
+                
                 notif.innerHTML = `
                   <div style="background: rgba(255, 71, 87, 0.2); color: #ff4757; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font-size: 16px; flex-shrink: 0; box-shadow: 0 0 10px rgba(255,71,87,0.2);">⚠️</div>
                   <div style="flex: 1;">
@@ -3585,13 +3578,13 @@
 
                 // मक्खन एनीमेशन
                 requestAnimationFrame(() => notif.style.transform = 'translateX(-430px)');
-                setTimeout(() => { if (document.body.contains(notif)) { notif.style.transform = 'translateX(0)'; setTimeout(() => notif.remove(), 500); } }, 10000);
+                setTimeout(() => { if(document.body.contains(notif)) { notif.style.transform = 'translateX(0)'; setTimeout(() => notif.remove(), 500); } }, 10000); 
 
                 change.doc.ref.update({ read: true }); // फायरबेस में मार्क कर दो कि पढ़ लिया
               }
             });
           });
-
+     
         // Agar user logged in hai, toh dashboard kholo aur data sync karo
         const name = user.displayName || user.email.split('@')[0];
         localStorage.setItem('studymate_username', name);
@@ -3608,21 +3601,21 @@
               });
             }
           });
-        // 📢 2. SMART SILENT GLOBAL BROADCAST (WITH CLASS FILTER)
+          // 📢 2. SMART SILENT GLOBAL BROADCAST (WITH CLASS FILTER)
         firebase.firestore().collection('server_controls').doc('broadcast')
           .onSnapshot((doc) => {
             if (doc.exists) {
               const data = doc.data();
               const now = new Date().getTime();
               const msgTime = data.timestamp ? data.timestamp.toDate().getTime() : now;
-
+              
               if (data.active && (now - msgTime < 60000)) {
                 let msg = data.message;
                 const userClass = localStorage.getItem('edunexus_class') || "";
 
                 // 🔥 THE GOD-TIER SMART FILTER LOGIC 🔥
-                if (msg.startsWith('[Class 11]') && !userClass.includes('11')) return;
-                if (msg.startsWith('[Class 12]') && !userClass.includes('12')) return;
+                if (msg.startsWith('[Class 11]') && !userClass.includes('11')) return; 
+                if (msg.startsWith('[Class 12]') && !userClass.includes('12')) return; 
 
                 // नोटिफिकेशन में दिखाने से पहले [Class 11] वाला टैग गायब कर दो (Magic 🪄)
                 msg = msg.replace('[Class 11]', '').replace('[Class 12]', '').trim();
@@ -3630,7 +3623,7 @@
                 // पर्पल रंग का प्रीमियम UI
                 const notif = document.createElement('div');
                 notif.style.cssText = `position: fixed; bottom: 30px; right: -400px; width: 320px; background: rgba(14, 20, 33, 0.95); backdrop-filter: blur(15px); border-left: 4px solid #8b7cff; border-radius: 12px; padding: 16px 20px; color: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 20px rgba(139,124,255,0.2); z-index: 10000; font-family: 'Inter', sans-serif; transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; gap: 12px; align-items: start;`;
-
+                
                 notif.innerHTML = `
                   <div style="background: rgba(139, 124, 255, 0.2); color: #8b7cff; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font-size: 16px; flex-shrink: 0; box-shadow: 0 0 10px rgba(139,124,255,0.2);">🔔</div>
                   <div style="flex: 1;">
@@ -3642,7 +3635,7 @@
                 document.body.appendChild(notif);
 
                 requestAnimationFrame(() => notif.style.transform = 'translateX(-430px)');
-                setTimeout(() => { if (document.body.contains(notif)) { notif.style.transform = 'translateX(0)'; setTimeout(() => notif.remove(), 500); } }, 8000);
+                setTimeout(() => { if(document.body.contains(notif)) { notif.style.transform = 'translateX(0)'; setTimeout(() => notif.remove(), 500); } }, 8000);
               }
             }
           });
@@ -4149,7 +4142,7 @@
 
           "Chemistry": [
 
-
+          
             {
               year: "2022-2023",
               name: "Chemistry DoE Mid-Term Paper",
@@ -4175,7 +4168,7 @@
               name: "Chemistry DoE Mid-Term Papers with MS (Evening)",
               link: "https://drive.google.com/file/d/123WRVsQr9tpl7khS3DdEkBhmKB-HOAiO/view?usp=sharing"
             },
-            {
+             {
               year: "2025-2026",
               name: "Chemistry DoE Mid-Term Papers (Morning)",
               link: "https://drive.google.com/file/d/1sG-EIV3cRE_6ZZg3RlzYkO5n9E7lGmdw/view?usp=drivesdk"
@@ -4183,8 +4176,8 @@
 
 
 
-
-
+            
+            
           ],
 
         },
@@ -5357,40 +5350,7 @@
       }
     });
   </script>
-  <!-- 🔥 THE INSTAGRAM-SMOOTH SPLASH REMOVER 🔥
-  <script>
-    const splash = document.getElementById('kx-splash');
-    const mainApp = document.getElementById('main-content');
 
-    // 🔥 Sirf tabhi skip karo jab user browser me refresh kar raha ho
-    if (sessionStorage.getItem('kx_splash_seen') === 'true') {
-        if (splash) {
-            splash.style.display = 'none';
-            splash.style.visibility = 'hidden';
-        }
-        if (mainApp) mainApp.classList.remove('blurred');
-    } else {
-        function removeSplashScreen() {
-            if (splash) {
-                splash.style.opacity = '0';
-                setTimeout(() => {
-                    splash.style.visibility = 'hidden';
-                    splash.style.display = 'none'; 
-                }, 500); 
-                
-                if (mainApp) {
-                    mainApp.classList.remove('blurred');
-                    mainApp.classList.add('apple-unlock-active');
-                }
-                sessionStorage.setItem('kx_splash_seen', 'true');
-            }
-        }
-
-        // 1.5 seconds ka wait taaki Android Logo seamlessly HTML me blend ho jaye aur KX EDGE dikhe
-        setTimeout(removeSplashScreen, 1500);
-    }
-  </script>
- -->
 
 
 </body>
