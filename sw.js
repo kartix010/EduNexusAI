@@ -1,11 +1,12 @@
-const CACHE_NAME = 'edunexus-live-v3'; // Version change kiya taaki naya turant update ho
+const CACHE_NAME = 'edunexus-live-v4'; // 🔥 Naya update turant push karne ke liye v4
+
 const ASSETS = [
   './',
   './index.html',
   './manifest.json'
 ];
 
-// 1. Force Install: Naya update aate hi wait mat karo, turant install karo
+// 1. INSTANT INSTALL: Naya update aate hi turant install (No Waiting)
 self.addEventListener('install', (event) => {
   self.skipWaiting();
   event.waitUntil(
@@ -13,13 +14,14 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// 2. Auto-Clean: Jaise hi naya update aaye, purane kachre (cache) ko delete maar do
+// 2. AUTO-CLEAN: Purane kachre aur caches ko turant delete maaro
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cache) => {
           if (cache !== CACHE_NAME) {
+            console.log('🧹 KX Core: Old cache cleared ->', cache);
             return caches.delete(cache);
           }
         })
@@ -28,28 +30,30 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// 3. THE MAGIC (Network First): Hamesha pehle internet se naya code laao
+// 3. THE MAGIC (Network First with Bulletproof Safety)
 self.addEventListener('fetch', (event) => {
-  // 🔥 THE LIFESAVER FIX: Sirf GET requests ko cache karo. POST (Firebase/AI) ko ignore karo warna crash hoga!
+  // 🔥 GET ke alawa kisi request ko mat chhedo (Firebase/AI API ekdam safe)
   if (event.request.method !== 'GET') {
-      return; // Browser ko normal kaam karne do, service worker interfere nahi karega
+    return;
   }
 
-  // Chrome extensions wagaira ke errors se bachne ke liye
+  // 🔥 Chrome extensions wagaira ke errors ko block karo
   if (!event.request.url.startsWith('http')) {
-      return;
+    return;
   }
 
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        // Agar internet chal raha hai, toh naya code dikhao aur cache ko bhi update kar lo
-        const resClone = response.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, resClone));
+        // 🔥 ULTIMATE SAFETY FIX: Sirf successful data (200 OK) ko hi cache me dalo. Error pages cache mat karo!
+        if (response && response.status === 200) {
+          const resClone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, resClone));
+        }
         return response;
       })
       .catch(() => {
-        // Agar user offline hai (no internet), tabhi phone ki memory se purana app dikhao
+        // Agar user offline (No Internet) hai, tabhi background memory se chalne do
         return caches.match(event.request);
       })
   );
