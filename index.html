@@ -20,16 +20,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap"
     rel="stylesheet">
-
-
-    
   <style>
-    /* 🔥 PWA NATIVE OVERLAP FIX 🔥 */
-    @media all and (display-mode: standalone) {
-      #kx-splash {
-        display: none !important;
-      }
-    }
     :root {
       --bg: #070a12;
       --panel: #0e1421;
@@ -2336,22 +2327,17 @@
     }
   </script>
   <style>
-    html.already-logged-in #login-overlay, 
-    html.already-logged-in #kx-splash { /* YAHAN ADD KIYA HAIN */
+    html.already-logged-in #login-overlay {
       display: none !important;
       opacity: 0 !important;
       visibility: hidden !important;
-      z-index: -100 !important;
+      z-index: -100 !important; /* 🔥 Ganda Flash block karne ke liye */
     }
 
     html.already-logged-in #main-content {
       filter: blur(0px) brightness(1) !important;
       pointer-events: auto !important;
     }
-   
-
-   
-
 
     .plan-list-wrapper {
       width: 100%;
