@@ -2356,19 +2356,19 @@
 </head>
 
 <body>
-  <!-- 🔥 KX EDGE PREMIUM SPLASH SCREEN (INSTAGRAM + APPLE UNLOCK) 🔥 -->
+  <!-- 🔥 THE TRUE INSTAGRAM LEVEL SPLASH SCREEN 🔥 -->
   <style>
     #kx-splash {
       position: fixed;
       inset: 0;
-      background-color: #04060a; 
+      background-color: #04060a; /* Android manifest se exactly match karega */
       z-index: 1000000;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       align-items: center;
       padding-bottom: 45px;
-      transition: opacity 0.4s ease-out, visibility 0.4s;
+      transition: opacity 0.5s ease-out, visibility 0.5s;
     }
 
     .splash-center {
@@ -2378,62 +2378,91 @@
       justify-content: center;
     }
 
+    /* 🔥 Ye logo hilna nahi chahiye warna lag dikhega 🔥 */
     .splash-logo-img {
-      width: 100px; /* Instagram jaisa perfect size */
-      border-radius: 22px;
-      /* Animation hata di taaki native screen se smooth overlap ho */
+      width: 100px; 
+      height: 100px;
+      object-fit: contain;
     }
 
+    /* 🔥 Niche wala KX EDGE smoothly fade in hoga 🔥 */
     .splash-bottom {
       text-align: center;
+      opacity: 0;
+      animation: fadeInEdge 0.6s ease-out 0.3s forwards;
     }
 
-    .from-text {
-      color: #727d91;
-      font-size: 13.5px;
-      letter-spacing: 1px;
-      font-weight: 600;
-      display: block;
-      margin-bottom: 4px;
+    @keyframes fadeInEdge {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
-    .brand-text {
+    .brand-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    /* TERA STYLIZED SVG KX LOGO */
+    .kx-neural-logo {
+      height: 28px;
+      width: auto;
+      filter: drop-shadow(0 0 10px rgba(94, 231, 197, 0.4));
+    }
+
+    .brand-text-edge {
       background: linear-gradient(90deg, #ffffff, #a59dff);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       font-family: 'Space Grotesk', sans-serif;
       font-weight: 800;
-      font-size: 26px;
-      letter-spacing: 3px;
+      font-size: 32px;
+      letter-spacing: 5px;
     }
 
-    /* 🍏 LAUT AAYI TERI APPLE iOS UNLOCK ANIMATION 🍏 */
+    .from-text {
+      color: #727d91;
+      font-size: 13px;
+      letter-spacing: 2px;
+      font-weight: 600;
+      display: block;
+      margin-bottom: 6px;
+      text-transform: lowercase;
+    }
+
     .apple-unlock-active {
       animation: iosUnlock 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
     }
 
     @keyframes iosUnlock {
-      0% {
-        transform: scale(0.90);
-        opacity: 0;
-        filter: blur(15px);
-      }
-      100% {
-        transform: scale(1);
-        opacity: 1;
-        filter: blur(0px);
-      }
+      0% { transform: scale(0.90); opacity: 0; filter: blur(15px); }
+      100% { transform: scale(1); opacity: 1; filter: blur(0px); }
     }
   </style>
->
 
   <div id="kx-splash">
     <div class="splash-center">
-      <img src="https://i.ibb.co/Kz0LvSg9/logo.png" alt="EduNexus AI" class="splash-logo-img">
+      <!-- 🎯 The Anchor Logo: Exact Android size -->
+      <img src="https://i.ibb.co/Kz0LvSg9/logo.png" alt="EduNexus" class="splash-logo-img">
     </div>
     <div class="splash-bottom">
       <span class="from-text">from</span>
-      <div class="brand-text">KX EDGE</div>
+      <div class="brand-wrapper">
+        <!-- 🎯 Tera Stylized KX SVG -->
+        <svg class="kx-neural-logo" viewBox="0 0 32 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="kxGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#5ee7c5" />
+              <stop offset="100%" stop-color="#8b7cff" />
+            </linearGradient>
+          </defs>
+          <path d="M 4 3 L 4 21" stroke="url(#kxGrad)" stroke-width="4" stroke-linecap="round"/>
+          <path d="M 18 3 L 4 12 L 18 21" stroke="url(#kxGrad)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M 11 3 L 25 21" stroke="url(#kxGrad)" stroke-width="4" stroke-linecap="round"/>
+        </svg>
+        <div class="brand-text-edge">EDGE</div>
+      </div>
     </div>
   </div>
   <!-- 🔥 SPLASH SCREEN END 🔥 -->
@@ -5439,44 +5468,39 @@
       }
     });
   </script>
-  <!-- 🔥 SPLASH SCREEN REMOVER ENGINE (ULTIMATE ZERO-LAG FIX) 🔥 -->
+  <!-- 🔥 THE INSTAGRAM-SMOOTH SPLASH REMOVER 🔥 -->
   <script>
     const splash = document.getElementById('kx-splash');
     const mainApp = document.getElementById('main-content');
 
-    // 🔥 THE MAGIC: अगर ऐप एक बार खुल चुकी है, तो रीलोड पर स्प्लैश गायब! (0-Lag) 🔥
+    // 🔥 Sirf tabhi skip karo jab user browser me refresh kar raha ho
     if (sessionStorage.getItem('kx_splash_seen') === 'true') {
-        if (splash) splash.style.display = 'none'; // स्प्लैश को तुरंत उड़ा दो
-        if (mainApp) mainApp.classList.remove('blurred'); // ऐप को तुरंत क्लियर कर दो
+        if (splash) {
+            splash.style.display = 'none';
+            splash.style.visibility = 'hidden';
+        }
+        if (mainApp) mainApp.classList.remove('blurred');
     } else {
-        // 🔥 पहली बार ऐप खोलने पर शानदार Apple 3D Animation चलेगी 🔥
         function removeSplashScreen() {
             if (splash) {
                 splash.style.opacity = '0';
                 setTimeout(() => {
                     splash.style.visibility = 'hidden';
                     splash.style.display = 'none'; 
-                }, 400); 
+                }, 500); 
                 
                 if (mainApp) {
                     mainApp.classList.remove('blurred');
                     mainApp.classList.add('apple-unlock-active');
                 }
-                // मेमोरी में सेव कर लो कि यूज़र ने स्प्लैश देख लिया है
                 sessionStorage.setItem('kx_splash_seen', 'true');
             }
         }
 
-        // Android PWA (Native Splash) को मैच करने के लिए 800ms का परफेक्ट टाइमर
-        window.addEventListener('load', () => {
-            setTimeout(removeSplashScreen, 800);
-        });
-        
-        // Fail-safe
-        setTimeout(removeSplashScreen, 3000);
+        // 1.5 seconds ka wait taaki Android Logo seamlessly HTML me blend ho jaye aur KX EDGE dikhe
+        setTimeout(removeSplashScreen, 1500);
     }
   </script>
-
 
 
 
