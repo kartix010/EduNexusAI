@@ -5439,44 +5439,42 @@
       }
     });
   </script>
-  <!-- 🔥 SPLASH SCREEN REMOVER ENGINE (INSTAGRAM + APPLE SYNC) 🔥 -->
+  <!-- 🔥 SPLASH SCREEN REMOVER ENGINE (ULTIMATE ZERO-LAG FIX) 🔥 -->
   <script>
     const splash = document.getElementById('kx-splash');
     const mainApp = document.getElementById('main-content');
 
-    function removeSplashScreen() {
-      if (splash) {
-        // 1. Splash screen ko Instagram ki tarah fade out karo
-        splash.style.opacity = '0';
-        setTimeout(() => {
-          splash.style.visibility = 'hidden';
-          splash.style.display = 'none'; 
-        }, 400); // CSS ke time se match kiya
+    // 🔥 THE MAGIC: अगर ऐप एक बार खुल चुकी है, तो रीलोड पर स्प्लैश गायब! (0-Lag) 🔥
+    if (sessionStorage.getItem('kx_splash_seen') === 'true') {
+        if (splash) splash.style.display = 'none'; // स्प्लैश को तुरंत उड़ा दो
+        if (mainApp) mainApp.classList.remove('blurred'); // ऐप को तुरंत क्लियर कर दो
+    } else {
+        // 🔥 पहली बार ऐप खोलने पर शानदार Apple 3D Animation चलेगी 🔥
+        function removeSplashScreen() {
+            if (splash) {
+                splash.style.opacity = '0';
+                setTimeout(() => {
+                    splash.style.visibility = 'hidden';
+                    splash.style.display = 'none'; 
+                }, 400); 
+                
+                if (mainApp) {
+                    mainApp.classList.remove('blurred');
+                    mainApp.classList.add('apple-unlock-active');
+                }
+                // मेमोरी में सेव कर लो कि यूज़र ने स्प्लैश देख लिया है
+                sessionStorage.setItem('kx_splash_seen', 'true');
+            }
+        }
+
+        // Android PWA (Native Splash) को मैच करने के लिए 800ms का परफेक्ट टाइमर
+        window.addEventListener('load', () => {
+            setTimeout(removeSplashScreen, 800);
+        });
         
-        // 2. Uske theek baad Dashboard ko Apple style me bahar nikalo
-        if (mainApp) {
-          mainApp.classList.remove('blurred');
-          mainApp.classList.add('apple-unlock-active');
-        }
-      }
+        // Fail-safe
+        setTimeout(removeSplashScreen, 3000);
     }
-
-    // 🔥 THE MAGIC: Firebase check hone tak Splash screen hategi nahi! (No double flash)
-    let splashRemoved = false;
-    firebase.auth().onAuthStateChanged((user) => {
-        if (!splashRemoved) {
-            splashRemoved = true;
-            setTimeout(removeSplashScreen, 400); 
-        }
-    });
-
-    // FAIL-SAFE (Agar net slow ho)
-    setTimeout(() => {
-        if (!splashRemoved) {
-            splashRemoved = true;
-            removeSplashScreen();
-        }
-    }, 3000);
   </script>
 
 
