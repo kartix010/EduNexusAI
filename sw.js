@@ -1,4 +1,4 @@
-const CACHE_NAME = 'edunexus-live-v4'; // 🔥 Naya update turant push karne ke liye v4
+const CACHE_NAME = 'edunexus-live-v2'; // 🔥 Naya update turant push karne ke liye v4
 
 const ASSETS = [
   './',
