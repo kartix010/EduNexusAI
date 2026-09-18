@@ -3809,15 +3809,22 @@
       document.getElementById('planEmptyTitle').textContent = `${name}'s personalized plan will appear here`;
       document.getElementById('messages').innerHTML = `<div class="message ai"><span class="msg-avatar">✦</span><div>Hey ${name} 👋 KX Core! initialized.. Ready for a quiz or a concept decode today?</div></div>`;
 
-      if (isFirstTime) {
-        const webhookURL = "https://edunexusai.onrender.com/discord-alert";
-        fetch(webhookURL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ content: `🚨 **BINGO!** New User Loged In!\n🧑‍🎓 **Name:** ${name}\n💻 **Action:** Launched EduNexus AI Dashboard 🚀` })
-        }).catch(err => console.log("Tracker silent fail"));
-      }
-    }
+
+      // 🔥 GOD-TIER TRACKER: Har Login par chalega aur Error dikhayega 🔥
+    const webhookURL = "https://edunexusai.onrender.com/discord-alert";
+    let actionTitle = isFirstTime ? "🚨 **BINGO!** New User Created Account!" : "🔄 **WELCOME BACK!** User Logged In!";
+    
+    fetch(webhookURL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ content: `${actionTitle}\n🧑‍🎓 **Name:** ${name}\n💻 **Action:** Launched EduNexus AI Dashboard 🚀` })
+    })
+    .then(res => { 
+      if(!res.ok) console.error("Discord Alert Blocked by Backend (Check Render Logs):", res.status); 
+    })
+    .catch(err => console.error("Discord Tracker Failed:", err)); // Silent fail hata diya!
+  }
+
 
     // 🔥 FIXED LOGOUT LOGIC (Firebase + Local Memory dono clear karega) 🔥
     function logout() {
@@ -4718,20 +4725,8 @@
       } catch (e) {
         console.error("Tracking Error: ", e);
       }
-
-      // 2. Send to Discord (सिर्फ इम्पॉर्टेंट चीज़ों के लिए लाइव अलर्ट)
-      if (actionType === "QUIZ_COMPLETED" || actionType === "PYQ_OPENED") {
-        const webhookURL = "https://edunexusai.onrender.com/discord-alert";
-
-        fetch(webhookURL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            content: `📊 **USER ACTIVITY ALERT!**\n🧑‍🎓 **User:** ${userName}\n⚡ **Action:** ${actionType}\n📌 **Details:** ${details}`
-          })
-        }).catch(err => console.log("Discord tracker silent fail"));
-      }
     }
+
 
 
 
