@@ -1,4 +1,4 @@
-const CACHE_NAME = 'edunexus-live-v6';
+const CACHE_NAME = 'edunexus-live-v7';
 const ASSETS = [
   './',
   './index.html',
