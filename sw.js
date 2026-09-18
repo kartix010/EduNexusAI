@@ -1,10 +1,10 @@
-const CACHE_NAME = 'edunexus-live-v10';
+const CACHE_NAME = 'edunexus-live-v11';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  'https://i.ibb.co/R4bq8sqB/KXEDGE.png', // 512 wala link
-  'https://i.ibb.co/ccXF7gCj/kx1.png'    // 192 wala link bhi aa gaya
+  'https://i.ibb.co/Kz0LvSg9/logo.png', // 512 wala link
+  'https://i.ibb.co/Kz0LvSg9/logo.png'    // 192 wala link bhi aa gaya
 ];
 
 self.addEventListener('install', (event) => {
