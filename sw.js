@@ -1,11 +1,11 @@
-const CACHE_NAME = 'edunexus-live-v5'; // Update version
-
+const CACHE_NAME = 'edunexus-live-v6';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  'https://ibb.co/JRtp47JK/KXEDGE.PNG' // Icon zaroor cache hona chahiye
+  'https://i.ibb.co/JRtp47JK/KXEDGE.PNG' // Yahan direct image link (i.ibb.co) daal diya!
 ];
+
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
