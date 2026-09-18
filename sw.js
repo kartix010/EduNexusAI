@@ -1,9 +1,9 @@
-const CACHE_NAME = 'edunexus-live-v7';
+const CACHE_NAME = 'edunexus-live-v8';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  'https://i.ibb.co/JRtp47JK/KXEDGE.PNG' // Yahan direct image link (i.ibb.co) daal diya!
+  'https://i.ibb.co/R4bq8sqB/KXEDGE.png' // Yahan direct image link (i.ibb.co) daal diya!
 ];
 
 
