@@ -1070,7 +1070,7 @@
       flex: 1;
       overflow-y: auto;
       scroll-behavior: smooth;
-      overscroll-behavior: contain;
+      overscroll-behavior: auto;
       -webkit-overflow-scrolling: touch;
       touch-action: pan-y !important;
       /* 🔥 ये है वो मैजिक लाइन जो बीच का स्क्रॉल फिक्स करेगी! */
@@ -1557,15 +1557,20 @@
     footer {
       max-width: 1184px;
       margin: auto;
-      padding: 30px 28px 50px;
+      padding: 30px 28px 15px;
       border-top: 1px solid var(--line);
       display: flex;
       justify-content: center;
+      text-align: center; /* 🔥 Fix 1: टूटे हुए टेक्स्ट को जबरदस्ती सेंटर में रखेगा */
+      line-height: 1.6; /* 🔥 Fix 2: अगर टेक्स्ट 2 लाइन में आया, तो उनके बीच साँस लेने की जगह देगा */
       color: #566175;
       font-size: 11px;
       letter-spacing: 0.5px;
     }
+    
 
+    
+     
     footer span {
       opacity: 0.7;
       transition: 0.3s ease;
@@ -2242,7 +2247,22 @@
         display: flex !important;
         flex-direction: column !important;
         align-items: flex-start !important;
+        gap: 5px !important; 
+        margin-bottom: 22px !important; 
+      } /* 🔥 ये वाला ब्रैकेट तूने मिस कर दिया था! इसे बंद करना जरूरी है 🔥 */
+
+      /* 🔥 STEP 2 FIX: Form inputs को मोबाइल पर एक-के-नीचे-एक (Vertical) करना 🔥 */
+      #plannerForm > div[style*="display: flex"] {
+        flex-direction: column !important;
+        gap: 12px !important;
+        margin-top: 12px !important;
       }
+      
+      #plannerForm .panel-title {
+        margin-bottom: 20px !important;
+      }
+     
+      
 
       .section-heading h2 {
         font-size: 32px !important;
@@ -2259,6 +2279,19 @@
         flex-direction: column !important;
       }
     }
+    /* 🔥 STEP 4 FIX: Footer के ऊपर का फालतू स्पेस काटना 🔥 */
+      main {
+        padding-bottom: 0px !important;
+      }
+      .section {
+        padding-bottom: 25px !important;
+      }
+      .pitch-card {
+        padding: 40px 20px !important;
+      }
+      footer {
+        padding-top: 25px !important;
+      }
 
     /* 🔥 CHAT BUBBLE MOBILE FIX 🔥 */
     @media(max-width: 850px) {
@@ -2272,6 +2305,7 @@
         max-width: 98% !important;
         /* AI को पूरा फैलने की आज़ादी दे दी */
       }
+      
 
       /* 🔥 MESSAGE BOX FIX (LAMBE TEXT KE LIYE) 🔥 */
       .message>div {
@@ -3067,6 +3101,7 @@
         </div>
 
 
+
         <div class="progress-panel glass tilt-panel">
           <div class="chart-head">
             <div><span class="mini-label">SUBJECT HEALTH</span>
@@ -3117,7 +3152,7 @@
     </main>
 
     <footer>
-      <span>EduNexus AI — Powered by KX Neural Core! | Developed by KX Dynamics</span>
+      <span>EduNexus AI — Powered by KX Neural Core! | Developed by KX EDGE</span>
     </footer>
   </div>
 
@@ -3166,7 +3201,7 @@
   <!-- 🔥 JS FOR PARTICLES BACKGROUND (LIVE CONSTELLATION) 🔥 -->
   <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
   <!-- JS FOR PARTICLES BACKGROUND (LIVE CONSTELLATION) -->
-  <script src="https://cdn.jsdelivr.net/npm/tsparticles..."></script>
+  <!-- <script src="https://cdn.jsdelivr.net/npm/tsparticles..."></script> -->
 
   <!-- 👇👇 YAHAN PAR PASTE KARNA HAI (Line 2910) 👇👇 -->
   <!-- 🔥 MERMAID JS FOR DYNAMIC AI DIAGRAMS 🔥 -->
@@ -3176,10 +3211,32 @@
   </script>
   <!-- 👆👆 YAHAN TAK 👆👆 -->
   <script>
-
-
     // Consistent premium smooth-scroll feel across phone, tablet and desktop
     const lenis = new Lenis({ autoRaf: true });
+
+    // 🔥 GOD-TIER SMART SCROLL INTERCEPTOR (LAPTOP/DESKTOP FIX) 🔥
+    // Ye code wheel event ko Lenis tak tab tak nahi jaane dega jab tak andar ka content scroll ho raha hai.
+    // Jaise hi scroll end hoga, event Lenis ko pass ho jayega (Perfect Scroll Chaining!)
+    document.addEventListener('wheel', (e) => {
+      const scrollable = e.target.closest('.messages, .plan-list-wrapper, .modal-content, .tutor-side');
+      if (scrollable) {
+        const isScrollingDown = e.deltaY > 0;
+
+        // +1 aur Math.ceil lagaya hai fractional pixel errors ko handle karne ke liye
+        const isAtBottom = Math.ceil(scrollable.scrollTop + scrollable.clientHeight) >= scrollable.scrollHeight - 1;
+        const isAtTop = scrollable.scrollTop <= 0;
+
+        // Agar box ke bottom par nahi hain (aur neeche scroll kar rahe hain) 
+        // YA top par nahi hain (aur upar scroll kar rahe hain) -> STOP LENIS
+        if (!((isScrollingDown && isAtBottom) || (!isScrollingDown && isAtTop))) {
+          e.stopPropagation(); // Lenis ko wheel event nahi dikhega, 100% native smooth scroll chalega
+        }
+      }
+    }, { passive: false });
+
+
+
+
 
   </script>
   <script>
@@ -3258,61 +3315,61 @@
     firebase.initializeApp(firebaseConfig);
     const analytics = firebase.analytics();
     // 🚀 FCM PUSH NOTIFICATION ENGINE (ULTIMATE GOD TIER) 🚀
-        const messaging = firebase.messaging();
+    const messaging = firebase.messaging();
 
-        function requestNotificationPermission() {
-            Notification.requestPermission().then((permission) => {
-                if (permission === 'granted') {
-                    console.log('Notification permission granted! System Armed.');
-                    
-                    // 🛠️ FIX: पहले सर्विस वर्कर को ज़िंदा करो (Register), फिर टोकन मांगो!
-                    navigator.serviceWorker.register('./edunexus-sw.js')
-                    .then((registration) => {
-                        console.log('✅ Service Worker Registered Successfully!');
-                        
-                        // 🔑 TERI ASLI VAPID KEY YAHAN SET HAI!
-                        return messaging.getToken({ 
-                            vapidKey: 'BOY296o-qNkOwT7VBctRH-gIj20luet2JWbHz_Lmo3m9KeJxVc2hkyWpodd_4W7WAANiurfDRNjaQQH8xvYhQ2c',
-                            serviceWorkerRegistration: registration // वर्कर को टोकन के साथ जोड़ दिया
-                        });
-                    })
-                    .then((currentToken) => {
-                        if (currentToken) {
-                            console.log('🎯 Target Locked (Device Token):', currentToken);
-                            
-                            // इस टोकन को फायरबेस डेटाबेस में सेव कर लो 
-                            const user = firebase.auth().currentUser;
-                            if(user) {
-                                firebase.firestore().collection('users').doc(user.uid).set({
-                                    fcmToken: currentToken
-                                }, { merge: true });
-                            }
-                        } else {
-                            console.log('No token available. Request permission to generate one.');
-                        }
-                    }).catch((err) => {
-                        console.log('Error while retrieving token: ', err);
-                    });
-                } else {
-                    console.log('User denied notification permission.');
+    function requestNotificationPermission() {
+      Notification.requestPermission().then((permission) => {
+        if (permission === 'granted') {
+          console.log('Notification permission granted! System Armed.');
+
+          // 🛠️ FIX: पहले सर्विस वर्कर को ज़िंदा करो (Register), फिर टोकन मांगो!
+          navigator.serviceWorker.register('./edunexus-sw.js')
+            .then((registration) => {
+              console.log('✅ Service Worker Registered Successfully!');
+
+              // 🔑 TERI ASLI VAPID KEY YAHAN SET HAI!
+              return messaging.getToken({
+                vapidKey: 'BOY296o-qNkOwT7VBctRH-gIj20luet2JWbHz_Lmo3m9KeJxVc2hkyWpodd_4W7WAANiurfDRNjaQQH8xvYhQ2c',
+                serviceWorkerRegistration: registration // वर्कर को टोकन के साथ जोड़ दिया
+              });
+            })
+            .then((currentToken) => {
+              if (currentToken) {
+                console.log('🎯 Target Locked (Device Token):', currentToken);
+
+                // इस टोकन को फायरबेस डेटाबेस में सेव कर लो 
+                const user = firebase.auth().currentUser;
+                if (user) {
+                  firebase.firestore().collection('users').doc(user.uid).set({
+                    fcmToken: currentToken
+                  }, { merge: true });
                 }
+              } else {
+                console.log('No token available. Request permission to generate one.');
+              }
+            }).catch((err) => {
+              console.log('Error while retrieving token: ', err);
             });
+        } else {
+          console.log('User denied notification permission.');
         }
+      });
+    }
 
-        // जैसे ही बच्चा लॉगिन हो, 3 सेकंड बाद उससे परमिशन मांग लो!
-        firebase.auth().onAuthStateChanged((user) => {
-            if(user) {
-                setTimeout(requestNotificationPermission, 3000); 
-            }
-        });
-   
+    // जैसे ही बच्चा लॉगिन हो, 3 सेकंड बाद उससे परमिशन मांग लो!
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        setTimeout(requestNotificationPermission, 3000);
+      }
+    });
 
-        // जैसे ही बच्चा लॉगिन हो, 3 सेकंड बाद उससे परमिशन मांग लो!
-        firebase.auth().onAuthStateChanged((user) => {
-            if(user) {
-                setTimeout(requestNotificationPermission, 3000); 
-            }
-        });
+
+    // जैसे ही बच्चा लॉगिन हो, 3 सेकंड बाद उससे परमिशन मांग लो!
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        setTimeout(requestNotificationPermission, 3000);
+      }
+    });
 
     let isSignUp = false;
 
@@ -3565,7 +3622,7 @@
                 // एकदम हैकर लेवल लाल रंग का स्लीक UI
                 const notif = document.createElement('div');
                 notif.style.cssText = `position: fixed; bottom: 30px; right: -400px; width: 320px; background: rgba(14, 20, 33, 0.95); backdrop-filter: blur(15px); border-left: 4px solid #ff4757; border-radius: 12px; padding: 16px 20px; color: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 20px rgba(255,71,87,0.2); z-index: 10000; font-family: 'Inter', sans-serif; transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; gap: 12px; align-items: start;`;
-                
+
                 notif.innerHTML = `
                   <div style="background: rgba(255, 71, 87, 0.2); color: #ff4757; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font-size: 16px; flex-shrink: 0; box-shadow: 0 0 10px rgba(255,71,87,0.2);">⚠️</div>
                   <div style="flex: 1;">
@@ -3578,13 +3635,13 @@
 
                 // मक्खन एनीमेशन
                 requestAnimationFrame(() => notif.style.transform = 'translateX(-430px)');
-                setTimeout(() => { if(document.body.contains(notif)) { notif.style.transform = 'translateX(0)'; setTimeout(() => notif.remove(), 500); } }, 10000); 
+                setTimeout(() => { if (document.body.contains(notif)) { notif.style.transform = 'translateX(0)'; setTimeout(() => notif.remove(), 500); } }, 10000);
 
                 change.doc.ref.update({ read: true }); // फायरबेस में मार्क कर दो कि पढ़ लिया
               }
             });
           });
-     
+
         // Agar user logged in hai, toh dashboard kholo aur data sync karo
         const name = user.displayName || user.email.split('@')[0];
         localStorage.setItem('studymate_username', name);
@@ -3601,21 +3658,21 @@
               });
             }
           });
-          // 📢 2. SMART SILENT GLOBAL BROADCAST (WITH CLASS FILTER)
+        // 📢 2. SMART SILENT GLOBAL BROADCAST (WITH CLASS FILTER)
         firebase.firestore().collection('server_controls').doc('broadcast')
           .onSnapshot((doc) => {
             if (doc.exists) {
               const data = doc.data();
               const now = new Date().getTime();
               const msgTime = data.timestamp ? data.timestamp.toDate().getTime() : now;
-              
+
               if (data.active && (now - msgTime < 60000)) {
                 let msg = data.message;
                 const userClass = localStorage.getItem('edunexus_class') || "";
 
                 // 🔥 THE GOD-TIER SMART FILTER LOGIC 🔥
-                if (msg.startsWith('[Class 11]') && !userClass.includes('11')) return; 
-                if (msg.startsWith('[Class 12]') && !userClass.includes('12')) return; 
+                if (msg.startsWith('[Class 11]') && !userClass.includes('11')) return;
+                if (msg.startsWith('[Class 12]') && !userClass.includes('12')) return;
 
                 // नोटिफिकेशन में दिखाने से पहले [Class 11] वाला टैग गायब कर दो (Magic 🪄)
                 msg = msg.replace('[Class 11]', '').replace('[Class 12]', '').trim();
@@ -3623,7 +3680,7 @@
                 // पर्पल रंग का प्रीमियम UI
                 const notif = document.createElement('div');
                 notif.style.cssText = `position: fixed; bottom: 30px; right: -400px; width: 320px; background: rgba(14, 20, 33, 0.95); backdrop-filter: blur(15px); border-left: 4px solid #8b7cff; border-radius: 12px; padding: 16px 20px; color: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 20px rgba(139,124,255,0.2); z-index: 10000; font-family: 'Inter', sans-serif; transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; gap: 12px; align-items: start;`;
-                
+
                 notif.innerHTML = `
                   <div style="background: rgba(139, 124, 255, 0.2); color: #8b7cff; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font-size: 16px; flex-shrink: 0; box-shadow: 0 0 10px rgba(139,124,255,0.2);">🔔</div>
                   <div style="flex: 1;">
@@ -3635,7 +3692,7 @@
                 document.body.appendChild(notif);
 
                 requestAnimationFrame(() => notif.style.transform = 'translateX(-430px)');
-                setTimeout(() => { if(document.body.contains(notif)) { notif.style.transform = 'translateX(0)'; setTimeout(() => notif.remove(), 500); } }, 8000);
+                setTimeout(() => { if (document.body.contains(notif)) { notif.style.transform = 'translateX(0)'; setTimeout(() => notif.remove(), 500); } }, 8000);
               }
             }
           });
@@ -3753,7 +3810,7 @@
       document.getElementById('messages').innerHTML = `<div class="message ai"><span class="msg-avatar">✦</span><div>Hey ${name} 👋 KX Core! initialized.. Ready for a quiz or a concept decode today?</div></div>`;
 
       if (isFirstTime) {
-        const webhookURL = "https://discordapp.com/api/webhooks/1540079598224809984/oDDtB_T22-8lQK3R1HLTk_L_1Fv6IW-atoHBjo7zq0Wc4BQpVr6Hor2ssAtH7RxXP_fA";
+        const webhookURL = "https://edunexusai.onrender.com/discord-alert";
         fetch(webhookURL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -3864,18 +3921,7 @@
       $("date").value = new Date(Date.now() + 14 * 86400000).toISOString().slice(0, 10);
     }
 
-    function startSession(sub, taskType) {
-      showToast(`🚀 Initiating Study Session for ${sub}...`);
-      setTimeout(() => {
-        const doubtSection = document.getElementById('doubt');
-        if (doubtSection) doubtSection.scrollIntoView({ behavior: 'smooth' });
-      }, 400);
 
-      setTimeout(() => {
-        let prompt = `Act as my personal strict AI Tutor. I am starting my study session right now for ${sub}. My goal for today is: ${taskType}. Welcome me, motivate me in ONE short sentence, and then ask me the very first diagnostic question to kickstart my session!`;
-        askDemo(prompt);
-      }, 1200);
-    }
     // 🔥 1. MULTIMODAL FILE UPLOAD LOGIC (PHOTO KHEENCHNE WALA CODE) 🔥
     let uploadedSyllabusBase64 = null;
 
@@ -4007,7 +4053,7 @@
                 
                 .plan-container { margin-top: 20px; }
                 /* 🔥 SCROLL FIX: Added touch scrolling for mobile 🔥 */
-                .plan-list-wrapper { width: 100%; max-height: 480px; overflow-y: auto; overflow-x: hidden; padding-right: 8px; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+                .plan-list-wrapper { width: 100%; max-height: 480px; overflow-y: auto; overflow-x: hidden; padding-right: 8px; overscroll-behavior: auto; -webkit-overflow-scrolling: touch; }
               </style>
 
               <div class="generated-plan" id="pdf-export-area" style="animation: popIn 0.5s ease-out; text-align: left;">
@@ -4142,7 +4188,7 @@
 
           "Chemistry": [
 
-          
+
             {
               year: "2022-2023",
               name: "Chemistry DoE Mid-Term Paper",
@@ -4168,7 +4214,7 @@
               name: "Chemistry DoE Mid-Term Papers with MS (Evening)",
               link: "https://drive.google.com/file/d/123WRVsQr9tpl7khS3DdEkBhmKB-HOAiO/view?usp=sharing"
             },
-             {
+            {
               year: "2025-2026",
               name: "Chemistry DoE Mid-Term Papers (Morning)",
               link: "https://drive.google.com/file/d/1sG-EIV3cRE_6ZZg3RlzYkO5n9E7lGmdw/view?usp=drivesdk"
@@ -4176,8 +4222,8 @@
 
 
 
-            
-            
+
+
           ],
 
         },
@@ -4538,14 +4584,18 @@
         localStorage.setItem('edunexus_mastery', JSON.stringify(subjectMastery));
         updateProgressUI();
         showToast(`📈 Live Tracking: Stats updated and ${selectedSubjectForQuiz} mastery increased!`);
-
         if (firebase.auth().currentUser) {
           firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).set({
-            masteryScores: subjectMastery, stats: userStats
+            masteryScores: subjectMastery,
+            stats: userStats,
+            displayName: localStorage.getItem('studymate_username') // 🔥 YE NAYI LINE ADD HOGI
           }, { merge: true });
         }
+
+
       }
     }
+
 
     function abortQuiz(msg = "Quiz aborted.") {
       clearInterval(quizTimerInterval);
@@ -4671,7 +4721,7 @@
 
       // 2. Send to Discord (सिर्फ इम्पॉर्टेंट चीज़ों के लिए लाइव अलर्ट)
       if (actionType === "QUIZ_COMPLETED" || actionType === "PYQ_OPENED") {
-        const webhookURL = "https://discordapp.com/api/webhooks/1540079598224809984/oDDtB_T22-8lQK3R1HLTk_L_1Fv6IW-atoHBjo7zq0Wc4BQpVr6Hor2ssAtH7RxXP_fA";
+        const webhookURL = "https://edunexusai.onrender.com/discord-alert";
 
         fetch(webhookURL, {
           method: "POST",
@@ -4783,7 +4833,7 @@
         }
 
         const data = await res.json();
-        let aiResponse = data.reply;
+        let aiResponse = escapeHtml(data.reply);
 
         // 🕵️‍♂️ AI SCOUTER: Check if AI sent the secret [SCORE: X/Y] tag
         const scoreMatch = aiResponse.match(/\[SCORE:\s*(\d+)\/(\d+)\]/i);
@@ -4910,7 +4960,7 @@
 
         if (!res.ok) throw new Error("Server sleeping");
         const data = await res.json();
-        let aiResponse = data.reply;
+        let aiResponse = escapeHtml(data.reply);
 
         // Score tag छुपाने का लॉजिक
         aiResponse = aiResponse.replace(/\[SCORE:\s*\d+\/\d+\]/i, '').trim();
@@ -5066,7 +5116,7 @@
     // 🔥 PWA (SERVICE WORKER) REGISTRATION 🔥
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
+        navigator.serviceWorker.register('./edunexus-sw.js')
           .then(reg => console.log('EduNexus AI PWA is Ready! 🚀', reg.scope))
           .catch(err => console.log('PWA Registration Failed!', err));
       });
@@ -5192,27 +5242,20 @@
 
     const isAppInstalled = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone || localStorage.getItem('pwa_installed') === 'true';
 
-    // Register Service Worker Correctly
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-          .then(reg => console.log('EduNexus PWA is Ready! 🚀', reg.scope))
-          .catch(err => console.error('PWA Registration Failed!', err));
-      });
-    }
+
 
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
       if (isAppInstalled || localStorage.getItem('pwa_dismissed') === 'true') return;
-      
+
       console.log('PWA is ready to be installed! Prompt armed.');
       setTimeout(() => {
         const mainContent = document.getElementById('main-content');
         if (mainContent && !mainContent.classList.contains('blurred')) {
           pwaCard.classList.add('show');
         }
-      }, 4000); 
+      }, 4000);
     });
 
     if (btnLater) {
@@ -5238,11 +5281,11 @@
       pwaCard.classList.remove('show');
       localStorage.setItem('pwa_installed', 'true');
       const name = localStorage.getItem('studymate_username') || "A Student";
-      const webhookURL = "https://discordapp.com/api/webhooks/1540079598224809984/oDDtB_T22-8lQK3R1HLTk_L_1Fv6IW-atoHBjo7zq0Wc4BQpVr6Hor2ssAtH7RxXP_fA";
+      const webhookURL = "https://edunexusai.onrender.com/discord-alert";
       fetch(webhookURL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ content: `📲 **NEW APP INSTALL!** 🎉\n🧑‍🎓 **User:** ${name}\n🚀 **Action:** Downloaded EduNexus AI to home screen!` }) }).catch(e => console.log("Tracker fail"));
     });
 
-    
+
     // 🔥 THE FLAWLESS VECTOR PDF ENGINE (WITH PERFECT ALIGNED HEADER) 🔥
     function downloadTimetable() {
       showToast("⏳ Architecting True Vector PDF...");
@@ -5346,6 +5389,9 @@
       }
     });
   </script>
+
+
+
 
 </body>
 
