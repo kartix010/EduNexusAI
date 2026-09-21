@@ -2574,6 +2574,31 @@
       <button class="btn primary full" onclick="closeExplanation()">Got it, let's start! 🚀</button>
     </div>
   </div>
+  <!-- 🔥 GOD-TIER SUPPORT MODAL (HIDDEN BY DEFAULT) 🔥 -->
+  <div id="support-modal" class="modal-overlay" style="z-index: 9999;">
+      <div class="modal-content glass tilt-panel" style="max-width: 420px; text-align: center; padding: 40px 30px; position: relative; border-radius: 30px; background: linear-gradient(145deg, rgba(20,25,35,0.95), rgba(10,15,25,0.98)); box-shadow: 0 30px 60px rgba(0,0,0,0.8), inset 0 2px 20px rgba(139, 124, 255, 0.2), 0 0 30px rgba(139, 124, 255, 0.15);">
+          
+          <!-- Glowing Aurora Background inside modal -->
+          <div style="position:absolute; top:-50px; left:-50px; width:200px; height:200px; background:#8b7cff; filter:blur(80px); opacity:0.2; z-index:-1; border-radius:50%; pointer-events:none;"></div>
+          <div style="position:absolute; bottom:-50px; right:-50px; width:200px; height:200px; background:#5ee7c5; filter:blur(80px); opacity:0.15; z-index:-1; border-radius:50%; pointer-events:none;"></div>
+
+          <button onclick="closeSupportModal()" style="position: absolute; top: 20px; right: 25px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #aeb7c8; font-size: 20px; cursor: pointer; transition: 0.3s; width:35px; height:35px; border-radius:50%; display:grid; place-items:center;" onmouseover="this.style.background='#ff4757'; this.style.color='#fff';">×</button>
+
+          <!-- Floating Icon -->
+          <div style="width: 70px; height: 70px; background: rgba(139,124,255,0.1); border: 1px solid rgba(139,124,255,0.3); border-radius: 20px; margin: 0 auto 20px; display: grid; place-items: center; box-shadow: 0 10px 25px rgba(139, 124, 255, 0.2); animation: floatGlow 3s infinite alternate;">
+              <span style="font-size: 32px;">💬</span>
+          </div>
+
+          <h2 style="font-family: 'Space Grotesk'; color: white; margin: 0 0 10px; font-size:26px;">Direct <span style="color:var(--accent2);">Admin Line</span></h2>
+          <p style="color: var(--muted); font-size: 13px; margin: 0 0 25px; line-height: 1.6;">Found a bug or have a suggestion? Send a direct message to the KX Edge founders.</p>
+
+          <textarea id="supportMsg" placeholder="Describe your issue here..." style="width: 100%; height: 120px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 15px; color: #fff; font-family: 'Inter', sans-serif; resize: none; outline: none; margin-bottom: 20px; transition: 0.3s; box-shadow: inset 0 4px 10px rgba(0,0,0,0.5);" onfocus="this.style.borderColor='var(--accent)'; this.style.boxShadow='inset 0 4px 10px rgba(0,0,0,0.5), 0 0 15px rgba(139, 124, 255, 0.2)';"></textarea>
+
+          <button onclick="sendSupportMessage()" style="width: 100%; background: linear-gradient(135deg, var(--accent), var(--accent2)); border: none; padding: 16px; border-radius: 16px; color: #000; font-weight: 800; font-size: 15px; cursor: pointer; transition: 0.3s; box-shadow: 0 10px 25px rgba(94, 231, 197, 0.3); display: flex; justify-content: center; gap: 10px; align-items: center;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 15px 35px rgba(94, 231, 197, 0.5)';">
+              <span id="supportBtnTxt">Send to Server</span> 🚀
+          </button>
+      </div>
+  </div>
 
   <!-- 🔥 NEXT-GEN INTERACTIVE QUIZ MODAL 🔥 -->
 
@@ -5383,6 +5408,57 @@
         sendQuestion(new Event("submit")); // मैसेज सेंड करो
       }
     });
+  </script>
+  <!-- 🔥 MAGIC URL LISTENER & SUPPORT LOGIC 🔥 -->
+  <script>
+    // Jab user notification pe click karke aayega, URL mein "?action=report" hoga
+    window.addEventListener('load', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('action') === 'report') {
+            openSupportModal();
+            // UI khulne ke baad URL se "?action=report" hata do taaki refresh hone par wapas pop-up na aaye
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    });
+
+    function openSupportModal() {
+        document.getElementById('support-modal').classList.add('show');
+        document.body.classList.add('no-scroll');
+    }
+
+    function closeSupportModal() {
+        document.getElementById('support-modal').classList.remove('show');
+        document.body.classList.remove('no-scroll');
+    }
+
+    function sendSupportMessage() {
+        const msg = document.getElementById('supportMsg').value.trim();
+        if(!msg) {
+            showToast("⚠️ Please write your concern first!");
+            return;
+        }
+
+        const name = localStorage.getItem('studymate_username') || "A Student";
+        const btnTxt = document.getElementById('supportBtnTxt');
+        btnTxt.innerText = "Sending... ⏳";
+
+        // 🚀 Discord Alert wale naye API pe data bhej do
+        fetch("https://edunexusai.onrender.com/discord-alert", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ 
+                content: `🚨 **NEW SUPPORT TICKET!**\n🧑‍🎓 **User:** ${name}\n💬 **Message:** ${msg}` 
+            })
+        }).then(() => {
+            showToast("✅ Concern sent securely to Admin Vault!");
+            document.getElementById('supportMsg').value = ""; // Textarea saaf karo
+            closeSupportModal(); // Modal band karo
+            btnTxt.innerText = "Send to Server";
+        }).catch((err) => {
+            showToast("❌ Connection error! Try again.");
+            btnTxt.innerText = "Send to Server";
+        });
+    }
   </script>
 
 
