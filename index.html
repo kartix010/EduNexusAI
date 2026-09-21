@@ -2599,6 +2599,23 @@
           </button>
       </div>
   </div>
+  <!-- 🔥 GOD-TIER SUPPORT MODAL (HIDDEN BY DEFAULT) 🔥 -->
+  <div id="support-modal" class="modal-overlay" style="z-index: 9999;">
+      <div class="modal-content glass tilt-panel" style="max-width: 420px; text-align: center; padding: 40px 30px; position: relative; border-radius: 30px; background: linear-gradient(145deg, rgba(20,25,35,0.95), rgba(10,15,25,0.98)); box-shadow: 0 30px 60px rgba(0,0,0,0.8), inset 0 2px 20px rgba(139, 124, 255, 0.2), 0 0 30px rgba(139, 124, 255, 0.15);">
+          
+          <button onclick="closeSupportModal()" style="position: absolute; top: 20px; right: 25px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #aeb7c8; font-size: 20px; cursor: pointer; transition: 0.3s; width:35px; height:35px; border-radius:50%; display:grid; place-items:center;">×</button>
+
+          <div style="font-size: 40px; margin-bottom: 10px;">💬</div>
+          <h2 style="font-family: 'Space Grotesk'; color: white; margin: 0 0 10px; font-size:26px;">Direct <span style="color:var(--accent2);">Admin Line</span></h2>
+          <p style="color: var(--muted); font-size: 13px; margin: 0 0 25px; line-height: 1.6;">Found a bug or have a suggestion? Reply directly to KX Dynamics.</p>
+
+          <textarea id="supportMsg" placeholder="Type your reply here..." style="width: 100%; height: 120px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 15px; color: #fff; font-family: 'Inter', sans-serif; resize: none; outline: none; margin-bottom: 20px; transition: 0.3s;"></textarea>
+
+          <button onclick="sendSupportMessage()" style="width: 100%; background: linear-gradient(135deg, var(--accent), var(--accent2)); border: none; padding: 16px; border-radius: 16px; color: #000; font-weight: 800; font-size: 15px; cursor: pointer; transition: 0.3s; box-shadow: 0 10px 25px rgba(94, 231, 197, 0.3);">
+              <span id="supportBtnTxt">Send to Admin</span> 🚀
+          </button>
+      </div>
+  </div>
 
   <!-- 🔥 NEXT-GEN INTERACTIVE QUIZ MODAL 🔥 -->
 
@@ -5457,6 +5474,56 @@
         }).catch((err) => {
             showToast("❌ Connection error! Try again.");
             btnTxt.innerText = "Send to Server";
+        });
+    }
+  </script>
+  <!-- 🔥 MAGIC URL LISTENER & REPLY LOGIC 🔥 -->
+  <script>
+    // 1. App khulte hi check karega ki user notification se aaya hai kya
+    window.addEventListener('load', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('action') === 'report') {
+            openSupportModal(); // Modal khol do
+            window.history.replaceState({}, document.title, window.location.pathname); // Link clean kar do
+        }
+    });
+
+    function openSupportModal() {
+        document.getElementById('support-modal').classList.add('show');
+        document.body.classList.add('no-scroll');
+    }
+
+    function closeSupportModal() {
+        document.getElementById('support-modal').classList.remove('show');
+        document.body.classList.remove('no-scroll');
+    }
+
+    // 2. User ka reply seedha tere Discord par bhejna
+    function sendSupportMessage() {
+        const msg = document.getElementById('supportMsg').value.trim();
+        if(!msg) {
+            showToast("⚠️ Please write your reply first!");
+            return;
+        }
+
+        const name = localStorage.getItem('studymate_username') || "A Student";
+        const btnTxt = document.getElementById('supportBtnTxt');
+        btnTxt.innerText = "Sending... ⏳";
+
+        fetch("https://edunexusai.onrender.com/discord-alert", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ 
+                content: `🚨 **NEW USER REPLY!**\n🧑‍🎓 **User:** ${name}\n💬 **Message:** ${msg}` 
+            })
+        }).then(() => {
+            showToast("✅ Reply sent securely to Admin!");
+            document.getElementById('supportMsg').value = ""; // Box khali karo
+            closeSupportModal(); // Modal band karo
+            btnTxt.innerText = "Send to Admin";
+        }).catch((err) => {
+            showToast("❌ Connection error! Try again.");
+            btnTxt.innerText = "Send to Admin";
         });
     }
   </script>
