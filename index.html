@@ -473,12 +473,12 @@
       margin: 0 auto;
       transition: filter 0.5s;
       padding-bottom: 40px;
-      padding-top: 90px;
+      padding-top: 60px;
     }
 
     .hero {
-      min-height: 600px;
-      padding: 40px 28px 80px;
+      min-height: auto;
+      padding: 40px 28px 8px;
       display: grid;
       grid-template-columns: 1.02fr 0.98fr;
       gap: 70px;
@@ -487,13 +487,15 @@
       top: -10px
     }
 
+  /* 🚀 2050 GOD-TIER SECTION EYEBROW (COLOR UPGRADE ONLY) 🚀 */
     .eyebrow {
       font-size: 11px;
-      letter-spacing: 1.5px;
-      color: #aaa3ff;
+      letter-spacing: 2px; /* Thoda sleek spacing */
+      color: #5ee7c5; /* Dead purple hata kar Sharp Neon Teal */
       font-weight: 800;
+      text-transform: uppercase;
+      text-shadow: 0 0 12px rgba(94, 231, 197, 0.4); /* Premium subtle glow */
     }
-
     .pulse {
       display: inline-block;
       width: 7px;
@@ -856,7 +858,7 @@
     }
 
     .section {
-      padding: 80px 28px;
+      padding: 70px 28px;
     }
 
     .section-heading {
@@ -1561,16 +1563,18 @@
       border-top: 1px solid var(--line);
       display: flex;
       justify-content: center;
-      text-align: center; /* 🔥 Fix 1: टूटे हुए टेक्स्ट को जबरदस्ती सेंटर में रखेगा */
-      line-height: 1.6; /* 🔥 Fix 2: अगर टेक्स्ट 2 लाइन में आया, तो उनके बीच साँस लेने की जगह देगा */
+      text-align: center;
+      /* 🔥 Fix 1: टूटे हुए टेक्स्ट को जबरदस्ती सेंटर में रखेगा */
+      line-height: 1.6;
+      /* 🔥 Fix 2: अगर टेक्स्ट 2 लाइन में आया, तो उनके बीच साँस लेने की जगह देगा */
       color: #566175;
       font-size: 11px;
       letter-spacing: 0.5px;
     }
-    
 
-    
-     
+
+
+
     footer span {
       opacity: 0.7;
       transition: 0.3s ease;
@@ -2247,22 +2251,24 @@
         display: flex !important;
         flex-direction: column !important;
         align-items: flex-start !important;
-        gap: 5px !important; 
-        margin-bottom: 22px !important; 
-      } /* 🔥 ये वाला ब्रैकेट तूने मिस कर दिया था! इसे बंद करना जरूरी है 🔥 */
+        gap: 5px !important;
+        margin-bottom: 22px !important;
+      }
+
+      /* 🔥 ये वाला ब्रैकेट तूने मिस कर दिया था! इसे बंद करना जरूरी है 🔥 */
 
       /* 🔥 STEP 2 FIX: Form inputs को मोबाइल पर एक-के-नीचे-एक (Vertical) करना 🔥 */
-      #plannerForm > div[style*="display: flex"] {
+      #plannerForm>div[style*="display: flex"] {
         flex-direction: column !important;
         gap: 12px !important;
         margin-top: 12px !important;
       }
-      
+
       #plannerForm .panel-title {
         margin-bottom: 20px !important;
       }
-     
-      
+
+
 
       .section-heading h2 {
         font-size: 32px !important;
@@ -2279,19 +2285,23 @@
         flex-direction: column !important;
       }
     }
+
     /* 🔥 STEP 4 FIX: Footer के ऊपर का फालतू स्पेस काटना 🔥 */
-      main {
-        padding-bottom: 0px !important;
-      }
-      .section {
-        padding-bottom: 25px !important;
-      }
-      .pitch-card {
-        padding: 40px 20px !important;
-      }
-      footer {
-        padding-top: 25px !important;
-      }
+    main {
+      padding-bottom: 0px !important;
+    }
+
+    .section {
+      padding-bottom: 25px !important;
+    }
+
+    .pitch-card {
+      padding: 40px 20px !important;
+    }
+
+    footer {
+      padding-top: 25px !important;
+    }
 
     /* 🔥 CHAT BUBBLE MOBILE FIX 🔥 */
     @media(max-width: 850px) {
@@ -2305,7 +2315,7 @@
         max-width: 98% !important;
         /* AI को पूरा फैलने की आज़ादी दे दी */
       }
-      
+
 
       /* 🔥 MESSAGE BOX FIX (LAMBE TEXT KE LIYE) 🔥 */
       .message>div {
@@ -2368,7 +2378,8 @@
     }
 
     html.already-logged-in #main-content {
-      filter: blur(0px) brightness(1) !important;
+      filter: none !important;
+      transform: none !important;
       pointer-events: auto !important;
     }
 
@@ -2381,6 +2392,229 @@
       overscroll-behavior-y: auto !important;
       -webkit-overflow-scrolling: touch !important;
     }
+    /* 🔥 2050 GOD-TIER SLANTED HALF-FILL BUTTON (EXACT VIDEO MATCH) 🔥 */
+    .btn {
+      position: relative;
+      border: 0;
+      border-radius: 14px;
+      padding: 16px 28px;
+      font-weight: 800;
+      font-size: 16px;
+      text-decoration: none;
+      display: inline-flex;
+      gap: 12px;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+      overflow: hidden;
+      z-index: 1;
+      letter-spacing: 0.3px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Tactile Haptic Press */
+    .btn:active {
+      transform: scale(0.96) translateY(2px) !important;
+      box-shadow: inset 0 3px 6px rgba(0,0,0,0.5) !important;
+    }
+
+    /* 🚀 PRIMARY CTA - THE SLANTED HALF-FILL 🚀 */
+    .primary {
+      color: #ffffff !important;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+      background: #14141d; /* Base dark color for the empty side */
+    }
+
+    /* The Slanted Fill using God-Tier Clip-Path */
+    .primary::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%; /* Pura size, but cut hoga */
+      background: linear-gradient(135deg, #8c7cff, #5ee7c5);
+      z-index: -1;
+      /* THE MAGIC: Slanted angle. Top is at 55%, Bottom is at 40% */
+      clip-path: polygon(0 0, 55% 0, 40% 100%, 0 100%);
+      transition: clip-path 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    /* Hover effect: The slant slides all the way to 100% smoothly */
+    .primary:hover::after {
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    }
+
+    .primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(94, 231, 197, 0.4);
+    }
+    /* Hover effect: Subtle, Classy aur Premium Glow */
+    .ghost:hover {
+      background: linear-gradient(135deg, rgba(140, 124, 255, 0.2), rgba(94, 231, 197, 0.1));
+      border-color: rgba(94, 231, 197, 0.7); /* Thoda soft neon border */
+      color: #ffffff !important;
+      
+      /* Scale hata diya, sirf ekdum halka sa upar uthega */
+      transform: translateY(-2px); 
+      
+      /* Glow ki power aur spread ekdum balance kar di */
+      box-shadow: 0 8px 20px rgba(94, 231, 197, 0.2), 0 0 15px rgba(140, 124, 255, 0.3); 
+      text-shadow: 0 0 8px rgba(94, 231, 197, 0.5);
+    }
+
+    /* The Killer Glowing Border (Kept intact because it's perfect) */
+    .primary::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 14px;
+        padding: 1.5px;
+        background: linear-gradient(90deg, #8c7cff, #5ee7c5);
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        opacity: 0.8;
+        z-index: -2;
+    }
+    /* 🤖 GOD-TIER AI TUTOR BUTTON (CORE FEATURE HIGHLIGHT) 🤖 */
+    .ghost {
+      /* AI Vibe: Dead grey hata kar deep cosmic purple/teal glass tint diya */
+      background: linear-gradient(135deg, rgba(140, 124, 255, 0.15), rgba(94, 231, 197, 0.05));
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      
+      /* Glowing Premium Purple Border */
+      border: 1.5px solid rgba(140, 124, 255, 0.5); 
+      
+      /* Text ekdum stark white aur chamakta hua */
+      color: #ffffff !important; 
+      text-shadow: 0 0 10px rgba(140, 124, 255, 0.8), 0 1px 2px rgba(0,0,0,0.8);
+      
+      /* Magic Glow: Button ke bahar aur andar ek AI aura */
+      box-shadow: 0 0 20px rgba(140, 124, 255, 0.25), inset 0 0 15px rgba(140, 124, 255, 0.15);
+      transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    /* Hover effect: Jab user cursor layega toh pura AI engine power up hoga */
+    .ghost:hover {
+      background: linear-gradient(135deg, rgba(140, 124, 255, 0.25), rgba(94, 231, 197, 0.15));
+      border-color: #5ee7c5; /* Border neon teal ho jayegi */
+      color: #ffffff !important;
+      
+      /* Thoda aage pop hoga aur glow double ho jayega */
+      transform: translateY(-3px) scale(1.02); 
+      box-shadow: 0 10px 30px rgba(94, 231, 197, 0.4), 0 0 25px rgba(140, 124, 255, 0.5); 
+      text-shadow: 0 0 12px rgba(94, 231, 197, 0.9);
+    }
+
+  
+   
+    /* 🔥 GOD-TIER PREMIUM SCROLLSPY INDICATOR 🔥 */
+    nav a {
+      position: relative;
+      padding-bottom: 6px; /* Text aur line ke beech breathing space */
+      transition: color 0.3s ease;
+    }
+    
+    nav a.active-link {
+      color: #ffffff !important;
+      font-weight: 700;
+      /* Koi cheap text-shadow nahi, pure clean white text */
+    }
+    
+    nav a::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 2px;
+      transform: scaleX(0);
+      transform-origin: center;
+      transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+      box-shadow: 0 2px 8px rgba(94, 231, 197, 0.4); /* Very subtle premium glow */
+    }
+    
+    nav a.active-link::after {
+      transform: scaleX(1);
+
+    }
+    /* 🌌 2050 GOD-TIER AI NOTE (PERFECT SUBTLE LOOK) 🌌 */
+    .ai-note {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+      padding: 16px;
+      border-radius: 14px;
+      background: rgba(20, 20, 29, 0.7); 
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border: 1px solid rgba(140, 124, 255, 0.2);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4), inset 0 0 10px rgba(140, 124, 255, 0.05);
+      align-items: center;
+    }
+
+    /* The Sparkle Icon - Subtler glow & size */
+    .ai-note > span {
+      color: #5ee7c5;
+      font-size: 13px; 
+      text-shadow: 0 0 8px rgba(94, 231, 197, 0.4); 
+    }
+
+    /* Regular Text - Smaller, crisp, not blinding */
+    .ai-note p {
+      margin: 0;
+      font-size: 11.5px; 
+      color: #b8c1d0; 
+      line-height: 1.5;
+      letter-spacing: 0.2px;
+    }
+
+    /* "AI insight:" Label - Sleeker gradient & semi-bold */
+    .ai-note b {
+      background: linear-gradient(90deg, #8c7cff, #5ee7c5);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 600; 
+      letter-spacing: 0.3px;
+      padding-right: 4px;
+    }
+    /* 🚀 2050 GOD-TIER HUD MINI-LABEL 🚀 */
+    .mini-label {
+      font-size: 10.5px !important;
+      letter-spacing: 1.5px;
+      color: #5ee7c5; /* Dead grey hata kar Neon Teal daal diya */
+      font-weight: 800;
+      display: inline-block; 
+      margin-bottom: 10px;
+      padding: 4px 10px;
+      background: rgba(94, 231, 197, 0.08); /* Sleek Glassy Teal Background */
+      border: 1px solid rgba(94, 231, 197, 0.25); /* Sharp glowing border */
+      border-radius: 6px;
+      text-transform: uppercase;
+      box-shadow: 0 0 12px rgba(94, 231, 197, 0.15); /* Subtle Neon Glow */
+    }
+    /* 🔥 2050 ALIGNMENT FIX FOR CARD HEADERS 🔥 */
+    .card-top > div {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px; /* Badge aur Title ke beech ka premium spacing */
+    }
+
+    /* Purana extra margin hata diya taaki gap perfect dikhe */
+    .mini-label {
+        margin-bottom: 0 !important; 
+    }
+
+    
+    
+    
+  
   </style>
   <!-- 🔥 PREMIUM PDF GENERATOR ENGINE 🔥 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -2576,45 +2810,65 @@
   </div>
   <!-- 🔥 GOD-TIER SUPPORT MODAL (HIDDEN BY DEFAULT) 🔥 -->
   <div id="support-modal" class="modal-overlay" style="z-index: 9999;">
-      <div class="modal-content glass tilt-panel" style="max-width: 420px; text-align: center; padding: 40px 30px; position: relative; border-radius: 30px; background: linear-gradient(145deg, rgba(20,25,35,0.95), rgba(10,15,25,0.98)); box-shadow: 0 30px 60px rgba(0,0,0,0.8), inset 0 2px 20px rgba(139, 124, 255, 0.2), 0 0 30px rgba(139, 124, 255, 0.15);">
-          
-          <!-- Glowing Aurora Background inside modal -->
-          <div style="position:absolute; top:-50px; left:-50px; width:200px; height:200px; background:#8b7cff; filter:blur(80px); opacity:0.2; z-index:-1; border-radius:50%; pointer-events:none;"></div>
-          <div style="position:absolute; bottom:-50px; right:-50px; width:200px; height:200px; background:#5ee7c5; filter:blur(80px); opacity:0.15; z-index:-1; border-radius:50%; pointer-events:none;"></div>
+    <div class="modal-content glass tilt-panel"
+      style="max-width: 420px; text-align: center; padding: 40px 30px; position: relative; border-radius: 30px; background: linear-gradient(145deg, rgba(20,25,35,0.95), rgba(10,15,25,0.98)); box-shadow: 0 30px 60px rgba(0,0,0,0.8), inset 0 2px 20px rgba(139, 124, 255, 0.2), 0 0 30px rgba(139, 124, 255, 0.15);">
 
-          <button onclick="closeSupportModal()" style="position: absolute; top: 20px; right: 25px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #aeb7c8; font-size: 20px; cursor: pointer; transition: 0.3s; width:35px; height:35px; border-radius:50%; display:grid; place-items:center;" onmouseover="this.style.background='#ff4757'; this.style.color='#fff';">×</button>
-
-          <!-- Floating Icon -->
-          <div style="width: 70px; height: 70px; background: rgba(139,124,255,0.1); border: 1px solid rgba(139,124,255,0.3); border-radius: 20px; margin: 0 auto 20px; display: grid; place-items: center; box-shadow: 0 10px 25px rgba(139, 124, 255, 0.2); animation: floatGlow 3s infinite alternate;">
-              <span style="font-size: 32px;">💬</span>
-          </div>
-
-          <h2 style="font-family: 'Space Grotesk'; color: white; margin: 0 0 10px; font-size:26px;">Direct <span style="color:var(--accent2);">Admin Line</span></h2>
-          <p style="color: var(--muted); font-size: 13px; margin: 0 0 25px; line-height: 1.6;">Found a bug or have a suggestion? Send a direct message to the EduNexus AI Support.</p>
-
-          <textarea id="supportMsg" placeholder="Describe your Review or concern here..." style="width: 100%; height: 120px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 15px; color: #fff; font-family: 'Inter', sans-serif; resize: none; outline: none; margin-bottom: 20px; transition: 0.3s; box-shadow: inset 0 4px 10px rgba(0,0,0,0.5);" onfocus="this.style.borderColor='var(--accent)'; this.style.boxShadow='inset 0 4px 10px rgba(0,0,0,0.5), 0 0 15px rgba(139, 124, 255, 0.2)';"></textarea>
-
-          <button onclick="sendSupportMessage()" style="width: 100%; background: linear-gradient(135deg, var(--accent), var(--accent2)); border: none; padding: 16px; border-radius: 16px; color: #000; font-weight: 800; font-size: 15px; cursor: pointer; transition: 0.3s; box-shadow: 0 10px 25px rgba(94, 231, 197, 0.3); display: flex; justify-content: center; gap: 10px; align-items: center;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 15px 35px rgba(94, 231, 197, 0.5)';">
-              <span id="supportBtnTxt">Send to Admin</span> 🚀
-          </button>
+      <!-- Glowing Aurora Background inside modal -->
+      <div
+        style="position:absolute; top:-50px; left:-50px; width:200px; height:200px; background:#8b7cff; filter:blur(80px); opacity:0.2; z-index:-1; border-radius:50%; pointer-events:none;">
       </div>
+      <div
+        style="position:absolute; bottom:-50px; right:-50px; width:200px; height:200px; background:#5ee7c5; filter:blur(80px); opacity:0.15; z-index:-1; border-radius:50%; pointer-events:none;">
+      </div>
+
+      <button onclick="closeSupportModal()"
+        style="position: absolute; top: 20px; right: 25px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #aeb7c8; font-size: 20px; cursor: pointer; transition: 0.3s; width:35px; height:35px; border-radius:50%; display:grid; place-items:center;"
+        onmouseover="this.style.background='#ff4757'; this.style.color='#fff';">×</button>
+
+      <!-- Floating Icon -->
+      <div
+        style="width: 70px; height: 70px; background: rgba(139,124,255,0.1); border: 1px solid rgba(139,124,255,0.3); border-radius: 20px; margin: 0 auto 20px; display: grid; place-items: center; box-shadow: 0 10px 25px rgba(139, 124, 255, 0.2); animation: floatGlow 3s infinite alternate;">
+        <span style="font-size: 32px;">💬</span>
+      </div>
+
+      <h2 style="font-family: 'Space Grotesk'; color: white; margin: 0 0 10px; font-size:26px;">Direct <span
+          style="color:var(--accent2);">Admin Line</span></h2>
+      <p style="color: var(--muted); font-size: 13px; margin: 0 0 25px; line-height: 1.6;">Found a bug or have a
+        suggestion? Send a direct message to the EduNexus AI Support.</p>
+
+      <textarea id="supportMsg" placeholder="Describe your Review or concern here..."
+        style="width: 100%; height: 120px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 15px; color: #fff; font-family: 'Inter', sans-serif; resize: none; outline: none; margin-bottom: 20px; transition: 0.3s; box-shadow: inset 0 4px 10px rgba(0,0,0,0.5);"
+        onfocus="this.style.borderColor='var(--accent)'; this.style.boxShadow='inset 0 4px 10px rgba(0,0,0,0.5), 0 0 15px rgba(139, 124, 255, 0.2)';"></textarea>
+
+      <button onclick="sendSupportMessage()"
+        style="width: 100%; background: linear-gradient(135deg, var(--accent), var(--accent2)); border: none; padding: 16px; border-radius: 16px; color: #000; font-weight: 800; font-size: 15px; cursor: pointer; transition: 0.3s; box-shadow: 0 10px 25px rgba(94, 231, 197, 0.3); display: flex; justify-content: center; gap: 10px; align-items: center;"
+        onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 15px 35px rgba(94, 231, 197, 0.5)';">
+        <span id="supportBtnTxt">Send to Admin</span> 🚀
+      </button>
+    </div>
   </div>
   <!-- 🔥 GOD-TIER SUPPORT MODAL (HIDDEN BY DEFAULT) 🔥 -->
   <div id="support-modal" class="modal-overlay" style="z-index: 9999;">
-      <div class="modal-content glass tilt-panel" style="max-width: 420px; text-align: center; padding: 40px 30px; position: relative; border-radius: 30px; background: linear-gradient(145deg, rgba(20,25,35,0.95), rgba(10,15,25,0.98)); box-shadow: 0 30px 60px rgba(0,0,0,0.8), inset 0 2px 20px rgba(139, 124, 255, 0.2), 0 0 30px rgba(139, 124, 255, 0.15);">
-          
-          <button onclick="closeSupportModal()" style="position: absolute; top: 20px; right: 25px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #aeb7c8; font-size: 20px; cursor: pointer; transition: 0.3s; width:35px; height:35px; border-radius:50%; display:grid; place-items:center;">×</button>
+    <div class="modal-content glass tilt-panel"
+      style="max-width: 420px; text-align: center; padding: 40px 30px; position: relative; border-radius: 30px; background: linear-gradient(145deg, rgba(20,25,35,0.95), rgba(10,15,25,0.98)); box-shadow: 0 30px 60px rgba(0,0,0,0.8), inset 0 2px 20px rgba(139, 124, 255, 0.2), 0 0 30px rgba(139, 124, 255, 0.15);">
 
-          <div style="font-size: 40px; margin-bottom: 10px;">💬</div>
-          <h2 style="font-family: 'Space Grotesk'; color: white; margin: 0 0 10px; font-size:26px;">Direct <span style="color:var(--accent2);">Admin Line</span></h2>
-          <p style="color: var(--muted); font-size: 13px; margin: 0 0 25px; line-height: 1.6;">Found a bug or have a suggestion? Reply directly to the EduNexus AI Support.</p>
+      <button onclick="closeSupportModal()"
+        style="position: absolute; top: 20px; right: 25px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #aeb7c8; font-size: 20px; cursor: pointer; transition: 0.3s; width:35px; height:35px; border-radius:50%; display:grid; place-items:center;">×</button>
 
-          <textarea id="supportMsg" placeholder="Type your reply here..." style="width: 100%; height: 120px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 15px; color: #fff; font-family: 'Inter', sans-serif; resize: none; outline: none; margin-bottom: 20px; transition: 0.3s;"></textarea>
+      <div style="font-size: 40px; margin-bottom: 10px;">💬</div>
+      <h2 style="font-family: 'Space Grotesk'; color: white; margin: 0 0 10px; font-size:26px;">Direct <span
+          style="color:var(--accent2);">Admin Line</span></h2>
+      <p style="color: var(--muted); font-size: 13px; margin: 0 0 25px; line-height: 1.6;">Found a bug or have a
+        suggestion? Reply directly to the EduNexus AI Support.</p>
 
-          <button onclick="sendSupportMessage()" style="width: 100%; background: linear-gradient(135deg, var(--accent), var(--accent2)); border: none; padding: 16px; border-radius: 16px; color: #000; font-weight: 800; font-size: 15px; cursor: pointer; transition: 0.3s; box-shadow: 0 10px 25px rgba(94, 231, 197, 0.3);">
-              <span id="supportBtnTxt">Send to Admin</span> 🚀
-          </button>
-      </div>
+      <textarea id="supportMsg" placeholder="Type your reply here..."
+        style="width: 100%; height: 120px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 15px; color: #fff; font-family: 'Inter', sans-serif; resize: none; outline: none; margin-bottom: 20px; transition: 0.3s;"></textarea>
+
+      <button onclick="sendSupportMessage()"
+        style="width: 100%; background: linear-gradient(135deg, var(--accent), var(--accent2)); border: none; padding: 16px; border-radius: 16px; color: #000; font-weight: 800; font-size: 15px; cursor: pointer; transition: 0.3s; box-shadow: 0 10px 25px rgba(94, 231, 197, 0.3);">
+        <span id="supportBtnTxt">Send to Admin</span> 🚀
+      </button>
+    </div>
   </div>
 
   <!-- 🔥 NEXT-GEN INTERACTIVE QUIZ MODAL 🔥 -->
@@ -3853,19 +4107,19 @@
 
 
       // 🔥 GOD-TIER TRACKER: Har Login par chalega aur Error dikhayega 🔥
-    const webhookURL = "https://edunexusai.onrender.com/discord-alert";
-    let actionTitle = isFirstTime ? "🚨 **BINGO!** New User Created Account!" : "🔄 **WELCOME BACK!** User Logged In!";
-    
-    fetch(webhookURL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ content: `${actionTitle}\n🧑‍🎓 **Name:** ${name}\n💻 **Action:** Launched EduNexus AI Dashboard 🚀` })
-    })
-    .then(res => { 
-      if(!res.ok) console.error("Discord Alert Blocked by Backend (Check Render Logs):", res.status); 
-    })
-    .catch(err => console.error("Discord Tracker Failed:", err)); // Silent fail hata diya!
-  }
+      const webhookURL = "https://edunexusai.onrender.com/discord-alert";
+      let actionTitle = isFirstTime ? "🚨 **BINGO!** New User Created Account!" : "🔄 **WELCOME BACK!** User Logged In!";
+
+      fetch(webhookURL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: `${actionTitle}\n🧑‍🎓 **Name:** ${name}\n💻 **Action:** Launched EduNexus AI Dashboard 🚀` })
+      })
+        .then(res => {
+          if (!res.ok) console.error("Discord Alert Blocked by Backend (Check Render Logs):", res.status);
+        })
+        .catch(err => console.error("Discord Tracker Failed:", err)); // Silent fail hata diya!
+    }
 
 
     // 🔥 FIXED LOGOUT LOGIC (Firebase + Local Memory dono clear karega) 🔥
@@ -5426,71 +5680,123 @@
       }
     });
   </script>
-   <!-- 🔥 MAGIC URL LISTENER & REPLY LOGIC 🔥 -->
+  <!-- 🔥 MAGIC URL LISTENER & REPLY LOGIC 🔥 -->
   <script>
     // 1. App khulte hi check karega ki user notification se aaya hai kya
     window.addEventListener('load', () => {
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('action') === 'report') {
-            openSupportModal(); // Modal khol do
-            window.history.replaceState({}, document.title, window.location.pathname); // Link clean kar do
-        }
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('action') === 'report') {
+        openSupportModal(); // Modal khol do
+        window.history.replaceState({}, document.title, window.location.pathname); // Link clean kar do
+      }
     });
 
 
     function openSupportModal() {
-        document.getElementById('support-modal').classList.add('show');
-        document.body.classList.add('no-scroll');
+      document.getElementById('support-modal').classList.add('show');
+      document.body.classList.add('no-scroll');
 
-        // 🔥 GOD-TIER HACK: Silent Read Receipt Tracker 🔥
-        const name = localStorage.getItem('studymate_username') || "A Student";
-        
-        // Jaise hi modal khulega, chhupe se Discord pe alert chala jayega
-        fetch("https://edunexusai.onrender.com/discord-alert", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ 
-                content: `👀 **READ RECEIPT:** \`${name}\` ne tera Admin Alert dekh liya hai aur Reply box open kar liya hai!` 
-            })
-        }).catch(err => console.log("Silent tracker error")); 
+      // 🔥 GOD-TIER HACK: Silent Read Receipt Tracker 🔥
+      const name = localStorage.getItem('studymate_username') || "A Student";
+
+      // Jaise hi modal khulega, chhupe se Discord pe alert chala jayega
+      fetch("https://edunexusai.onrender.com/discord-alert", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          content: `👀 **READ RECEIPT:** \`${name}\` ne tera Admin Alert dekh liya hai aur Reply box open kar liya hai!`
+        })
+      }).catch(err => console.log("Silent tracker error"));
     }
 
-    
+
 
     function closeSupportModal() {
-        document.getElementById('support-modal').classList.remove('show');
-        document.body.classList.remove('no-scroll');
+      document.getElementById('support-modal').classList.remove('show');
+      document.body.classList.remove('no-scroll');
     }
 
     // 2. User ka reply seedha tere Discord par bhejna
     function sendSupportMessage() {
-        const msg = document.getElementById('supportMsg').value.trim();
-        if(!msg) {
-            showToast("⚠️ Please write your reply first!");
-            return;
-        }
+      const msg = document.getElementById('supportMsg').value.trim();
+      if (!msg) {
+        showToast("⚠️ Please write your reply first!");
+        return;
+      }
 
-        const name = localStorage.getItem('studymate_username') || "A Student";
-        const btnTxt = document.getElementById('supportBtnTxt');
-        btnTxt.innerText = "Sending... ⏳";
+      const name = localStorage.getItem('studymate_username') || "A Student";
+      const btnTxt = document.getElementById('supportBtnTxt');
+      btnTxt.innerText = "Sending... ⏳";
 
-        fetch("https://edunexusai.onrender.com/discord-alert", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ 
-                content: `🚨 **NEW USER REPLY!**\n🧑‍🎓 **User:** ${name}\n💬 **Message:** ${msg}` 
-            })
-        }).then(() => {
-            showToast("✅ Reply sent securely to Admin!");
-            document.getElementById('supportMsg').value = ""; // Box khali karo
-            closeSupportModal(); // Modal band karo
-            btnTxt.innerText = "Send to Admin";
-        }).catch((err) => {
-            showToast("❌ Connection error! Try again.");
-            btnTxt.innerText = "Send to Admin";
-        });
+      fetch("https://edunexusai.onrender.com/discord-alert", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          content: `🚨 **NEW USER REPLY!**\n🧑‍🎓 **User:** ${name}\n💬 **Message:** ${msg}`
+        })
+      }).then(() => {
+        showToast("✅ Reply sent securely to Admin!");
+        document.getElementById('supportMsg').value = ""; // Box khali karo
+        closeSupportModal(); // Modal band karo
+        btnTxt.innerText = "Send to Admin";
+      }).catch((err) => {
+        showToast("❌ Connection error! Try again.");
+        btnTxt.innerText = "Send to Admin";
+      });
     }
+
+    // 🔥 SCROLLSPY ACTIVE INDICATOR ENGINE 🔥
+    document.addEventListener("DOMContentLoaded", () => {
+      const sections = document.querySelectorAll("#quiz-engine, #pyq-vault-section, #planner, #doubt, #progress");
+      const navLinks = document.querySelectorAll("nav a[href^='#']");
+
+      const observerOptions = {
+        root: null,
+        rootMargin: "-20% 0px -70% 0px", 
+        threshold: 0
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            // Saare links se dot hatao
+            navLinks.forEach((link) => link.classList.remove("active-link"));
+            
+            // Jo section screen par hai, sirf uspe dot lagao
+            const activeLinks = document.querySelectorAll(`nav a[href="#${entry.target.id}"]`);
+            activeLinks.forEach(link => link.classList.add("active-link"));
+          }
+        });
+      }, observerOptions);
+
+      // Har section par nazar rakho
+      sections.forEach((sec) => observer.observe(sec));
+    });
+    // 🔥 THE GOD-TIER ANTI-JUMP SCROLL FIX 🔥
+    
+    // 1. Browser ki auto-scroll memory ko hamesha ke liye block kar do
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+
+    // 2. URL mein agar koi purana #tag fasa hai, toh usko chup-chaap mita do
+    window.addEventListener('DOMContentLoaded', () => {
+      if (window.location.hash) {
+        window.history.replaceState(null, null, window.location.pathname);
+      }
+    });
+
+    // 3. Page load hote hi Lenis aur Browser dono ko zabardasti TOP par lock kar do
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        if (typeof lenis !== 'undefined') {
+          lenis.scrollTo(0, { immediate: true });
+        }
+      }, 10);
+    });
   </script>
+  
 
 
 
