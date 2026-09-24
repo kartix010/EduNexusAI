@@ -82,10 +82,11 @@
 
     .reveal {
       opacity: 0;
-      transform: translateY(80px) scale(0.9);
-      transition: all 0.8s cubic-bezier(0.34, 2, 0.64, 1);
+      transform: translateY(40px) scale(0.95);
+      transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       pointer-events: none;
-      /* 👈 YE LINE ADD KAR */
+      will-change: transform, opacity;
+      /* 🔥 Hardware Acceleration = Zero Lag 🔥 */
     }
 
     .reveal.active {
@@ -1523,9 +1524,18 @@
     }
 
     .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
+      grid-template-columns: 1fr 1fr !important;
+      gap: 15px !important;
+    }
+
+    /* 🔥 STATS OVERFLOW FIX 🔥 */
+    .stat {
+      padding: 15px !important;
+    }
+
+    .stat strong {
+      font-size: 26px !important;
+      /* Bada number ab box ke bahar nahi jayega */
     }
 
     .stat {
@@ -3108,6 +3118,44 @@
     /* Jab bhi typing mode ON hoga, Nav Bar gayab ho jayega */
     body.typing-mode .mobile-nav-bar {
       display: none !important;
+    }
+
+    /* =========================================
+       🔥 MOBILE SPACING & MASSIVE GAP FIX 🔥
+       ========================================= */
+    @media (max-width: 850px) {
+
+      /* 1. Scroll hone par upar se aane wala extra dhakka khatam */
+      #planner,
+      #progress,
+      #doubt {
+        scroll-margin-top: 15px !important;
+        padding-top: 20px !important;
+        /* Andar ka khali space ekdum tight kar diya */
+      }
+
+      /* 2. Heading aur cards ke beech ka gap bhi balance kar diya */
+      .section-heading {
+        margin-bottom: 25px !important;
+      }
+    }
+
+    /* 🔥 RESTORE NATIVE SCROLL BOUNCE (ELASTIC FEEL) 🔥 */
+    html,
+    body {
+      overscroll-behavior-y: auto !important;
+      /* Ye native bounce allow karta hai */
+      -webkit-overflow-scrolling: touch !important;
+      /* iOS par makkhan momentum scroll */
+    }
+
+    /* Agar andar ke dabbe (jaise chat ya list) me bhi bounce chahiye */
+    .messages,
+    .plan-list-wrapper,
+    .tutor-side,
+    .hero-right-panels {
+      overscroll-behavior-y: auto !important;
+      -webkit-overflow-scrolling: touch !important;
     }
   </style>
   <!-- 🔥 PREMIUM PDF GENERATOR ENGINE 🔥 -->
@@ -6305,15 +6353,16 @@
     });
   </script>
   <script>
-    // 🔥 1. GOD-TIER POP ANIMATION CSS INJECTOR 🔥
+
+    // 🔥 1. GOD-TIER POP ANIMATION (UPDATED FOR MAKKHAN SMOOTHNESS) 🔥
     const popStyle = document.createElement('style');
     popStyle.innerHTML = `
       @keyframes godTierPop {
-        0% { opacity: 0; transform: translateY(60px) scale(0.9); }
+        0% { opacity: 0; transform: translateY(30px) scale(0.95); }
         100% { opacity: 1; transform: translateY(0) scale(1); }
       }
       .force-pop {
-        animation: godTierPop 0.8s cubic-bezier(0.34, 2, 0.64, 1) forwards !important;
+        animation: godTierPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
       }
     `;
     document.head.appendChild(popStyle);
@@ -6323,57 +6372,44 @@
       document.querySelectorAll('.mobile-nav-item').forEach(el => el.classList.remove('active'));
       if (clickedItem) {
         clickedItem.classList.add('active');
-
-        // Button dabte hi magic shuru
         triggerPop(clickedItem.getAttribute('href'));
       }
     }
 
-    // 🔥 3. DESKTOP/LAPTOP NAV KE LIYE BHI SAME JADOO 🔥
+    // 🔥 3. DESKTOP/LAPTOP NAV 🔥
     document.querySelectorAll('a[href^="#"]').forEach(link => {
       link.addEventListener('click', function (e) {
-        // Mobile wale pe double click na ho isliye ye check
         if (!this.classList.contains('mobile-nav-item')) {
           triggerPop(this.getAttribute('href'));
         }
       });
     });
 
-    // 🔥 4. THE MASTER POP ENGINE 🔥
+    // 🔥 4. THE MASTER POP ENGINE (NO DELAY, NO BLACK SCREEN) 🔥
     function triggerPop(targetId) {
       if (!targetId || targetId === '#') return;
 
       let targets = [];
-      // Decide karo ki kis button pe kis kis cheez ko udana hai
       if (targetId === '#dashboard') {
-        targets = document.querySelectorAll('.hero-copy, #quiz-engine'); // Home ke liye
+        targets = document.querySelectorAll('.hero-copy, #quiz-engine');
       } else if (targetId === '#pyq-vault-section') {
-        targets = document.querySelectorAll('.hero-feature-text, #pyq-vault-section'); // Vault ke liye
+        targets = document.querySelectorAll('.hero-feature-text, #pyq-vault-section');
       } else {
         const el = document.querySelector(targetId);
-        if (el) targets = [el]; // Baaki sabke liye
+        if (el) targets = [el];
       }
 
       targets.forEach(el => {
         if (!el) return;
 
-        // Step A: Scroll hone tak dabe ko chupke se gayab kar do (taaki glitch na dikhe)
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(60px) scale(0.9)';
-        el.classList.remove('force-pop');
-
-        // Step B: Theek 350ms baad (jab scroll complete ho jaye) BOOM! Pop karo!
-        setTimeout(() => {
-          el.style.opacity = '';
-          el.style.transform = '';
-
-          void el.offsetWidth; // Browser ko reflow karne ka secret hack
-          el.classList.add('force-pop');
-        }, 350);
+        // 🔥 THE FIX: Faltu ka 350ms delay aur opacity:0 hata diya. 
+        // Ab click karte hi instant smooth pop hoga bina screen blank kiye.
+        el.classList.remove('force-pop', 'active');
+        void el.offsetWidth; // Browser reflow hack to restart animation
+        el.classList.add('force-pop');
       });
     }
   </script>
-  
 </body>
 
 </html>
