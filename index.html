@@ -89,20 +89,26 @@
       opacity: 1;
       transform: translateY(0) scale(1);
     }
-
+    /* ==================================================
+       🚀 TARGET 3: GOD-TIER LIQUID MODAL ANIMATIONS
+       ================================================== */
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(15px);
-      z-index: 6000;
+      /* Deep dark cinematic background */
+      background: rgba(7, 10, 18, 0.85); 
+      /* Ultimate Frosted Glass Blur */
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      z-index: 9999;
       display: flex;
       justify-content: center;
       align-items: center;
       padding: 20px;
       opacity: 0;
       visibility: hidden;
-      transition: 0.4s ease-out;
+      /* Smooth fade-in background */
+      transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
     }
 
     .modal-overlay.show {
@@ -111,26 +117,93 @@
     }
 
     .modal-content {
-      background: linear-gradient(145deg, #121a29, #0b101b);
-      border: 1px solid var(--accent2);
-      border-radius: 24px;
-      padding: 30px;
+      /* Premium Dark Gradient */
+      background: linear-gradient(145deg, rgba(18, 26, 41, 0.95), rgba(11, 16, 27, 0.98));
+      
+      /* Subtle teal glowing border with a sharp top-edge shine */
+      border: 1px solid rgba(94, 231, 197, 0.2);
+      border-top: 1px solid rgba(94, 231, 197, 0.4); 
+      
+      border-radius: 28px; /* Extra smooth Apple-like curves */
+      padding: 35px;
       max-width: 500px;
       width: 100%;
       text-align: left;
-      box-shadow: 0 30px 60px rgba(94, 231, 197, 0.15);
-      transform: scale(0.9) translateY(20px);
-      transition: 0.4s ease-out;
-      max-height: 70vh;
+      
+      /* Deep 3D Shadow with inner highlight */
+      box-shadow: 0 40px 80px rgba(0, 0, 0, 0.8), inset 0 2px 10px rgba(255, 255, 255, 0.05);
+      
+      /* 🔥 THE MAGIC: Starts small and pushed down 🔥 */
+      transform: scale(0.85) translateY(40px);
+      opacity: 0;
+      
+      /* Apple iOS Level Elastic Bouncy Transition */
+      transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+      
+      max-height: 85vh;
       overflow-y: auto !important;
       -webkit-overflow-scrolling: touch;
-      pointer-events: auto;
-      margin: auto;
+      position: relative;
     }
 
     .modal-overlay.show .modal-content {
+      /* 🔥 Pops to full size smoothly 🔥 */
       transform: scale(1) translateY(0);
+      opacity: 1;
     }
+    /* ==================================================
+       🚀 TARGET 4: THE ULTIMATE POLISH (FINAL DETAILS)
+       ================================================== */
+
+    /* 🔥 1. 2050 NEON SCROLLBAR 🔥 */
+    ::-webkit-scrollbar {
+      width: 8px; /* Ekdum patla aur sleek */
+    }
+    ::-webkit-scrollbar-track {
+      background: #070a12; /* Deep dark background */
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(94, 231, 197, 0.4); /* Neon teal ka transparent glow */
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(94, 231, 197, 1); /* Hover par solid neon aag */
+    }
+
+    /* 🔥 2. MODAL "GOT IT" BUTTON EXPLOSION 🔥 */
+    .modal-content button {
+      background: linear-gradient(135deg, #8c7cff, #5ee7c5); /* Purple to Teal blend */
+      border-radius: 12px;
+      padding: 14px 24px;
+      font-size: 15px;
+      font-weight: 800;
+      color: #070a12 !important; /* Dark text for max contrast */
+      border: none;
+      box-shadow: 0 8px 25px rgba(94, 231, 197, 0.3);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
+      margin-top: 20px;
+      letter-spacing: 1px;
+    }
+    
+    /* Button press par liquid feel */
+    .modal-content button:active {
+      transform: scale(0.95);
+      box-shadow: 0 4px 15px rgba(94, 231, 197, 0.2);
+    }
+    /* 🔥 3. MODAL SCROLLBAR FIX (Apple-Level Glass Transparency) 🔥 */
+    .modal-content::-webkit-scrollbar {
+      width: 4px; /* Ekdum patla aur sleek */
+    }
+    .modal-content::-webkit-scrollbar-track {
+      background: transparent; /* Solid background hata diya taaki glass feel na tute */
+    }
+    .modal-content::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15); /* Ekdum subtle frosted white thumb */
+      border-radius: 10px;
+    }
+
 
     .modal-content h2 {
       font-family: "Space Grotesk";
@@ -468,6 +541,7 @@
       font-weight: bold;
     }
 
+
     main {
       max-width: 1240px;
       margin: 0 auto;
@@ -475,6 +549,36 @@
       padding-bottom: 40px;
       padding-top: 75px;
     }
+
+    /* 🔥 MANUAL SNIPER FIX FOR AI-POWERED TEXT 🔥 */
+    .hero-top-text .eyebrow {
+      transform: translateY(-8px);
+
+      /* 👈 Isko -10px ya -12px karke manually adjust kar le */
+      /* 🔥 MOBILE-SPECIFIC SNIPER FIX (Desktop pe -8px rahega, Phone pe wapas normal) 🔥 */
+      @media (max-width: 850px) {
+      .hero-top-text .eyebrow {
+        /* 👇 YAHAN 0px ko change karke apna number daal (e.g., 5px ya -5px) */
+        transform: translateY(5px) !important; 
+        
+        display: inline-block;
+        margin-bottom: 15px !important;
+      }
+    }
+      }
+      /* 🔥 SUPREME MOBILE GAP FIX (ABSOLUTE BOTTOM MEIN PASTE KARNA) 🔥 */
+    @media (max-width: 850px) {
+      .hero-top-text .eyebrow {
+        transform: none !important; /* Hawa mein udne wala hack khatam */
+        display: inline-block !important;
+        margin-bottom: 25px !important; /* 👈 THE MAGIC: "Study smarter" ko neeche dhakel dega */
+      }
+      
+      .hero h1 {
+        margin-top: 10px !important; /* Text ko thoda sa aur breathing room */
+      }
+    }
+    
 
     .hero {
       min-height: auto;
@@ -487,15 +591,19 @@
       top: -10px
     }
 
-  /* 🚀 2050 GOD-TIER SECTION EYEBROW (COLOR UPGRADE ONLY) 🚀 */
+    /* 🚀 2050 GOD-TIER SECTION EYEBROW (COLOR UPGRADE ONLY) 🚀 */
     .eyebrow {
       font-size: 11px;
-      letter-spacing: 2px; /* Thoda sleek spacing */
-      color: #5ee7c5; /* Dead purple hata kar Sharp Neon Teal */
+      letter-spacing: 2px;
+      /* Thoda sleek spacing */
+      color: #5ee7c5;
+      /* Dead purple hata kar Sharp Neon Teal */
       font-weight: 800;
       text-transform: uppercase;
-      text-shadow: 0 0 12px rgba(94, 231, 197, 0.4); /* Premium subtle glow */
+      text-shadow: 0 0 12px rgba(94, 231, 197, 0.4);
+      /* Premium subtle glow */
     }
+
     .pulse {
       display: inline-block;
       width: 7px;
@@ -608,7 +716,7 @@
 
     .hero-feature-text {
       margin-top: 150px;
-      padding-top: 30px;
+      padding-top: 40px;
       padding-right: 20px;
       border-top: 1px solid rgba(255, 255, 255, 0.05);
       position: relative;
@@ -626,29 +734,60 @@
       height: 1px;
       background: #5ee7c5;
       box-shadow: 0 0 15px #5ee7c5;
+
     }
 
+    /* 🔥 LIQUID SPACING: Cards ke beech ki jagah aur smooth scroll 🔥 */
     .hero-right-panels {
       display: flex;
       flex-direction: column;
-      gap: 30px;
+      gap: 35px;
+      /* Thoda aur breathing room diya */
       margin-top: 0;
+      /* Mobile par scroll makkhan karne ke liye */
+      -webkit-overflow-scrolling: touch;
     }
 
+
+    /* 🚀 2050 GOD-TIER HOLOGRAPHIC CARDS 🚀 */
     .glass {
-      background: linear-gradient(145deg, #121a29cc, #0b101bdd);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(18px);
-      transition: transform 0.1s ease-out;
+      /* Deep space dark gradient for premium depth */
+      background: linear-gradient(145deg, rgba(18, 26, 41, 0.75), rgba(11, 16, 27, 0.9));
+
+      /* Subtle purple border with a Sharp Neon Teal top-edge shine */
+      border: 1px solid rgba(140, 124, 255, 0.15);
+      border-top: 1px solid rgba(94, 231, 197, 0.3);
+
+      /* Maximum frosted glass blur */
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+
+      /* 3D shadow separating it from the background */
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), inset 0 2px 5px rgba(255, 255, 255, 0.05);
+
+      transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
       transform-style: preserve-3d;
     }
 
+    /* 🔥 THE HOOK: Fluid Touch & Hover Interaction 🔥 */
+    .glass:hover,
+    .hero-card:active {
+      transform: translateY(-5px) scale(1.01);
+      border-color: rgba(94, 231, 197, 0.4);
+      /* Border glows teal on touch */
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(140, 124, 255, 0.15);
+    }
+
     .hero-card {
-      border-radius: 22px;
-      padding: 26px;
+      border-radius: 24px;
+      /* Smoother, Apple-like corners */
+      padding: 28px;
+      /* Tera original 3D tilt effect intact rakha hai */
       transform: perspective(1000px) rotateY(-5deg) rotateX(5deg);
     }
+
+
+
 
     .hero-card>* {
       transform: translateZ(30px);
@@ -680,26 +819,41 @@
       display: block;
     }
 
+    /* 🚀 2050 PREMIUM GLASS INPUTS 🚀 */
     select,
-    input:not(#login-overlay input) {
+    input:not(#login-overlay input),
+    textarea#planSyllabus {
       color: #f4f7ff !important;
-      background: #0d1421 !important;
-      border: 1px solid rgba(255, 255, 255, 0.15) !important;
+      background: rgba(14, 20, 33, 0.6) !important;
+      /* Semi-transparent dark glass */
+      border: 1px solid rgba(140, 124, 255, 0.2) !important;
+      /* Subtle purple hint */
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       font: inherit;
       display: block;
       width: 100%;
       margin-top: 8px;
-      border-radius: 10px;
-      padding: 11px;
+      border-radius: 12px;
+      /* Thoda zyada golai */
+      padding: 13px;
+      /* Thoda bada target area mobile ke liye */
       outline: none;
-      transition: 0.3s;
+      transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+      box-shadow: inset 0 2px 5px rgba(1, 65, 137, 0.3);
+      /* Andar ki taraf ek depth */
     }
 
+    /* Jab tap karega toh glow hoga */
     select:focus,
-    input:not(#login-overlay input):focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 15px rgba(139, 124, 255, 0.3);
+    input:not(#login-overlay input):focus,
+    textarea#planSyllabus:focus {
+      border-color: #01199e !important;
+      /* Neon teal focus */
+      background: rgba(14, 20, 33, 0.8) !important;
+      box-shadow: 0 0 15px rgba(94, 231, 197, 0.2), inset 0 2px 5px rgba(0, 0, 0, 0.3) !important;
     }
+
 
     .panel h3 {
       color: #ffffff;
@@ -2392,6 +2546,7 @@
       overscroll-behavior-y: auto !important;
       -webkit-overflow-scrolling: touch !important;
     }
+
     /* 🔥 2050 GOD-TIER SLANTED HALF-FILL BUTTON (EXACT VIDEO MATCH) 🔥 */
     .btn {
       position: relative;
@@ -2416,14 +2571,15 @@
     /* Tactile Haptic Press */
     .btn:active {
       transform: scale(0.96) translateY(2px) !important;
-      box-shadow: inset 0 3px 6px rgba(0,0,0,0.5) !important;
+      box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.5) !important;
     }
 
     /* 🚀 PRIMARY CTA - THE SLANTED HALF-FILL 🚀 */
     .primary {
       color: #ffffff !important;
-      text-shadow: 0 1px 4px rgba(0,0,0,0.8);
-      background: #14141d; /* Base dark color for the empty side */
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+      background: #14141d;
+      /* Base dark color for the empty side */
     }
 
     /* The Slanted Fill using God-Tier Clip-Path */
@@ -2433,8 +2589,9 @@
       top: 0;
       left: 0;
       height: 100%;
-      width: 100%; /* Pura size, but cut hoga */
-      background: linear-gradient(135deg, #8c7cff, #5ee7c5);
+      width: 100%;
+      /* Pura size, but cut hoga */
+      background: linear-gradient(135deg, #433990, #1cdcac);
       z-index: -1;
       /* THE MAGIC: Slanted angle. Top is at 55%, Bottom is at 40% */
       clip-path: polygon(0 0, 55% 0, 40% 100%, 0 100%);
@@ -2450,48 +2607,55 @@
       transform: translateY(-2px);
       box-shadow: 0 10px 25px rgba(94, 231, 197, 0.4);
     }
+
     /* Hover effect: Subtle, Classy aur Premium Glow */
     .ghost:hover {
       background: linear-gradient(135deg, rgba(140, 124, 255, 0.2), rgba(94, 231, 197, 0.1));
-      border-color: rgba(94, 231, 197, 0.7); /* Thoda soft neon border */
+      border-color: rgba(94, 231, 197, 0.7);
+      /* Thoda soft neon border */
       color: #ffffff !important;
-      
+
       /* Scale hata diya, sirf ekdum halka sa upar uthega */
-      transform: translateY(-2px); 
-      
+      transform: translateY(-2px);
+
       /* Glow ki power aur spread ekdum balance kar di */
-      box-shadow: 0 8px 20px rgba(94, 231, 197, 0.2), 0 0 15px rgba(140, 124, 255, 0.3); 
-      text-shadow: 0 0 8px rgba(94, 231, 197, 0.5);
+      /* Text ki chamak ekdum limit mein kardi (8px se 4px) */
+      text-shadow: 0 0 4px rgba(94, 231, 197, 0.4);
+
+      /* Bahar ka failta hua neon glow 50% cut kar diya */
+      box-shadow: 0 6px 15px rgba(94, 231, 197, 0.15), 0 0 10px rgba(140, 124, 255, 0.15);
+
     }
 
     /* The Killer Glowing Border (Kept intact because it's perfect) */
     .primary::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        border-radius: 14px;
-        padding: 1.5px;
-        background: linear-gradient(90deg, #8c7cff, #5ee7c5);
-        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-        -webkit-mask-composite: xor;
-        mask-composite: exclude;
-        opacity: 0.8;
-        z-index: -2;
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 14px;
+      padding: 1.5px;
+      background: linear-gradient(90deg, #8c7cff, #5ee7c5);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0.8;
+      z-index: -2;
     }
+
     /* 🤖 GOD-TIER AI TUTOR BUTTON (CORE FEATURE HIGHLIGHT) 🤖 */
     .ghost {
       /* AI Vibe: Dead grey hata kar deep cosmic purple/teal glass tint diya */
       background: linear-gradient(135deg, rgba(140, 124, 255, 0.15), rgba(94, 231, 197, 0.05));
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
-      
+
       /* Glowing Premium Purple Border */
-      border: 1.5px solid rgba(140, 124, 255, 0.5); 
-      
+      border: 1.5px solid rgba(140, 124, 255, 0.5);
+
       /* Text ekdum stark white aur chamakta hua */
-      color: #ffffff !important; 
-      text-shadow: 0 0 10px rgba(140, 124, 255, 0.8), 0 1px 2px rgba(0,0,0,0.8);
-      
+      color: #ffffff !important;
+      text-shadow: 0 0 10px rgba(140, 124, 255, 0.8), 0 1px 2px rgba(0, 0, 0, 0.8);
+
       /* Magic Glow: Button ke bahar aur andar ek AI aura */
       box-shadow: 0 0 20px rgba(140, 124, 255, 0.25), inset 0 0 15px rgba(140, 124, 255, 0.15);
       transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
@@ -2500,30 +2664,32 @@
     /* Hover effect: Jab user cursor layega toh pura AI engine power up hoga */
     .ghost:hover {
       background: linear-gradient(135deg, rgba(140, 124, 255, 0.25), rgba(94, 231, 197, 0.15));
-      border-color: #5ee7c5; /* Border neon teal ho jayegi */
+      border-color: #5ee7c5;
+      /* Border neon teal ho jayegi */
       color: #ffffff !important;
-      
+
       /* Thoda aage pop hoga aur glow double ho jayega */
-      transform: translateY(-3px) scale(1.02); 
-      box-shadow: 0 10px 30px rgba(94, 231, 197, 0.4), 0 0 25px rgba(140, 124, 255, 0.5); 
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 10px 30px rgba(94, 231, 197, 0.4), 0 0 25px rgba(140, 124, 255, 0.5);
       text-shadow: 0 0 12px rgba(94, 231, 197, 0.9);
     }
 
-  
-   
+
+
     /* 🔥 GOD-TIER PREMIUM SCROLLSPY INDICATOR 🔥 */
     nav a {
       position: relative;
-      padding-bottom: 6px; /* Text aur line ke beech breathing space */
+      padding-bottom: 6px;
+      /* Text aur line ke beech breathing space */
       transition: color 0.3s ease;
     }
-    
+
     nav a.active-link {
       color: #ffffff !important;
       font-weight: 700;
       /* Koi cheap text-shadow nahi, pure clean white text */
     }
-    
+
     nav a::after {
       content: '';
       position: absolute;
@@ -2536,13 +2702,15 @@
       transform: scaleX(0);
       transform-origin: center;
       transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-      box-shadow: 0 2px 8px rgba(94, 231, 197, 0.4); /* Very subtle premium glow */
+      box-shadow: 0 2px 8px rgba(94, 231, 197, 0.4);
+      /* Very subtle premium glow */
     }
-    
+
     nav a.active-link::after {
       transform: scaleX(1);
 
     }
+
     /* 🌌 2050 GOD-TIER AI NOTE (PERFECT SUBTLE LOOK) 🌌 */
     .ai-note {
       display: flex;
@@ -2550,7 +2718,7 @@
       margin-top: 20px;
       padding: 16px;
       border-radius: 14px;
-      background: rgba(20, 20, 29, 0.7); 
+      background: rgba(20, 20, 29, 0.7);
       backdrop-filter: blur(15px);
       -webkit-backdrop-filter: blur(15px);
       border: 1px solid rgba(140, 124, 255, 0.2);
@@ -2559,17 +2727,17 @@
     }
 
     /* The Sparkle Icon - Subtler glow & size */
-    .ai-note > span {
+    .ai-note>span {
       color: #5ee7c5;
-      font-size: 13px; 
-      text-shadow: 0 0 8px rgba(94, 231, 197, 0.4); 
+      font-size: 13px;
+      text-shadow: 0 0 8px rgba(94, 231, 197, 0.4);
     }
 
     /* Regular Text - Smaller, crisp, not blinding */
     .ai-note p {
       margin: 0;
-      font-size: 11.5px; 
-      color: #b8c1d0; 
+      font-size: 11.5px;
+      color: #b8c1d0;
       line-height: 1.5;
       letter-spacing: 0.2px;
     }
@@ -2579,42 +2747,283 @@
       background: linear-gradient(90deg, #8c7cff, #5ee7c5);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      font-weight: 600; 
+      font-weight: 600;
       letter-spacing: 0.3px;
       padding-right: 4px;
     }
+
     /* 🚀 2050 GOD-TIER HUD MINI-LABEL 🚀 */
     .mini-label {
       font-size: 10.5px !important;
       letter-spacing: 1.5px;
-      color: #5ee7c5; /* Dead grey hata kar Neon Teal daal diya */
+      color: #5ee7c5;
+      /* Dead grey hata kar Neon Teal daal diya */
       font-weight: 800;
-      display: inline-block; 
+      display: inline-block;
       margin-bottom: 10px;
       padding: 4px 10px;
-      background: rgba(94, 231, 197, 0.08); /* Sleek Glassy Teal Background */
-      border: 1px solid rgba(94, 231, 197, 0.25); /* Sharp glowing border */
+      background: rgba(94, 231, 197, 0.08);
+      /* Sleek Glassy Teal Background */
+      border: 1px solid rgba(94, 231, 197, 0.25);
+      /* Sharp glowing border */
       border-radius: 6px;
       text-transform: uppercase;
-      box-shadow: 0 0 12px rgba(94, 231, 197, 0.15); /* Subtle Neon Glow */
+      box-shadow: 0 0 12px rgba(94, 231, 197, 0.15);
+      /* Subtle Neon Glow */
     }
+
     /* 🔥 2050 ALIGNMENT FIX FOR CARD HEADERS 🔥 */
-    .card-top > div {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 6px; /* Badge aur Title ke beech ka premium spacing */
+    .card-top>div {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+      /* Badge aur Title ke beech ka premium spacing */
     }
 
     /* Purana extra margin hata diya taaki gap perfect dikhe */
     .mini-label {
-        margin-bottom: 0 !important; 
+      margin-bottom: 0 !important;
     }
 
+    .ghost {
+      position: relative;
+      overflow: hidden;
+      /* Ye bahut zaroori hai warna shine bahar nikal jayegi */
+      /* ... tera baaki purana code same rahega ... */
+    }
+
+    /* 🔥 THE WHITE SWEEP SHINE EFFECT 🔥 */
+    .ghost::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -150%;
+      /* Start position (button ke left mein chhipa hua) */
+      width: 50%;
+      height: 100%;
+
+      /* Ye gradient wo white glass wali chamak banata hai */
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+
+      transform: skewX(-25deg);
+      /* Shine ko tircha (slanted) karne ke liye */
+      transition: left 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+      z-index: 1;
+      /* Text ke upar se sweep hone ke liye */
+      pointer-events: none;
+      /* Taaki ye mouse hover ko block na kare */
+    }
+
+    /* 🔥 HOVER KARNE PAR SLIDE ANIMATION 🔥 */
+    .ghost:hover::before {
+      left: 150%;
+      /* Hover par smoothly right side bahar nikal jayega */
+    }
+
+    /* ==================================================
+       📱 TARGET 1: GOD-TIER MOBILE BOTTOM NAV (SLEEK V2)
+       ================================================== */
+    .mobile-nav-bar {
+      display: none;
+    }
+
+    @media (max-width: 850px) {
+      .mobile-nav-bar {
+        display: flex;
+        position: fixed;
+        /* 🔥 BOTTOM GAP FIX: 25px se ghata kar 15px kiya, ab zyada hawa mein nahi udega 🔥 */
+        bottom: 15px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 92%;
+        max-width: 400px;
+
+        /* 🔥 DABBA FIX: 70px se 60px kar diya. Ekdum patla, sleek aur premium! 🔥 */
+        height: 60px;
+
+        background: rgba(14, 20, 33, 0.85);
+        /* Thoda dark kiya taaki icons pop karein */
+        backdrop-filter: blur(25px);
+        -webkit-backdrop-filter: blur(25px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        /* Border subtle kar di */
+        border-radius: 999px;
+        padding: 0 12px;
+        justify-content: space-between;
+        align-items: center;
+        z-index: 9999;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.9), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+      }
+
+      .mobile-nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        color: #616e85;
+        /* Premium muted color */
+        transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        width: 48px;
+        height: 100%;
+        position: relative;
+      }
+
+      .mobile-nav-item svg {
+        /* 🔥 ICON SIZE: Sleek look ke liye 22px se 20px kiya 🔥 */
+        width: 20px;
+        height: 20px;
+        fill: currentColor;
+        transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+      }
+
+      .mobile-nav-item span {
+        font-size: 8.5px;
+        /* Text ekdum compact */
+        font-weight: 800;
+        font-family: 'Inter', sans-serif;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        opacity: 0;
+        transform: translateY(10px) scale(0.8);
+        transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        position: absolute;
+        /* 🔥 THE MAGIC FIX: Text ab dabe ke andar hi rahega, bahar nahi niklega 🔥 */
+        bottom: 6px;
+      }
+
+      .mobile-nav-item.active {
+        color: #ffffff;
+      }
+
+      .mobile-nav-item.active svg {
+        /* 🔥 SVG upar jump karega taaki text ke liye jagah ban jaye 🔥 */
+        transform: translateY(-8px);
+        filter: drop-shadow(0 4px 8px rgba(255, 255, 255, 0.3));
+      }
+
+      .mobile-nav-item.active span {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        color: #5ee7c5;
+      }
+
+      /* 🤖 THE GOD-TIER AI CENTER PULSING BUTTON (PROPORTIONAL SIZE) 🤖 */
+      .mobile-nav-ai {
+        position: relative;
+        /* Bahar uthne wala effect balance kiya */
+        top: -18px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        /* 🔥 AI BUTTON FIX: 58px se 52px kiya taaki dabe ke hisaab se perfect lage 🔥 */
+        width: 52px;
+        height: 52px;
+        background: linear-gradient(135deg, #8c7cff, #5ee7c5);
+        border-radius: 50%;
+        border: 4px solid #070a12;
+        box-shadow: 0 8px 20px rgba(94, 231, 197, 0.4), inset 0 2px 8px rgba(255, 255, 255, 0.5);
+        color: #000;
+        cursor: pointer;
+        animation: aiHeartbeat 2.5s infinite;
+        transition: all 0.3s ease;
+        z-index: 2;
+      }
+
+      .mobile-nav-ai svg {
+        width: 24px;
+        height: 24px;
+        fill: currentColor;
+      }
+
+      @keyframes aiHeartbeat {
+        0% {
+          box-shadow: 0 0 0 0 rgba(94, 231, 197, 0.5), inset 0 2px 8px rgba(255, 255, 255, 0.5);
+        }
+
+        70% {
+          box-shadow: 0 0 0 12px rgba(94, 231, 197, 0), inset 0 2px 8px rgba(255, 255, 255, 0.5);
+        }
+
+        100% {
+          box-shadow: 0 0 0 0 rgba(94, 231, 197, 0), inset 0 2px 8px rgba(255, 255, 255, 0.5);
+        }
+      }
+    }
+
+    /* 🔥 THE GOD-TIER GRADIENT BORDER FOR NAVIGATION 🔥 */
+    .mobile-nav-bar::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      /* Nav bar ke upar ekdum fit ho jayega */
+      border-radius: 999px;
+      /* Nav bar ki capsule shape */
+      padding: 1.5px;
+      /* Border ki motai (thickness) */
+      background: linear-gradient(90deg, #8c7cff, #5ee7c5);
+      /* Tera signature neon gradient */
+
+      /* THE MAGIC: Andar ka hissa kaatne ke liye taaki sirf border dikhe */
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+
+      opacity: 0.8;
+      /* Chamak ko balance karne ke liye */
+      pointer-events: none;
+      /* Taaki clicks block na hon */
+      z-index: -1;
+    }
+    /* ==================================================
+       🚀 TARGET 5: NATIVE APPLE "AIRCRAFT" FEEL
+       ================================================== */
+
+    /* 🔥 1. ZERO-FLASH TOUCH (Ugly Web Tap Highlight Killer) 🔥 */
+    /* Phone pe button dabane par jo sasta neela dabba aata hai, wo hamesha ke liye khatam */
+    * {
+      -webkit-tap-highlight-color: transparent !important;
+    }
+
+    /* 🔥 2. iMESSAGE & SIRI LEVEL CHAT BUBBLES 🔥 */
+    /* AI ke bubbles Siri ki tarah, top-left se round aur bottom-left se point honge */
+    .message.ai > div {
+      border-radius: 20px 20px 20px 4px !important; 
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
     
-    
-    
-  
+    /* User ke bubbles iMessage ki tarah, bottom-right se point honge aur premium purple chamkenge */
+    .message.user > div {
+      border-radius: 20px 20px 4px 20px !important; 
+      background: linear-gradient(135deg, #8c7cff, #665cff) !important; 
+      color: #fff !important;
+      border: none !important;
+      box-shadow: 0 5px 15px rgba(140, 124, 255, 0.3) !important;
+    }
+
+    /* 🔥 3. iPHONE NOTCH & HOME BAR SAFE AREA (Hardware Respect) 🔥 */
+    /* iPhone ke neeche jo white swipe line hoti hai, tera nav bar usse clash nahi karega */
+    @media (max-width: 850px) {
+      .mobile-nav-bar {
+        bottom: calc(15px + env(safe-area-inset-bottom)) !important; 
+      }
+      
+      /* Mobile par cards Apple ki tarah zyada gol (round) hone chahiye */
+      .glass {
+        border-radius: 32px !important; 
+      }
+      .quiz-box {
+        border-radius: 24px !important;
+      }
+    }
+
+    /* 🔥 4. LIQUID SCROLL PHYSICS 🔥 */
+    /* Page scroll ekdum makkhan jaisa chalega, jhatke se nahi rukega */
+    body, main, .messages, .plan-list-wrapper {
+      -webkit-overflow-scrolling: touch !important;
+      overscroll-behavior-y: none !important;
+    }
   </style>
   <!-- 🔥 PREMIUM PDF GENERATOR ENGINE 🔥 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -5752,7 +6161,7 @@
 
       const observerOptions = {
         root: null,
-        rootMargin: "-20% 0px -70% 0px", 
+        rootMargin: "-20% 0px -70% 0px",
         threshold: 0
       };
 
@@ -5761,7 +6170,7 @@
           if (entry.isIntersecting) {
             // Saare links se dot hatao
             navLinks.forEach((link) => link.classList.remove("active-link"));
-            
+
             // Jo section screen par hai, sirf uspe dot lagao
             const activeLinks = document.querySelectorAll(`nav a[href="#${entry.target.id}"]`);
             activeLinks.forEach(link => link.classList.add("active-link"));
@@ -5773,7 +6182,7 @@
       sections.forEach((sec) => observer.observe(sec));
     });
     // 🔥 THE GOD-TIER ANTI-JUMP SCROLL FIX 🔥
-    
+
     // 1. Browser ki auto-scroll memory ko hamesha ke liye block kar do
     if ('scrollRestoration' in history) {
       history.scrollRestoration = 'manual';
@@ -5796,7 +6205,63 @@
       }, 10);
     });
   </script>
-  
+
+  <!-- 📱 2050 GOD-TIER MOBILE BOTTOM NAVIGATION (ONLY VISIBLE ON PHONE) 📱 -->
+  <div class="mobile-nav-bar">
+    <a href="#dashboard" class="mobile-nav-item active" onclick="updateMobileNav(this)">
+      <!-- Professional Home Icon -->
+      <svg viewBox="0 0 24 24">
+        <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+      </svg>
+      <span>Home</span>
+    </a>
+
+    <a href="#pyq-vault-section" class="mobile-nav-item" onclick="updateMobileNav(this)">
+      <!-- Professional Vault/Library Icon -->
+      <svg viewBox="0 0 24 24">
+        <path
+          d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9H9V9h10v2zm-4 4H9v-2h6v2zm4-8H9V5h10v2z" />
+      </svg>
+      <span>Vault</span>
+    </a>
+
+    <!-- 🤖 THE GOD-TIER AI CENTER BUTTON 🤖 -->
+    <a href="#doubt" class="mobile-nav-ai" onclick="updateMobileNav(null)">
+      <!-- Sparkling AI Core Icon -->
+      <svg viewBox="0 0 24 24">
+        <path
+          d="M19 9l1.25-2.75L23 5l-2.75-1.25L19 1l-1.25 2.75L15 5l2.75 1.25L19 9zm-7.5.5L9 4 7.5 9.5 2 11l5.5 1.5L9 18l1.5-5.5L16 11l-4.5-1.5z" />
+      </svg>
+    </a>
+
+    <a href="#planner" class="mobile-nav-item" onclick="updateMobileNav(this)">
+      <!-- Professional Planner Icon -->
+      <svg viewBox="0 0 24 24">
+        <path
+          d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z" />
+      </svg>
+      <span>Plan</span>
+    </a>
+
+    <a href="#progress" class="mobile-nav-item" onclick="updateMobileNav(this)">
+      <!-- Professional Progress/Stats Icon -->
+      <svg viewBox="0 0 24 24">
+        <path
+          d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" />
+      </svg>
+      <span>Stats</span>
+    </a>
+  </div>
+  <script>
+    // 🔥 FLUID ANIMATION LOGIC FOR MOBILE NAV 🔥
+    function updateMobileNav(clickedItem) {
+      document.querySelectorAll('.mobile-nav-item').forEach(el => el.classList.remove('active'));
+      if (clickedItem) {
+        clickedItem.classList.add('active');
+      }
+    }
+  </script>
+
 
 
 
