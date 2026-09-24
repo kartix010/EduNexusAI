@@ -41,6 +41,8 @@
       scroll-behavior: smooth;
       overflow-x: hidden;
       width: 100%;
+      /* 🔥 THE MAGIC OFFSET FIX 🔥 */
+      scroll-padding-top: 100px !important;
     }
 
     .lenis.lenis-smooth {
@@ -89,6 +91,7 @@
       opacity: 1;
       transform: translateY(0) scale(1);
     }
+
     /* ==================================================
        🚀 TARGET 3: GOD-TIER LIQUID MODAL ANIMATIONS
        ================================================== */
@@ -96,7 +99,7 @@
       position: fixed;
       inset: 0;
       /* Deep dark cinematic background */
-      background: rgba(7, 10, 18, 0.85); 
+      background: rgba(7, 10, 18, 0.85);
       /* Ultimate Frosted Glass Blur */
       backdrop-filter: blur(25px);
       -webkit-backdrop-filter: blur(25px);
@@ -119,27 +122,28 @@
     .modal-content {
       /* Premium Dark Gradient */
       background: linear-gradient(145deg, rgba(18, 26, 41, 0.95), rgba(11, 16, 27, 0.98));
-      
+
       /* Subtle teal glowing border with a sharp top-edge shine */
       border: 1px solid rgba(94, 231, 197, 0.2);
-      border-top: 1px solid rgba(94, 231, 197, 0.4); 
-      
-      border-radius: 28px; /* Extra smooth Apple-like curves */
+      border-top: 1px solid rgba(94, 231, 197, 0.4);
+
+      border-radius: 28px;
+      /* Extra smooth Apple-like curves */
       padding: 35px;
       max-width: 500px;
       width: 100%;
       text-align: left;
-      
+
       /* Deep 3D Shadow with inner highlight */
       box-shadow: 0 40px 80px rgba(0, 0, 0, 0.8), inset 0 2px 10px rgba(255, 255, 255, 0.05);
-      
+
       /* 🔥 THE MAGIC: Starts small and pushed down 🔥 */
       transform: scale(0.85) translateY(40px);
       opacity: 0;
-      
+
       /* Apple iOS Level Elastic Bouncy Transition */
       transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-      
+
       max-height: 85vh;
       overflow-y: auto !important;
       -webkit-overflow-scrolling: touch;
@@ -151,33 +155,43 @@
       transform: scale(1) translateY(0);
       opacity: 1;
     }
+
     /* ==================================================
        🚀 TARGET 4: THE ULTIMATE POLISH (FINAL DETAILS)
        ================================================== */
 
     /* 🔥 1. 2050 NEON SCROLLBAR 🔥 */
     ::-webkit-scrollbar {
-      width: 8px; /* Ekdum patla aur sleek */
+      width: 8px;
+      /* Ekdum patla aur sleek */
     }
+
     ::-webkit-scrollbar-track {
-      background: #070a12; /* Deep dark background */
+      background: #070a12;
+      /* Deep dark background */
     }
+
     ::-webkit-scrollbar-thumb {
-      background: rgba(94, 231, 197, 0.4); /* Neon teal ka transparent glow */
+      background: rgba(94, 231, 197, 0.4);
+      /* Neon teal ka transparent glow */
       border-radius: 10px;
     }
+
     ::-webkit-scrollbar-thumb:hover {
-      background: rgba(94, 231, 197, 1); /* Hover par solid neon aag */
+      background: rgba(94, 231, 197, 1);
+      /* Hover par solid neon aag */
     }
 
     /* 🔥 2. MODAL "GOT IT" BUTTON EXPLOSION 🔥 */
     .modal-content button {
-      background: linear-gradient(135deg, #8c7cff, #5ee7c5); /* Purple to Teal blend */
+      background: linear-gradient(135deg, #8c7cff, #5ee7c5);
+      /* Purple to Teal blend */
       border-radius: 12px;
       padding: 14px 24px;
       font-size: 15px;
       font-weight: 800;
-      color: #070a12 !important; /* Dark text for max contrast */
+      color: #070a12 !important;
+      /* Dark text for max contrast */
       border: none;
       box-shadow: 0 8px 25px rgba(94, 231, 197, 0.3);
       cursor: pointer;
@@ -186,21 +200,27 @@
       margin-top: 20px;
       letter-spacing: 1px;
     }
-    
+
     /* Button press par liquid feel */
     .modal-content button:active {
       transform: scale(0.95);
       box-shadow: 0 4px 15px rgba(94, 231, 197, 0.2);
     }
+
     /* 🔥 3. MODAL SCROLLBAR FIX (Apple-Level Glass Transparency) 🔥 */
     .modal-content::-webkit-scrollbar {
-      width: 4px; /* Ekdum patla aur sleek */
+      width: 4px;
+      /* Ekdum patla aur sleek */
     }
+
     .modal-content::-webkit-scrollbar-track {
-      background: transparent; /* Solid background hata diya taaki glass feel na tute */
+      background: transparent;
+      /* Solid background hata diya taaki glass feel na tute */
     }
+
     .modal-content::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.15); /* Ekdum subtle frosted white thumb */
+      background: rgba(255, 255, 255, 0.15);
+      /* Ekdum subtle frosted white thumb */
       border-radius: 10px;
     }
 
@@ -557,28 +577,32 @@
       /* 👈 Isko -10px ya -12px karke manually adjust kar le */
       /* 🔥 MOBILE-SPECIFIC SNIPER FIX (Desktop pe -8px rahega, Phone pe wapas normal) 🔥 */
       @media (max-width: 850px) {
-      .hero-top-text .eyebrow {
-        /* 👇 YAHAN 0px ko change karke apna number daal (e.g., 5px ya -5px) */
-        transform: translateY(5px) !important; 
-        
-        display: inline-block;
-        margin-bottom: 15px !important;
+        .hero-top-text .eyebrow {
+          /* 👇 YAHAN 0px ko change karke apna number daal (e.g., 5px ya -5px) */
+          transform: translateY(5px) !important;
+
+          display: inline-block;
+          margin-bottom: 15px !important;
+        }
       }
     }
-      }
-      /* 🔥 SUPREME MOBILE GAP FIX (ABSOLUTE BOTTOM MEIN PASTE KARNA) 🔥 */
+
+    /* 🔥 SUPREME MOBILE GAP FIX (ABSOLUTE BOTTOM MEIN PASTE KARNA) 🔥 */
     @media (max-width: 850px) {
       .hero-top-text .eyebrow {
-        transform: none !important; /* Hawa mein udne wala hack khatam */
+        transform: none !important;
+        /* Hawa mein udne wala hack khatam */
         display: inline-block !important;
-        margin-bottom: 25px !important; /* 👈 THE MAGIC: "Study smarter" ko neeche dhakel dega */
+        margin-bottom: 25px !important;
+        /* 👈 THE MAGIC: "Study smarter" ko neeche dhakel dega */
       }
-      
+
       .hero h1 {
-        margin-top: 10px !important; /* Text ko thoda sa aur breathing room */
+        margin-top: 10px !important;
+        /* Text ko thoda sa aur breathing room */
       }
     }
-    
+
 
     .hero {
       min-height: auto;
@@ -2496,9 +2520,12 @@
    🔥 ULTIMATE MOBILE SCROLL MASTER FIX 🔥
    ========================================= */
 
-    /* 1. Touch Hijacking Fix: ये लाइन किसी भी डब्बे (Cards, Chat) को पेज स्क्रॉल रोकने से मना करेगी */
-    * {
-      touch-action: pan-y !important;
+    /* 🔥 THE REAL UNBLOCKER 🔥 */
+    body,
+    main {
+      touch-action: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+      overscroll-behavior-y: none !important;
     }
 
     /* 2. Smooth Momentum Scrolling: Apple/Android का नेटिव मक्खन स्क्रॉल इनेबल करने के लिए */
@@ -2833,7 +2860,7 @@
         display: flex;
         position: fixed;
         /* 🔥 BOTTOM GAP FIX: 25px se ghata kar 15px kiya, ab zyada hawa mein nahi udega 🔥 */
-        bottom: 15px;
+        bottom: 2px;
         left: 50%;
         transform: translateX(-50%);
         width: 92%;
@@ -2976,6 +3003,7 @@
       /* Taaki clicks block na hon */
       z-index: -1;
     }
+
     /* ==================================================
        🚀 TARGET 5: NATIVE APPLE "AIRCRAFT" FEEL
        ================================================== */
@@ -2988,15 +3016,15 @@
 
     /* 🔥 2. iMESSAGE & SIRI LEVEL CHAT BUBBLES 🔥 */
     /* AI ke bubbles Siri ki tarah, top-left se round aur bottom-left se point honge */
-    .message.ai > div {
-      border-radius: 20px 20px 20px 4px !important; 
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    .message.ai>div {
+      border-radius: 20px 20px 20px 4px !important;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     }
-    
+
     /* User ke bubbles iMessage ki tarah, bottom-right se point honge aur premium purple chamkenge */
-    .message.user > div {
-      border-radius: 20px 20px 4px 20px !important; 
-      background: linear-gradient(135deg, #8c7cff, #665cff) !important; 
+    .message.user>div {
+      border-radius: 20px 20px 4px 20px !important;
+      background: linear-gradient(135deg, #8c7cff, #665cff) !important;
       color: #fff !important;
       border: none !important;
       box-shadow: 0 5px 15px rgba(140, 124, 255, 0.3) !important;
@@ -3006,13 +3034,14 @@
     /* iPhone ke neeche jo white swipe line hoti hai, tera nav bar usse clash nahi karega */
     @media (max-width: 850px) {
       .mobile-nav-bar {
-        bottom: calc(15px + env(safe-area-inset-bottom)) !important; 
+        bottom: calc(2px + env(safe-area-inset-bottom)) !important;
       }
-      
+
       /* Mobile par cards Apple ki tarah zyada gol (round) hone chahiye */
       .glass {
-        border-radius: 32px !important; 
+        border-radius: 32px !important;
       }
+
       .quiz-box {
         border-radius: 24px !important;
       }
@@ -3020,9 +3049,37 @@
 
     /* 🔥 4. LIQUID SCROLL PHYSICS 🔥 */
     /* Page scroll ekdum makkhan jaisa chalega, jhatke se nahi rukega */
-    body, main, .messages, .plan-list-wrapper {
+    body,
+    main,
+    .messages,
+    .plan-list-wrapper {
       -webkit-overflow-scrolling: touch !important;
       overscroll-behavior-y: none !important;
+    }
+
+    /* ==================================================
+       🔥 TARGET 6: BULLETPROOF SCROLL MARGIN FIX 🔥
+       ================================================== */
+
+    /* In sabhi ID's par click karne se browser inhe 100px pehle hi rok dega! */
+    #dashboard,
+    #quiz-engine,
+    #pyq-vault-section,
+    #planner,
+    #doubt,
+    #progress {
+      scroll-margin-top: 100px !important;
+      /* Top bar (76px) + Saans lene ki jagah */
+    }
+
+    /* ==================================================
+       🔥 TARGET 6.1: VAULT SPECIAL MOBILE SCROLL FIX 🔥
+       ================================================== */
+    @media (max-width: 850px) {
+      #pyq-vault-section {
+        /* Top bar (76px) + Upar wale text ki height ke barabar extra break */
+        scroll-margin-top: 320px !important;
+      }
     }
   </style>
   <!-- 🔥 PREMIUM PDF GENERATOR ENGINE 🔥 -->
@@ -3392,9 +3449,10 @@
     <main>
 
       <!-- HERO DASHBOARD -->
-      <section class="hero reveal" id="dashboard">
+      <section class="hero" id="dashboard">
 
-        <div class="hero-copy">
+
+        <div class="hero-copy reveal">
           <div class="hero-top-text">
             <div class="eyebrow" style="margin-bottom: 15px;"><span class="pulse"></span> AI-powered learning companion
             </div>
@@ -3945,55 +4003,7 @@
 
   </script>
   <script>
-    // Elastic edge-bounce: same rubber-band feel at top AND bottom, on every device
-    // Elastic edge-bounce: same rubber-band feel at top AND bottom, on every device
-    (function () {
-      const el = document.querySelector('main');
-      if (!el) return;
 
-      const MAX_BOUNCE = 70;
-      let current = 0;
-      let pulling = false;
-      let wheelTimer = null;
-
-      function atTop() { return window.scrollY <= 0; }
-      function atBottom() { return Math.ceil(window.scrollY + window.innerHeight) >= document.documentElement.scrollHeight - 1; }
-
-      function push(amount) {
-        current = Math.max(-MAX_BOUNCE, Math.min(MAX_BOUNCE, amount));
-        el.style.transition = 'none';
-        el.style.transform = `translateY(${current}px)`;
-      }
-
-      function release() {
-        current = 0;
-        el.style.transition = 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)';
-        el.style.transform = 'translateY(0)';
-        pulling = false;
-      }
-      window.addEventListener('touchmove', (e) => {
-        // 🔥 MAGIC LOCK MOBILE KE LIYE BHI (FIXED) 🔥
-        if (e.target && e.target.closest && (e.target.closest('.messages') || e.target.closest('.plan-list-wrapper') || e.target.closest('.modal-content') || e.target.closest('.chat') || e.target.closest('.chat-input textarea'))) return;
-
-        const dy = e.touches[0].clientY - startY;
-        if (atTop() && dy > 0) { push(dy * 0.4); pulling = true; }
-        else if (atBottom() && dy < 0) { push(dy * 0.4); pulling = true; }
-      }, { passive: true });
-
-
-      let startY = 0;
-      window.addEventListener('touchstart', (e) => { startY = e.touches[0].clientY; }, { passive: true });
-      window.addEventListener('touchmove', (e) => {
-        // 🔥 MAGIC LOCK MOBILE KE LIYE BHI 🔥
-        // 🔥 MAGIC LOCK MOBILE KE LIYE BHI 🔥
-        if (e.target && e.target.closest && (e.target.closest('.messages') || e.target.closest('.days-list') || e.target.closest('.modal-content'))) return;
-
-        const dy = e.touches[0].clientY - startY;
-        if (atTop() && dy > 0) { push(dy * 0.4); pulling = true; }
-        else if (atBottom() && dy < 0) { push(dy * 0.4); pulling = true; }
-      }, { passive: true });
-      window.addEventListener('touchend', () => { if (pulling) release(); });
-    })();
 
 
   </script>
