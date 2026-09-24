@@ -3077,6 +3077,28 @@
         scroll-margin-top: 320px !important;
       }
     }
+    .tutor {
+    grid-template-columns: 1fr;
+    /* 🔥 Screen ki height ke hisaab se chat ko lock kar dega */
+    height: calc(100vh - 100px); 
+    /* 🔥 Ye 700px wali bimari hata di jisne scroll ko mara tha */
+    min-height: unset; 
+    display: flex;
+    flex-direction: column;
+  }
+
+  .chat {
+    flex: 1;
+    /* 🔥 'auto' hata kar 100% kiya taaki box bahar na nikle */
+    height: 100%; 
+    min-height: 0; /* 🔥 Flexbox ke andar scroll jagane ki chabi */
+    overflow: hidden;
+  }
+
+  .messages {
+    /* 🔥 Jab tu chat scroll karega, toh peeche ki screen nahi hilegi! */
+    overscroll-behavior: contain !important; 
+  }
   </style>
   <!-- 🔥 PREMIUM PDF GENERATOR ENGINE 🔥 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
