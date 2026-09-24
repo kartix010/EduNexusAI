@@ -85,11 +85,14 @@
       opacity: 0;
       transform: translateY(80px) scale(0.9);
       transition: all 0.8s cubic-bezier(0.34, 2, 0.64, 1);
+      pointer-events: none;      /* 👈 YE LINE ADD KAR */
     }
 
     .reveal.active {
       opacity: 1;
       transform: translateY(0) scale(1);
+      pointer-events: auto;      /* 👈 YE LINE ADD KAR */
+
     }
 
     /* ==================================================
