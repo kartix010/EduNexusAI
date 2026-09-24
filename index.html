@@ -187,7 +187,8 @@
     }
 
     /* 🔥 2. MODAL "GOT IT" BUTTON EXPLOSION 🔥 */
-    .modal-content button {
+    .modal-content button.btn {
+      /* <--- YAHAN .btn ADD KIYA HAI */
       background: linear-gradient(135deg, #8c7cff, #5ee7c5);
       /* Purple to Teal blend */
       border-radius: 12px;
@@ -206,7 +207,8 @@
     }
 
     /* Button press par liquid feel */
-    .modal-content button:active {
+    .modal-content button.btn:active {
+      /* <--- YAHAN BHI .btn ADD KIYA HAI */
       transform: scale(0.95);
       box-shadow: 0 4px 15px rgba(94, 231, 197, 0.2);
     }
@@ -3050,7 +3052,8 @@
     .messages,
     .plan-list-wrapper {
       -webkit-overflow-scrolling: touch !important;
-      overscroll-behavior-y: none !important;
+      overscroll-behavior-y: auto !important;
+      /* 🔥 'none' ki jagah 'auto' kar diya! Ab scroll bahar niklega! */
     }
 
     /* ==================================================
@@ -3069,36 +3072,43 @@
     }
 
     /* ==================================================
-       🔥 TARGET 6.1: VAULT SPECIAL MOBILE SCROLL FIX 🔥
+       🔥 TARGET 6.1 & CHAT FIX (ONLY FOR MOBILE) 🔥
        ================================================== */
     @media (max-width: 850px) {
       #pyq-vault-section {
-        /* Top bar (76px) + Upar wale text ki height ke barabar extra break */
-        scroll-margin-top: 320px !important;
+        /* Top bar (76px) + extra break */
+        scroll-margin-top: 280px !important;
+      }
+
+      .tutor {
+        grid-template-columns: 1fr !important;
+        /* 🔥 LE BHAI TERA FULL SIZE BADA DABBA WAPAS! 🔥 */
+        height: calc(100vh - 100px) !important;
+        min-height: unset !important;
+        display: flex !important;
+        flex-direction: column !important;
+      }
+
+      .chat {
+        flex: 1 !important;
+        height: 100% !important;
+        min-height: 0 !important;
+        overflow: hidden !important;
       }
     }
-    .tutor {
-    grid-template-columns: 1fr;
-    /* 🔥 Screen ki height ke hisaab se chat ko lock kar dega */
-    height: calc(100vh - 100px); 
-    /* 🔥 Ye 700px wali bimari hata di jisne scroll ko mara tha */
-    min-height: unset; 
-    display: flex;
-    flex-direction: column;
-  }
 
-  .chat {
-    flex: 1;
-    /* 🔥 'auto' hata kar 100% kiya taaki box bahar na nikle */
-    height: 100%; 
-    min-height: 0; /* 🔥 Flexbox ke andar scroll jagane ki chabi */
-    overflow: hidden;
-  }
+    /* 🔥 Ye bahar rahega taaki Laptop aur Phone dono pe scroll makkhan rahe 🔥 */
+    .messages {
+      overscroll-behavior: auto !important;
+    }
 
-  .messages {
-    /* 🔥 Jab tu chat scroll karega, toh peeche ki screen nahi hilegi! */
-    overscroll-behavior: contain !important; 
-  }
+    /* ==================================================
+       🔥 TARGET 7: NATIVE KEYBOARD OVERLAP FIX 🔥
+       ================================================== */
+    /* Jab bhi typing mode ON hoga, Nav Bar gayab ho jayega */
+    body.typing-mode .mobile-nav-bar {
+      display: none !important;
+    }
   </style>
   <!-- 🔥 PREMIUM PDF GENERATOR ENGINE 🔥 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -6281,19 +6291,88 @@
     </a>
   </div>
   <script>
-    // 🔥 FLUID ANIMATION LOGIC FOR MOBILE NAV 🔥
+
+
+    /* 🔥 NATIVE KEYBOARD SENSOR (Hides Nav Bar when typing) 🔥 */
+    document.querySelectorAll('input, textarea').forEach(el => {
+      // Jab ungli input par lage (Keyboard khule) -> Nav Bar Hatao
+      el.addEventListener('focus', () => document.body.classList.add('typing-mode'));
+
+      // Jab typing khatam ho (Keyboard band ho) -> Nav Bar Wapas Lao
+      el.addEventListener('blur', () => {
+        setTimeout(() => document.body.classList.remove('typing-mode'), 100);
+      });
+    });
+  </script>
+  <script>
+    // 🔥 1. GOD-TIER POP ANIMATION CSS INJECTOR 🔥
+    const popStyle = document.createElement('style');
+    popStyle.innerHTML = `
+      @keyframes godTierPop {
+        0% { opacity: 0; transform: translateY(60px) scale(0.9); }
+        100% { opacity: 1; transform: translateY(0) scale(1); }
+      }
+      .force-pop {
+        animation: godTierPop 0.8s cubic-bezier(0.34, 2, 0.64, 1) forwards !important;
+      }
+    `;
+    document.head.appendChild(popStyle);
+
+    // 🔥 2. FLUID ANIMATION LOGIC FOR MOBILE NAV 🔥
     function updateMobileNav(clickedItem) {
       document.querySelectorAll('.mobile-nav-item').forEach(el => el.classList.remove('active'));
       if (clickedItem) {
         clickedItem.classList.add('active');
+
+        // Button dabte hi magic shuru
+        triggerPop(clickedItem.getAttribute('href'));
       }
     }
+
+    // 🔥 3. DESKTOP/LAPTOP NAV KE LIYE BHI SAME JADOO 🔥
+    document.querySelectorAll('a[href^="#"]').forEach(link => {
+      link.addEventListener('click', function (e) {
+        // Mobile wale pe double click na ho isliye ye check
+        if (!this.classList.contains('mobile-nav-item')) {
+          triggerPop(this.getAttribute('href'));
+        }
+      });
+    });
+
+    // 🔥 4. THE MASTER POP ENGINE 🔥
+    function triggerPop(targetId) {
+      if (!targetId || targetId === '#') return;
+
+      let targets = [];
+      // Decide karo ki kis button pe kis kis cheez ko udana hai
+      if (targetId === '#dashboard') {
+        targets = document.querySelectorAll('.hero-copy, #quiz-engine'); // Home ke liye
+      } else if (targetId === '#pyq-vault-section') {
+        targets = document.querySelectorAll('.hero-feature-text, #pyq-vault-section'); // Vault ke liye
+      } else {
+        const el = document.querySelector(targetId);
+        if (el) targets = [el]; // Baaki sabke liye
+      }
+
+      targets.forEach(el => {
+        if (!el) return;
+
+        // Step A: Scroll hone tak dabe ko chupke se gayab kar do (taaki glitch na dikhe)
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(60px) scale(0.9)';
+        el.classList.remove('force-pop');
+
+        // Step B: Theek 350ms baad (jab scroll complete ho jaye) BOOM! Pop karo!
+        setTimeout(() => {
+          el.style.opacity = '';
+          el.style.transform = '';
+
+          void el.offsetWidth; // Browser ko reflow karne ka secret hack
+          el.classList.add('force-pop');
+        }, 350);
+      });
+    }
   </script>
-
-
-
-
-
 </body>
 
 </html>
