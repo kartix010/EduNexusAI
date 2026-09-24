@@ -38,7 +38,6 @@
 
     html,
     body {
-      scroll-behavior: smooth;
       overflow-x: hidden;
       width: 100%;
       /* 🔥 THE MAGIC OFFSET FIX 🔥 */
@@ -85,13 +84,15 @@
       opacity: 0;
       transform: translateY(80px) scale(0.9);
       transition: all 0.8s cubic-bezier(0.34, 2, 0.64, 1);
-      pointer-events: none;      /* 👈 YE LINE ADD KAR */
+      pointer-events: none;
+      /* 👈 YE LINE ADD KAR */
     }
 
     .reveal.active {
       opacity: 1;
       transform: translateY(0) scale(1);
-      pointer-events: auto;      /* 👈 YE LINE ADD KAR */
+      pointer-events: auto;
+      /* 👈 YE LINE ADD KAR */
 
     }
 
@@ -2523,13 +2524,7 @@
    🔥 ULTIMATE MOBILE SCROLL MASTER FIX 🔥
    ========================================= */
 
-    /* 🔥 THE REAL UNBLOCKER 🔥 */
-    body,
-    main {
-      touch-action: auto !important;
-      -webkit-overflow-scrolling: touch !important;
-      overscroll-behavior-y: none !important;
-    }
+
 
     /* 2. Smooth Momentum Scrolling: Apple/Android का नेटिव मक्खन स्क्रॉल इनेबल करने के लिए */
     .chat-history,
@@ -3052,8 +3047,6 @@
 
     /* 🔥 4. LIQUID SCROLL PHYSICS 🔥 */
     /* Page scroll ekdum makkhan jaisa chalega, jhatke se nahi rukega */
-    body,
-    main,
     .messages,
     .plan-list-wrapper {
       -webkit-overflow-scrolling: touch !important;
