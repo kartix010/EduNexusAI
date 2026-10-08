@@ -3160,6 +3160,139 @@
   </style>
   <!-- 🔥 PREMIUM PDF GENERATOR ENGINE 🔥 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <style id="edunexus-mobile-nav-fix">
+  @media (max-width: 850px) {
+    #main-content.blurred ~ .mobile-nav-bar,
+    .modal-overlay.show ~ .mobile-nav-bar,
+    #mobile-menu-overlay.active ~ .mobile-nav-bar,
+    #zen-mode-overlay.active ~ .mobile-nav-bar {
+      display: none !important;
+    }
+
+    .mobile-nav-bar {
+      z-index: 6000;
+    }
+
+    .toast {
+      bottom: calc(96px + env(safe-area-inset-bottom));
+    }
+  }
+</style>
+<style id="edunexus-dashboard-polish">
+@media (max-width: 850px) {
+  #dashboard {
+    top: 0;
+    padding: 28px 20px 16px;
+    gap: 30px;
+  }
+
+  #dashboard .hero-copy {
+    padding-bottom: 0;
+    transform: none;
+  }
+
+  #dashboard .hero-top-text .eyebrow {
+    font-size: 9px;
+    line-height: 1.6;
+    letter-spacing: 1.6px;
+    margin-bottom: 16px !important;
+  }
+
+  #dashboard #typing-text {
+    font-size: clamp(36px, 9.5vw, 48px);
+    line-height: 1.08;
+    letter-spacing: -1.8px;
+    min-height: 2.16em;
+    margin: 0 0 18px !important;
+  }
+
+  #dashboard .hero-top-text > p {
+    font-size: 15px;
+    line-height: 1.7;
+    color: #aab6cc;
+    margin: 0 0 22px;
+  }
+
+  #dashboard .hero-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  #dashboard .hero-actions .btn {
+    min-height: 48px;
+    padding: 12px 10px;
+    font-size: 12px;
+    line-height: 1.4;
+    gap: 8px;
+    letter-spacing: 0;
+  }
+
+  #dashboard .trust-row {
+    justify-content: flex-start;
+    gap: 8px 14px;
+    margin-top: 16px;
+    font-size: 10px;
+    line-height: 1.6;
+    color: #929fb5;
+  }
+
+  #quiz-engine {
+    padding: 20px;
+  }
+
+  #quiz-engine .card-top > div { gap: 12px; }
+
+  #quiz-engine .card-top h3 {
+    font-size: clamp(22px, 5.8vw, 27px) !important;
+    line-height: 1.2 !important;
+    letter-spacing: -0.6px;
+  }
+
+  #quiz-engine .quiz-box {
+    margin-top: 22px;
+    padding: 12px;
+  }
+
+  #quiz-engine .quiz-box label {
+    font-size: 10px;
+    line-height: 1.5;
+    letter-spacing: 1px;
+  }
+
+  #quiz-engine .quiz-box input,
+  #quiz-engine .quiz-box select {
+    min-height: 48px;
+    padding: 12px;
+    font-size: 16px;
+    line-height: 1.4;
+  }
+
+  #quiz-engine .quiz-box > div > div { min-width: 0; }
+
+  #quiz-engine .quiz-box > div:last-of-type select {
+    font-size: 13px;
+    padding-inline: 8px;
+  }
+
+  #quiz-engine .quiz-box .btn {
+    min-height: 48px;
+    font-size: 13px !important;
+    letter-spacing: 0.2px;
+  }
+
+  #quiz-engine .ai-note {
+    padding: 14px;
+    margin-top: 16px;
+    align-items: flex-start;
+  }
+
+  #quiz-engine .ai-note p {
+    font-size: 12px;
+    line-height: 1.6;
+  }
+}
+</style>
 
 
 </head>
