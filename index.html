@@ -6976,7 +6976,6 @@
       function normVal(v) {
         if (v && typeof v === 'object') v = v.mastery ?? v.percent ?? v.score ?? v.value ?? 0;
         v = Number(v) || 0;
-        if (v > 0 && v <= 1) v *= 100;
         return Math.max(0, Math.min(100, v));
       }
 
