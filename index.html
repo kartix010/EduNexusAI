@@ -800,6 +800,70 @@
       transform-style: preserve-3d;
     }
 
+    /* 💎 PREMIUM CURSOR SPOTLIGHT (Linear/Vercel style — subtle, no kichad) */
+    .glass {
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Sirf 1px border jo cursor ke paas neon mein jalti hai */
+    .glass::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      background: radial-gradient(500px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+          rgba(94, 231, 197, 0.5),
+          rgba(139, 124, 255, 0.25) 30%,
+          transparent 65%);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* Andar sirf halki si sheen (5% white) — poori card tint NAHI hogi */
+    .glass::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: radial-gradient(400px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+          rgba(255, 255, 255, 0.05),
+          transparent 55%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .glass:hover::before,
+    .glass:hover::after {
+      opacity: 1;
+    }
+
+    /* Click ripple — ab sirf halki si jhalak, dhabba nahi */
+    .glass .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(94, 231, 197, 0.15) 0%, transparent 70%);
+      transform: scale(0);
+      animation: neonRipple 0.7s ease-out forwards;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    @keyframes neonRipple {
+      to {
+        transform: scale(2.5);
+        opacity: 0;
+      }
+    }
+
     /* 🔥 THE HOOK: Fluid Touch & Hover Interaction 🔥 */
     .glass:hover,
     .hero-card:active {
@@ -3161,138 +3225,351 @@
   <!-- 🔥 PREMIUM PDF GENERATOR ENGINE 🔥 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style id="edunexus-mobile-nav-fix">
-  @media (max-width: 850px) {
-    #main-content.blurred ~ .mobile-nav-bar,
-    .modal-overlay.show ~ .mobile-nav-bar,
-    #mobile-menu-overlay.active ~ .mobile-nav-bar,
-    #zen-mode-overlay.active ~ .mobile-nav-bar {
-      display: none !important;
+    @media (max-width: 850px) {
+
+      #main-content.blurred~.mobile-nav-bar,
+      .modal-overlay.show~.mobile-nav-bar,
+      #mobile-menu-overlay.active~.mobile-nav-bar,
+      #zen-mode-overlay.active~.mobile-nav-bar {
+        display: none !important;
+      }
+
+      .mobile-nav-bar {
+        z-index: 6000;
+      }
+
+      .toast {
+        bottom: calc(96px + env(safe-area-inset-bottom));
+      }
+    }
+  </style>
+  <style id="edunexus-dashboard-polish">
+    @media (max-width: 850px) {
+      #dashboard {
+        top: 0;
+        padding: 28px 20px 16px;
+        gap: 30px;
+      }
+
+      #dashboard .hero-copy {
+        padding-bottom: 0;
+        transform: none;
+      }
+
+      #dashboard .hero-top-text .eyebrow {
+        font-size: 9px;
+        line-height: 1.6;
+        letter-spacing: 1.6px;
+        margin-bottom: 16px !important;
+      }
+
+      #dashboard #typing-text {
+        font-size: clamp(36px, 9.5vw, 48px);
+        line-height: 1.08;
+        letter-spacing: -1.8px;
+        min-height: 2.16em;
+        margin: 0 0 18px !important;
+      }
+
+      #dashboard .hero-top-text>p {
+        font-size: 15px;
+        line-height: 1.7;
+        color: #aab6cc;
+        margin: 0 0 22px;
+      }
+
+      #dashboard .hero-actions {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      #dashboard .hero-actions .btn {
+        min-height: 48px;
+        padding: 12px 10px;
+        font-size: 12px;
+        line-height: 1.4;
+        gap: 8px;
+        letter-spacing: 0;
+      }
+
+      #dashboard .trust-row {
+        justify-content: flex-start;
+        gap: 8px 14px;
+        margin-top: 16px;
+        font-size: 10px;
+        line-height: 1.6;
+        color: #929fb5;
+      }
+
+      #quiz-engine {
+        padding: 20px;
+      }
+
+      #quiz-engine .card-top>div {
+        gap: 12px;
+      }
+
+      #quiz-engine .card-top h3 {
+        font-size: clamp(22px, 5.8vw, 27px) !important;
+        line-height: 1.2 !important;
+        letter-spacing: -0.6px;
+      }
+
+      #quiz-engine .quiz-box {
+        margin-top: 22px;
+        padding: 12px;
+      }
+
+      #quiz-engine .quiz-box label {
+        font-size: 10px;
+        line-height: 1.5;
+        letter-spacing: 1px;
+      }
+
+      #quiz-engine .quiz-box input,
+      #quiz-engine .quiz-box select {
+        min-height: 48px;
+        padding: 12px;
+        font-size: 16px;
+        line-height: 1.4;
+      }
+
+      #quiz-engine .quiz-box>div>div {
+        min-width: 0;
+      }
+
+      #quiz-engine .quiz-box>div:last-of-type select {
+        font-size: 13px;
+        padding-inline: 8px;
+      }
+
+      #quiz-engine .quiz-box .btn {
+        min-height: 48px;
+        font-size: 13px !important;
+        letter-spacing: 0.2px;
+      }
+
+      #quiz-engine .ai-note {
+        padding: 14px;
+        margin-top: 16px;
+        align-items: flex-start;
+      }
+
+      #quiz-engine .ai-note p {
+        font-size: 12px;
+        line-height: 1.6;
+      }
+    }
+  </style>
+  <style id="edunexus-aurora-color-upgrade">
+    /* ===== 1. HERO HEADING: Flat White → Aurora Gradient ===== */
+    #typing-text {
+      background: linear-gradient(100deg, #ffffff 0%, #cfc8ff 30%, #8b7cff 55%, #5ee7c5 95%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
-    .mobile-nav-bar {
-      z-index: 6000;
+    /* "Not harder." ko Purple → Teal punch */
+    #typing-text br+span {
+      background: linear-gradient(90deg, #8f82ff 10%, #5ee7c5 90%) !important;
+      -webkit-background-clip: text !important;
+      background-clip: text !important;
+      -webkit-text-fill-color: transparent !important;
     }
 
-    .toast {
-      bottom: calc(96px + env(safe-area-inset-bottom));
+    /* ===== 2. SAARE TITLES: Animated Aurora Gradient ===== */
+    .gradient-title {
+      background: linear-gradient(90deg, #ffffff, #a59dff 35%, #5ee7c5 70%, #8b7cff 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: auroraShift 7s linear infinite;
     }
-  }
-</style>
-<style id="edunexus-dashboard-polish">
-@media (max-width: 850px) {
-  #dashboard {
-    top: 0;
-    padding: 28px 20px 16px;
-    gap: 30px;
-  }
 
-  #dashboard .hero-copy {
-    padding-bottom: 0;
-    transform: none;
-  }
+    @keyframes auroraShift {
+      0% {
+        background-position: 0% center;
+      }
 
-  #dashboard .hero-top-text .eyebrow {
-    font-size: 9px;
-    line-height: 1.6;
-    letter-spacing: 1.6px;
-    margin-bottom: 16px !important;
-  }
+      100% {
+        background-position: 200% center;
+      }
+    }
 
-  #dashboard #typing-text {
-    font-size: clamp(36px, 9.5vw, 48px);
-    line-height: 1.08;
-    letter-spacing: -1.8px;
-    min-height: 2.16em;
-    margin: 0 0 18px !important;
-  }
+    /* ===== 3. BADE HEADINGS (Why practice... / Pitch card) ===== */
+    .hero-feature-text h2,
+    .pitch-card h2 {
+      background: linear-gradient(100deg, #ffffff 0%, #cfc8ff 45%, #8b7cff 80%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
 
-  #dashboard .hero-top-text > p {
-    font-size: 15px;
-    line-height: 1.7;
-    color: #aab6cc;
-    margin: 0 0 22px;
-  }
+    .pitch-card h2 span {
+      background: linear-gradient(90deg, #8f86ff, #5ee7c5);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: none;
+      filter: drop-shadow(0 0 14px rgba(94, 231, 197, 0.35));
+    }
 
-  #dashboard .hero-actions {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
-  }
+    /* ===== 4. STATS NUMBERS: White → Neon Gradient ===== */
+    .stat strong {
+      background: linear-gradient(135deg, #ffffff 15%, #5ee7c5 60%, #8b7cff 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
 
-  #dashboard .hero-actions .btn {
-    min-height: 48px;
-    padding: 12px 10px;
-    font-size: 12px;
-    line-height: 1.4;
-    gap: 8px;
-    letter-spacing: 0;
-  }
+    /* ===== 5. TEXT SELECTION: Neon Teal ===== */
+    ::selection {
+      background: rgba(94, 231, 197, 0.35);
+      color: #ffffff;
+    }
 
-  #dashboard .trust-row {
-    justify-content: flex-start;
-    gap: 8px 14px;
-    margin-top: 16px;
-    font-size: 10px;
-    line-height: 1.6;
-    color: #929fb5;
-  }
+    /* ===== 6. MOBILE: Battery/perf ke liye animation off ===== */
+    @media (max-width: 520px) {
+      .gradient-title {
+        animation: none;
+        background-position: 40% center;
+      }
+    }
+  </style>
+  <style id="edunexus-select-fix">
+    /* 🔥 WHITE DROPDOWN BUG FIX: select se blur hatao (Chrome artifact killer) 🔥 */
+    select,
+    select:focus {
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      background: #0e1421 !important;
+      /* solid dark — rgba nahi, isliye white dabba nahi */
+    }
 
-  #quiz-engine {
-    padding: 20px;
-  }
+    select option,
+    select optgroup {
+      background: #0e1421;
+      color: #f4f7ff;
+    }
 
-  #quiz-engine .card-top > div { gap: 12px; }
+    select option:checked {
+      background: #1c2740;
+      color: #5ee7c5;
+    }
+  </style>
 
-  #quiz-engine .card-top h3 {
-    font-size: clamp(22px, 5.8vw, 27px) !important;
-    line-height: 1.2 !important;
-    letter-spacing: -0.6px;
-  }
+  <style id="edunexus-missing-animations">
+    /* 1. Pulse Animation (Online Dot & Loading states ke liye) */
+    @keyframes pulse {
+      0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(94, 231, 197, 0.7);
+      }
 
-  #quiz-engine .quiz-box {
-    margin-top: 22px;
-    padding: 12px;
-  }
+      70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 10px rgba(94, 231, 197, 0);
+      }
 
-  #quiz-engine .quiz-box label {
-    font-size: 10px;
-    line-height: 1.5;
-    letter-spacing: 1px;
-  }
+      100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(94, 231, 197, 0);
+      }
+    }
 
-  #quiz-engine .quiz-box input,
-  #quiz-engine .quiz-box select {
-    min-height: 48px;
-    padding: 12px;
-    font-size: 16px;
-    line-height: 1.4;
-  }
+    /* 💎 GOD-TIER SKELETON LOADER (Shimmer Effect) */
+    .skeleton-wrap {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      animation: popIn 0.4s ease-out;
+    }
 
-  #quiz-engine .quiz-box > div > div { min-width: 0; }
+    .skeleton-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
 
-  #quiz-engine .quiz-box > div:last-of-type select {
-    font-size: 13px;
-    padding-inline: 8px;
-  }
+    .skeleton-line {
+      height: 12px;
+      background: #1a2235;
+      border-radius: 6px;
+      position: relative;
+      overflow: hidden;
+    }
 
-  #quiz-engine .quiz-box .btn {
-    min-height: 48px;
-    font-size: 13px !important;
-    letter-spacing: 0.2px;
-  }
+    /* Ye line teri existing shimmer animation ko use karegi */
+    .skeleton-line::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(94, 231, 197, 0.15), transparent);
+      animation: shimmer 1.5s infinite;
+    }
 
-  #quiz-engine .ai-note {
-    padding: 14px;
-    margin-top: 16px;
-    align-items: flex-start;
-  }
+    .skeleton-line.title {
+      height: 18px;
+      width: 40%;
+      background: #232d45;
+    }
 
-  #quiz-engine .ai-note p {
-    font-size: 12px;
-    line-height: 1.6;
-  }
-}
-</style>
+    .skeleton-line.short {
+      width: 30%;
+    }
+
+    /* 2. Shimmer Animation (Progress Bars ki chamak ke liye) */
+    @keyframes shimmer {
+      0% {
+        transform: translateX(-100%);
+      }
+
+      100% {
+        transform: translateX(100%);
+      }
+    }
+
+    /* 3. Float Animation (Planner Logo ke liye) */
+    @keyframes float {
+      0% {
+        transform: translateY(0px);
+      }
+
+      50% {
+        transform: translateY(-10px);
+      }
+
+      100% {
+        transform: translateY(0px);
+      }
+    }
+
+    /* 4. PulseMic Animation (Recording wale Mic button ke liye) */
+    @keyframes pulseMic {
+      0% {
+        box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.7);
+      }
+
+      70% {
+        box-shadow: 0 0 0 15px rgba(255, 71, 87, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(255, 71, 87, 0);
+      }
+    }
+
+  </style>
+
+
 
 
 </head>
@@ -3518,29 +3795,6 @@
       <button onclick="sendSupportMessage()"
         style="width: 100%; background: linear-gradient(135deg, var(--accent), var(--accent2)); border: none; padding: 16px; border-radius: 16px; color: #000; font-weight: 800; font-size: 15px; cursor: pointer; transition: 0.3s; box-shadow: 0 10px 25px rgba(94, 231, 197, 0.3); display: flex; justify-content: center; gap: 10px; align-items: center;"
         onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 15px 35px rgba(94, 231, 197, 0.5)';">
-        <span id="supportBtnTxt">Send to Admin</span> 🚀
-      </button>
-    </div>
-  </div>
-  <!-- 🔥 GOD-TIER SUPPORT MODAL (HIDDEN BY DEFAULT) 🔥 -->
-  <div id="support-modal" class="modal-overlay" style="z-index: 9999;">
-    <div class="modal-content glass tilt-panel"
-      style="max-width: 420px; text-align: center; padding: 40px 30px; position: relative; border-radius: 30px; background: linear-gradient(145deg, rgba(20,25,35,0.95), rgba(10,15,25,0.98)); box-shadow: 0 30px 60px rgba(0,0,0,0.8), inset 0 2px 20px rgba(139, 124, 255, 0.2), 0 0 30px rgba(139, 124, 255, 0.15);">
-
-      <button onclick="closeSupportModal()"
-        style="position: absolute; top: 20px; right: 25px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #aeb7c8; font-size: 20px; cursor: pointer; transition: 0.3s; width:35px; height:35px; border-radius:50%; display:grid; place-items:center;">×</button>
-
-      <div style="font-size: 40px; margin-bottom: 10px;">💬</div>
-      <h2 style="font-family: 'Space Grotesk'; color: white; margin: 0 0 10px; font-size:26px;">Direct <span
-          style="color:var(--accent2);">Admin Line</span></h2>
-      <p style="color: var(--muted); font-size: 13px; margin: 0 0 25px; line-height: 1.6;">Found a bug or have a
-        suggestion? Reply directly to the EduNexus AI Support.</p>
-
-      <textarea id="supportMsg" placeholder="Type your reply here..."
-        style="width: 100%; height: 120px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 15px; color: #fff; font-family: 'Inter', sans-serif; resize: none; outline: none; margin-bottom: 20px; transition: 0.3s;"></textarea>
-
-      <button onclick="sendSupportMessage()"
-        style="width: 100%; background: linear-gradient(135deg, var(--accent), var(--accent2)); border: none; padding: 16px; border-radius: 16px; color: #000; font-weight: 800; font-size: 15px; cursor: pointer; transition: 0.3s; box-shadow: 0 10px 25px rgba(94, 231, 197, 0.3);">
         <span id="supportBtnTxt">Send to Admin</span> 🚀
       </button>
     </div>
@@ -4472,13 +4726,11 @@
         }
       }, 1500);
     }
-
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           entry.target.classList.add('active');
-        } else {
-          entry.target.classList.remove('active');
+          observer.unobserve(entry.target); // 🔥 Ek baar animate hua, phir kabhi ghost nahi banega
         }
       });
     }, { threshold: 0.05 });
@@ -4823,6 +5075,7 @@
     if (window.innerWidth > 850) {
       document.querySelectorAll('.tilt-panel').forEach(card => {
         card.addEventListener('mousemove', e => {
+          if (card.querySelector('select:focus')) return; // 🛑 DROPDOWN GUARD: select khula/focused hai toh tilt freeze
           const rect = card.getBoundingClientRect();
           const rotateX = (((e.clientY - rect.top) - (rect.height / 2)) / (rect.height / 2)) * -10;
           const rotateY = (((e.clientX - rect.left) - (rect.width / 2)) / (rect.width / 2)) * 10;
@@ -4830,6 +5083,7 @@
           card.style.transition = "transform 0.1s ease-out";
         });
         card.addEventListener('mouseleave', () => {
+          if (card.querySelector('select:focus')) return; // 🛑 DROPDOWN GUARD: transform mat chhedo jab select focused ho
           card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
           card.style.transition = "transform 0.5s ease-out";
         });
@@ -4906,11 +5160,26 @@
 
       // 🔥 PREMIUM LOADING UI 🔥
       $("planResult").innerHTML = `
-        <div class="result-empty" style="animation: pulse 1.5s infinite;">
-            <div class="pulse" style="width: 20px; height: 20px; margin: 0 auto 20px;"></div>
-            <h3 class="gradient-title">KX Core is analyzing your syllabus...</h3>
-            <p>Scanning documents & architecting a personalized ${totalDays}-day timetable.</p>
-        </div>`;
+<div class="skeleton-wrap">
+  <div class="skeleton-card">
+    <div class="skeleton-line title"></div>
+    <div class="skeleton-line"></div>
+    <div class="skeleton-line short"></div>
+  </div>
+  <div class="skeleton-card">
+    <div class="skeleton-line title"></div>
+    <div class="skeleton-line"></div>
+    <div class="skeleton-line short"></div>
+  </div>
+  <div class="skeleton-card">
+    <div class="skeleton-line title"></div>
+    <div class="skeleton-line"></div>
+    <div class="skeleton-line short"></div>
+  </div>
+  <div style="text-align:center; margin-top:10px; color:#5ee7c5; font-size:12px; font-weight:600; letter-spacing:1px;">
+    ✦ KX CORE IS ARCHITECTING YOUR PLAN...
+  </div>
+</div>`;
 
       setTimeout(() => { $("planResult").scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
 
@@ -5832,16 +6101,14 @@
             </div>`;
         });
 
+        // 🔥 STREAMING UI SETUP 🔥
         document.getElementById(loadingId).innerHTML = `
-          <span class="msg-avatar">✦</span>
-          <div style="flex:1; white-space: pre-wrap;">${aiResponse}</div>
-          <button onclick="speakText(this.previousElementSibling.innerText, this)" style="background:transparent; border:none; cursor:pointer; font-size:16px; padding:0; margin-left:8px; align-self:flex-start;" title="Listen to AI">🔊</button>
-        `;
-
-        // 🔥 Render the diagrams on screen 🔥
-        setTimeout(() => { mermaid.init(undefined, document.querySelectorAll('.mermaid')); }, 100);
-
-
+<span class="msg-avatar">✦</span>
+<div id="stream-box-${loadingId}" style="flex:1; white-space: pre-wrap;"></div>
+<button onclick="speakText(document.getElementById('stream-box-${loadingId}').innerText, this)" style="background:transparent; border:none; cursor:pointer; font-size:16px; padding:0; margin-left:8px; align-self:flex-start;" title="Listen to AI">🔊</button>
+`;
+        // 🔥 START THE MAGIC STREAM 🔥
+        typeHTML(document.getElementById(`stream-box-${loadingId}`), aiResponse, 12);
       } catch (error) {
         document.getElementById(loadingId).innerHTML = `<span class="msg-avatar">🚨</span><div style="color:#ff4757; font-size:11px; line-height:1.5;"><b>Connection Blocked!</b><br>Browser blocked the request (CORS) because the server is offline or sleeping.</div>`;
       }
@@ -5900,12 +6167,14 @@
                 </div>
                 <pre style="margin: 0; padding: 16px; overflow-x: auto; white-space: pre; font-family: monospace; color: #dce2ee; font-size: 13px; line-height: 1.6;"><code>${code.trim().replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code></pre>
             </div>`;
-        });
+        });// 🔥 STREAMING UI SETUP 🔥
         document.getElementById(loadingId).innerHTML = `
-          <span class="msg-avatar">✦</span>
-          <div style="flex:1; white-space: pre-wrap;">${aiResponse}</div>
-          <button onclick="speakText(this.previousElementSibling.innerText, this)" style="background:transparent; border:none; cursor:pointer; font-size:16px; padding:0; margin-left:8px; align-self:flex-start;" title="Listen to AI">🔊</button>
-        `;
+<span class="msg-avatar">✦</span>
+<div id="stream-box-${loadingId}" style="flex:1; white-space: pre-wrap;"></div>
+<button onclick="speakText(document.getElementById('stream-box-${loadingId}').innerText, this)" style="background:transparent; border:none; cursor:pointer; font-size:16px; padding:0; margin-left:8px; align-self:flex-start;" title="Listen to AI">🔊</button>
+`;
+        // 🔥 START THE MAGIC STREAM 🔥
+        typeHTML(document.getElementById(`stream-box-${loadingId}`), aiResponse, 12);
       } catch (error) {
         document.getElementById(loadingId).innerHTML = `<span class="msg-avatar">🚨</span><div style="color:#ff4757;"><b>System Alert:</b> Engine is warming up. Please try again in 5 seconds.</div>`;
       }
@@ -6537,12 +6806,280 @@
 
         // 🔥 THE FIX: Faltu ka 350ms delay aur opacity:0 hata diya. 
         // Ab click karte hi instant smooth pop hoga bina screen blank kiye.
-        el.classList.remove('force-pop', 'active');
-        void el.offsetWidth; // Browser reflow hack to restart animation
+        el.classList.remove('force-pop');
+        void el.offsetWidth;
         el.classList.add('force-pop');
       });
     }
+    // 🔥 LIQUID GLASS MOUSE TRACKER (CARDS PAR LIGHT FOLLOW KAREGA) 🔥
+    document.addEventListener('DOMContentLoaded', () => {
+      const glassElements = document.querySelectorAll('.glass');
+
+      glassElements.forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+          const rect = card.getBoundingClientRect();
+          const x = ((e.clientX - rect.left) / rect.width) * 100;
+          const y = ((e.clientY - rect.top) / rect.height) * 100;
+
+          card.style.setProperty('--mouse-x', x + '%');
+          card.style.setProperty('--mouse-y', y + '%');
+        });
+
+        // Touch devices ke liye
+        card.addEventListener('touchmove', (e) => {
+          const rect = card.getBoundingClientRect();
+          const touch = e.touches[0];
+          const x = ((touch.clientX - rect.left) / rect.width) * 100;
+          const y = ((touch.clientY - rect.top) / rect.height) * 100;
+
+          card.style.setProperty('--mouse-x', x + '%');
+          card.style.setProperty('--mouse-y', y + '%');
+        });
+      });
+    });
+    // 🔥 GOD-TIER AI STREAMING ENGINE (ChatGPT Style Typewriter) 
+    function typeHTML(element, html, speed = 12) {
+      let i = 0;
+      let isTag = false;
+      let currentText = "";
+
+      function type() {
+        if (i < html.length) {
+          let char = html.charAt(i);
+          if (char === '<') isTag = true;
+          if (char === '>') {
+            isTag = false;
+            currentText += char;
+            i++;
+            element.innerHTML = currentText;
+            type(); // Tags ko instantly render karo taaki user ko code na dikhe
+            return;
+          }
+          currentText += char;
+          i++;
+          if (!isTag) {
+            element.innerHTML = currentText;
+            setTimeout(type, speed); // Text ko type karo
+          } else {
+            type();
+          }
+        } else {
+          element.innerHTML = html; // Final render
+          // Mermaid diagrams aur copy buttons ko zinda karo
+          setTimeout(() => {
+            if (window.mermaid) mermaid.init(undefined, document.querySelectorAll('.mermaid'));
+          }, 100);
+        }
+      }
+      type();
+    }
   </script>
+
+
+  <!-- 🍩 GOD-TIER ANIMATED SVG PROGRESS RINGS (EduNexus AI) -->
+  <style id="edunexus-progress-rings">
+    .kx-rings {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 26px;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 18px 6px 8px;
+      animation: popIn .5s ease-out
+    }
+
+    .kx-ring-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      min-width: 104px
+    }
+
+    .kx-ring-wrap {
+      position: relative;
+      width: 112px;
+      height: 112px
+
+    }
+
+    .kx-ring-svg {
+      width: 112px;
+      height: 112px;
+      transform: rotate(-90deg)
+    }
+
+    .kx-ring-track {
+      fill: none;
+      stroke: rgba(255, 255, 255, .07);
+      stroke-width: 10
+    }
+
+    .kx-ring-val {
+      fill: none;
+      stroke: url(#kxRingGrad);
+      stroke-width: 10;
+      stroke-linecap: round;
+      stroke-dasharray: 283;
+      stroke-dashoffset: 283;
+      transition: stroke-dashoffset 1.4s cubic-bezier(.22, 1, .36, 1);
+      filter: drop-shadow(0 0 6px rgba(94, 231, 197, .45))
+    }
+
+    .kx-ring-num {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: #f2f4ff;
+      text-shadow: 0 0 12px rgba(139, 124, 255, .5)
+    }
+
+    .kx-ring-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #727d91
+    }
+
+    @media(max-width:600px) {
+      .kx-rings {
+        gap: 14px
+      }
+
+      .kx-ring-wrap,
+      .kx-ring-svg {
+        width: 92px;
+        height: 92px
+      }
+
+      .kx-ring-num {
+        font-size: 18px
+      }
+
+      .kx-ring-card {
+        min-width: 86px
+      }
+    }
+  </style>
+
+  <script id="edunexus-progress-rings-js">
+    (function () {
+      const C = 283; // circle circumference (2 * pi * 45)
+      const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+
+      function normVal(v) {
+        if (v && typeof v === 'object') v = v.mastery ?? v.percent ?? v.score ?? v.value ?? 0;
+        v = Number(v) || 0;
+        if (v > 0 && v <= 1) v *= 100;
+        return Math.max(0, Math.min(100, v));
+      }
+
+      // Tera mastery data dhoondhta hai (subjectMastery ya localStorage)
+      function getMastery() {
+        if (window.subjectMastery && typeof window.subjectMastery === 'object') return window.subjectMastery;
+        try {
+          for (const k of Object.keys(localStorage)) {
+            if (/mastery|progress/i.test(k)) {
+              const v = JSON.parse(localStorage.getItem(k));
+              if (v && typeof v === 'object') return v;
+            }
+          }
+        } catch (e) { }
+        return null;
+      }
+
+      // Purani flat bars ka container dhoondhta hai
+      function findBars() {
+        const sels = ['#progressBars', '.progress-bars', '#progress-bars', '.bars', '#masteryBars', '.progress-bars-wrap'];
+        for (const s of sels) { const el = document.querySelector(s); if (el) return el; }
+        const cands = [...document.querySelectorAll('[id*="bar" i],[class*="bar" i]')];
+        for (const el of cands) {
+          let n = 0;
+          el.querySelectorAll('*').forEach(f => { if (/%$/.test(f.style.width || '')) n++; });
+          if (n >= 3) return el;
+        }
+        return null;
+      }
+
+      // Agar mastery object na mile, toh bars ke DOM se % padh leta hai
+      function scrapeFromBars(bars) {
+        const out = {};
+        [...bars.children].forEach(row => {
+          const m = (row.textContent.match(/(\d+)\s*%/) || [])[1];
+          const label = (row.textContent.replace(/[\d%]+/g, '').trim() || '').split('\n')[0].trim();
+          if (label) out[label] = m ? Number(m) : 0;
+        });
+        return out;
+      }
+
+      let wrap = null, cards = {};
+
+      function build() {
+        const bars = findBars();
+        if (!bars) { if (window.showToast) showToast('⚠️ Rings: progress bars section nahi mili — screenshot bhej bhai'); return null; }
+        wrap = document.createElement('div');
+        wrap.className = 'kx-rings';
+        wrap.innerHTML = `<svg width="0" height="0" style="position:absolute"><defs><linearGradient id="kxRingGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#8b7cff"/><stop offset="100%" stop-color="#5ee7c5"/></linearGradient></defs></svg>`;
+        bars.parentElement.insertBefore(wrap, bars);
+        bars.style.display = 'none'; // purani boring bars chhup gayi
+        return wrap;
+      }
+
+      function ensureCards(keys) {
+        keys.forEach(key => {
+          if (cards[key]) return;
+          const card = document.createElement('div');
+          card.className = 'kx-ring-card';
+          card.innerHTML = `<div class="kx-ring-wrap"><svg class="kx-ring-svg" viewBox="0 0 112 112"><circle class="kx-ring-track" cx="56" cy="56" r="45"/><circle class="kx-ring-val" cx="56" cy="56" r="45"/></svg><div class="kx-ring-num">0%</div></div><div class="kx-ring-label">${cap(key)}</div>`;
+          wrap.appendChild(card);
+          cards[key] = { val: card.querySelector('.kx-ring-val'), num: card.querySelector('.kx-ring-num'), cur: 0 };
+        });
+      }
+
+      function setRing(key, pct, first) {
+        const c = cards[key]; if (!c) return;
+        c.val.style.strokeDashoffset = C - (C * pct / 100);
+        const from = first ? 0 : c.cur, to = pct, t0 = performance.now();
+        (function tick(t) {
+          const p = Math.min(1, (t - t0) / 1400), e = 1 - Math.pow(1 - p, 3);
+          c.num.textContent = Math.round(from + (to - from) * e) + '%';
+          if (p < 1) requestAnimationFrame(tick); else c.cur = to;
+        })(t0);
+      }
+
+      function render(first) {
+        if (!wrap && !build()) return;
+        let data = getMastery();
+        const bars = findBars();
+        if (!data || !Object.keys(data).length) data = bars ? scrapeFromBars(bars) : {};
+        const keys = Object.keys(data).slice(0, 6);
+        if (!keys.length) return;
+        ensureCards(keys);
+        keys.forEach(k => setRing(k, normVal(data[k]), first));
+      }
+
+      // Tere updateProgressUI() ko patch kiya — quiz complete hote hi rings auto-update
+      function hook() {
+        if (typeof window.updateProgressUI === 'function' && !window.updateProgressUI.__kxPatched) {
+          const orig = window.updateProgressUI;
+          const wrapped = function () { const r = orig.apply(this, arguments); setTimeout(() => render(false), 60); return r; };
+          wrapped.__kxPatched = true;
+          window.updateProgressUI = wrapped;
+        }
+      }
+
+      window.addEventListener('load', () => { hook(); setTimeout(() => render(true), 300); });
+    })();
+  </script>
+=
+  <!-- 🍩 PROGRESS RINGS END -->
+
 </body>
 
 </html>
