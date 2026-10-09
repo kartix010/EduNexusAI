@@ -6101,14 +6101,14 @@
             </div>`;
         });
 
-        // 🔥 STREAMING UI SETUP 🔥
+        // AI response container
         document.getElementById(loadingId).innerHTML = `
 <span class="msg-avatar">✦</span>
 <div id="stream-box-${loadingId}" style="flex:1; white-space: pre-wrap;"></div>
 <button onclick="speakText(document.getElementById('stream-box-${loadingId}').innerText, this)" style="background:transparent; border:none; cursor:pointer; font-size:16px; padding:0; margin-left:8px; align-self:flex-start;" title="Listen to AI">🔊</button>
 `;
-        // 🔥 START THE MAGIC STREAM 🔥
-        typeHTML(document.getElementById(`stream-box-${loadingId}`), aiResponse, 12);
+        // Display the complete formatted answer.
+        renderAIResponse(document.getElementById(`stream-box-${loadingId}`), aiResponse);
       } catch (error) {
         document.getElementById(loadingId).innerHTML = `<span class="msg-avatar">🚨</span><div style="color:#ff4757; font-size:11px; line-height:1.5;"><b>Connection Blocked!</b><br>Browser blocked the request (CORS) because the server is offline or sleeping.</div>`;
       }
@@ -6167,20 +6167,18 @@
                 </div>
                 <pre style="margin: 0; padding: 16px; overflow-x: auto; white-space: pre; font-family: monospace; color: #dce2ee; font-size: 13px; line-height: 1.6;"><code>${code.trim().replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code></pre>
             </div>`;
-        });// 🔥 STREAMING UI SETUP 🔥
+        });// AI response container
         document.getElementById(loadingId).innerHTML = `
 <span class="msg-avatar">✦</span>
 <div id="stream-box-${loadingId}" style="flex:1; white-space: pre-wrap;"></div>
 <button onclick="speakText(document.getElementById('stream-box-${loadingId}').innerText, this)" style="background:transparent; border:none; cursor:pointer; font-size:16px; padding:0; margin-left:8px; align-self:flex-start;" title="Listen to AI">🔊</button>
 `;
-        // 🔥 START THE MAGIC STREAM 🔥
-        typeHTML(document.getElementById(`stream-box-${loadingId}`), aiResponse, 12);
+        // Display the complete formatted answer.
+        renderAIResponse(document.getElementById(`stream-box-${loadingId}`), aiResponse);
       } catch (error) {
         document.getElementById(loadingId).innerHTML = `<span class="msg-avatar">🚨</span><div style="color:#ff4757;"><b>System Alert:</b> Engine is warming up. Please try again in 5 seconds.</div>`;
       }
       wrap.scrollTop = wrap.scrollHeight;
-      // Render the diagrams on screen
-      setTimeout(() => { mermaid.init(undefined, document.querySelectorAll('.mermaid')); }, 100);
     }
 
 
@@ -6837,41 +6835,15 @@
         });
       });
     });
-    // 🔥 GOD-TIER AI STREAMING ENGINE (ChatGPT Style Typewriter) 
-    function typeHTML(element, html, speed = 12) {
-      let i = 0;
-      let isTag = false;
-      let currentText = "";
-
-      function type() {
-        if (i < html.length) {
-          let char = html.charAt(i);
-          if (char === '<') isTag = true;
-          if (char === '>') {
-            isTag = false;
-            currentText += char;
-            i++;
-            element.innerHTML = currentText;
-            type(); // Tags ko instantly render karo taaki user ko code na dikhe
-            return;
-          }
-          currentText += char;
-          i++;
-          if (!isTag) {
-            element.innerHTML = currentText;
-            setTimeout(type, speed); // Text ko type karo
-          } else {
-            type();
-          }
-        } else {
-          element.innerHTML = html; // Final render
-          // Mermaid diagrams aur copy buttons ko zinda karo
-          setTimeout(() => {
-            if (window.mermaid) mermaid.init(undefined, document.querySelectorAll('.mermaid'));
-          }, 100);
-        }
+    // Render the complete formatted answer as soon as the response arrives.
+    function renderAIResponse(element, html) {
+      element.innerHTML = html;
+      const diagrams = element.querySelectorAll('.mermaid');
+      if (diagrams.length) {
+        setTimeout(() => {
+          if (window.mermaid) mermaid.init(undefined, diagrams);
+        }, 100);
       }
-      type();
     }
   </script>
 
