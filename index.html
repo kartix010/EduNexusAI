@@ -7166,29 +7166,75 @@
     lead.className = 'enh-lead';
     lead.innerHTML = `
       <p>Plan your study. Practise smarter. Get unstuck with KX AI.</p>
-      <svg class="enh-planet" viewBox="0 0 160 160" aria-hidden="true" focusable="false">
-        <defs>
-          <radialGradient id="enh-aura"><stop stop-color="#8b7cff" stop-opacity=".20"/><stop offset="1" stop-color="#8b7cff" stop-opacity="0"/></radialGradient>
-          <radialGradient id="enh-glass" cx="28%" cy="22%" r="85%"><stop stop-color="#8171bd" stop-opacity=".70"/><stop offset=".45" stop-color="#292441"/><stop offset=".85" stop-color="#0e1421"/><stop offset="1" stop-color="#193c38"/></radialGradient>
-          <linearGradient id="enh-edge" x2="1" y2="1"><stop stop-color="#b6aaff" stop-opacity=".7"/><stop offset=".5" stop-color="#8b7cff" stop-opacity=".1"/><stop offset="1" stop-color="#5ee7c5" stop-opacity=".65"/></linearGradient>
-          <linearGradient id="enh-ring" x2="1" y2=".4"><stop stop-color="#8b7cff"/><stop offset=".45" stop-color="#b5aaff"/><stop offset="1" stop-color="#5ee7c5"/></linearGradient>
-          <clipPath id="enh-front-half"><rect x="0" y="80" width="160" height="80"/></clipPath>
-        </defs>
-        <circle cx="80" cy="80" r="77" fill="url(#enh-aura)"/>
-        <g class="enh-ring-motion"><g transform="rotate(-24 80 80)">
-          <ellipse cx="80" cy="80" rx="62" ry="21" fill="none" stroke="url(#enh-ring)" stroke-width="1.5" opacity=".55"/>
-          <g><circle class="enh-particle" r="2.2" fill="#5ee7c5"/><circle class="enh-particle" r="1.7" fill="#b5aaff"/><circle class="enh-particle" r="1.3" fill="#f4f7ff"/></g>
-        </g></g>
-        <circle cx="80" cy="80" r="33" fill="url(#enh-glass)" stroke="url(#enh-edge)" stroke-width=".9"/>
-        <path d="M57 65 Q70 45 94 56" fill="none" stroke="#d5cbff" stroke-opacity=".16" stroke-width="1.2" stroke-linecap="round"/>
-        <text x="80" y="84" text-anchor="middle" fill="#e7e1ff" font-family="Space Grotesk, sans-serif" font-weight="500" font-size="13" letter-spacing="1.7">KX</text>
-        <g class="enh-ring-motion"><g transform="rotate(-24 80 80)" clip-path="url(#enh-front-half)">
-          <ellipse cx="80" cy="80" rx="62" ry="21" fill="none" stroke="url(#enh-ring)" stroke-width="5" opacity=".07"/>
-          <ellipse cx="80" cy="80" rx="62" ry="21" fill="none" stroke="url(#enh-ring)" stroke-width="1.6" opacity=".95"/>
-          <g><circle class="enh-particle" r="2.2" fill="#5ee7c5"/><circle class="enh-particle" r="1.7" fill="#b5aaff"/><circle class="enh-particle" r="1.3" fill="#f4f7ff"/></g>
-        </g></g>
-      </svg>`;
+      
+      <!-- 🔥 THE NEW KX QUANTUM CORE 🔥 -->
+      <style>
+        .kx-quantum-core {
+          width: 120px; height: 120px;
+          position: relative; display: flex;
+          justify-content: center; align-items: center;
+          perspective: 800px; transform-style: preserve-3d;
+          margin-left: auto;
+          /* 🔥 Ye raha magic number! Isko badhayega (jaise -70px) toh aur upar jayega */
+          margin-top: -90px; 
+        }
+        .kx-core-text {
+          position: relative; font-family: 'Space Grotesk', sans-serif;
+          font-weight: 900; 
+          font-size: 28px; 
+          font-style: italic; 
+          letter-spacing: 2px; 
+          
+          background: linear-gradient(135deg, #ffffff 10%, #5ee7c5 50%, #8b7cff 90%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          z-index: 10;
+        }
+        .kx-orbit {
+          position: absolute; border-radius: 50%; border-style: solid;
+          transform-style: preserve-3d;
+        }
+        .kx-orbit-1 {
+          width: 100%; height: 100%; border-width: 2px;
+          border-color: #5ee7c5 transparent #8b7cff transparent;
+          animation: spin1 12s linear infinite !important; 
+        }
+        .kx-orbit-2 {
+          width: 75%; height: 75%; border-width: 2px;
+          border-color: transparent #8b7cff transparent #5ee7c5;
+          animation: spin2 16s linear infinite reverse !important; 
+        }
+        .kx-orbit-3 {
+          width: 50%; height: 50%; border-width: 1px;
+          border-color: rgba(255, 255, 255, 0.4) transparent transparent transparent;
+          animation: spin3 8s linear infinite !important; 
+        }
 
+        @keyframes spin1 {
+          0% { transform: rotateX(65deg) rotateY(35deg) rotateZ(0deg); }
+          100% { transform: rotateX(65deg) rotateY(35deg) rotateZ(360deg); }
+        }
+        @keyframes spin2 {
+          0% { transform: rotateX(55deg) rotateY(-45deg) rotateZ(0deg); }
+          100% { transform: rotateX(55deg) rotateY(-45deg) rotateZ(360deg); }
+        }
+        @keyframes spin3 {
+          0% { transform: rotateX(75deg) rotateY(15deg) rotateZ(0deg); }
+          100% { transform: rotateX(75deg) rotateY(15deg) rotateZ(360deg); }
+        }
+      </style>
+       
+
+      <div class="kx-quantum-core">
+        <div class="kx-orbit kx-orbit-1"></div>
+        <div class="kx-orbit kx-orbit-2"></div>
+        <div class="kx-orbit kx-orbit-3"></div>
+        <div class="kx-core-glow"></div>
+        <span class="kx-core-text">KX</span>
+      </div>
+    `;
+ 
     const toolkit = document.createElement('section');
     toolkit.className = 'enh-toolkit';
     toolkit.setAttribute('aria-labelledby', 'enh-tools-heading');
