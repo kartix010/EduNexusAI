@@ -6835,15 +6835,99 @@
         });
       });
     });
-    // Render the complete formatted answer as soon as the response arrives.
+    // Brief typing lead-in, then a fast reveal; formatted blocks stay intact.
     function renderAIResponse(element, html) {
       element.innerHTML = html;
       const diagrams = element.querySelectorAll('.mermaid');
-      if (diagrams.length) {
-        setTimeout(() => {
-          if (window.mermaid) mermaid.init(undefined, diagrams);
-        }, 100);
+      const renderDiagrams = () => {
+        if (diagrams.length && window.mermaid) {
+          Promise.resolve(mermaid.init(undefined, diagrams)).catch(console.error);
+        }
+      };
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || document.hidden) {
+        renderDiagrams();
+        return;
       }
+
+      const units = [];
+      let total = 0;
+      const segmenter = typeof Intl.Segmenter === 'function'
+        ? new Intl.Segmenter(undefined, { granularity: 'grapheme' }) : null;
+      function collect(node) {
+        if (node.nodeType === Node.TEXT_NODE) {
+          const text = node.nodeValue;
+          if (!text.trim()) return;
+          const chars = segmenter
+            ? Array.from(segmenter.segment(text), part => part.segment) : Array.from(text);
+          units.push({ node, text, chars, start: total, length: chars.length });
+          total += chars.length;
+        } else if (node.nodeType === Node.ELEMENT_NODE) {
+          if (node.matches('.mermaid, pre, code') || node.querySelector(':scope > pre')) {
+            units.push({ node, display: node.style.display, start: total, length: 1 });
+            total++;
+          } else {
+            Array.from(node.childNodes).forEach(collect);
+          }
+        }
+      }
+      Array.from(element.childNodes).forEach(collect);
+      if (!total) { renderDiagrams(); return; }
+
+      units.forEach(unit => {
+        if (unit.chars) unit.node.nodeValue = '';
+        else unit.node.style.display = 'none';
+      });
+      element.setAttribute('aria-busy', 'true');
+      const scroller = element.closest('.messages');
+      const lead = Math.min(120, Math.ceil(total * 0.4));
+      const started = performance.now();
+      let frame = 0, finished = false, previous = -1;
+      const followsBottom = () => scroller &&
+        scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight < 64;
+      function finish() {
+        if (finished) return;
+        finished = true;
+        cancelAnimationFrame(frame);
+        document.removeEventListener('visibilitychange', onVisibility);
+        const follow = followsBottom();
+        units.forEach(unit => {
+          if (unit.chars) unit.node.nodeValue = unit.text;
+          else unit.node.style.display = unit.display;
+        });
+        element.removeAttribute('aria-busy');
+        if (follow) scroller.scrollTop = scroller.scrollHeight;
+        if (element.isConnected) renderDiagrams();
+      }
+      function onVisibility() { if (document.hidden) finish(); }
+      document.addEventListener('visibilitychange', onVisibility);
+      function tick(now) {
+        if (!element.isConnected) { finish(); return; }
+        const elapsed = now - started;
+        if (elapsed >= 950) { finish(); return; }
+        const count = elapsed < 380
+          ? Math.floor(lead * elapsed / 380)
+          : Math.floor(lead + (total - lead) * (elapsed - 380) / 570);
+        if (count !== previous) {
+          previous = count;
+          const follow = followsBottom();
+          units.forEach(unit => {
+            if (unit.chars) {
+              let visible = Math.max(0, Math.min(unit.length, count - unit.start));
+              // After the lead-in, reveal whole word groups instead of individual letters.
+              if (elapsed >= 380 && visible > 0) {
+                while (visible < unit.length && !/\s/.test(unit.chars[visible])) visible++;
+              }
+              const text = unit.chars.slice(0, visible).join('');
+              if (unit.node.nodeValue !== text) unit.node.nodeValue = text;
+            } else {
+              unit.node.style.display = count > unit.start ? unit.display : 'none';
+            }
+          });
+          if (follow) scroller.scrollTop = scroller.scrollHeight;
+        }
+        frame = requestAnimationFrame(tick);
+      }
+      frame = requestAnimationFrame(tick);
     }
   </script>
 
