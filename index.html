@@ -1845,72 +1845,49 @@
 
     /* Shared status messages never intercept controls, even while visible. */
     .toast {
-      --toast-accent: #a99aff;
-      --toast-duration: 3200ms;
+      --toast-accent: #b9afff;
       position: fixed;
-      bottom: 40px;
-      right: 20px;
-      left: 20px;
+      top: calc(86px + env(safe-area-inset-top, 0px));
+      bottom: auto;
+      left: 0;
+      right: 0;
       z-index: 8000;
       display: flex;
       align-items: center;
-      gap: 12px;
-      max-width: 400px;
+      gap: 8px;
+      width: fit-content;
+      max-width: min(360px, calc(100% - 32px));
       margin: 0 auto;
-      padding: 14px 16px;
-      overflow: hidden;
-      border: 1px solid rgba(139, 124, 255, .24);
-      border-radius: 18px;
-      background: linear-gradient(120deg, rgba(139, 124, 255, .10), rgba(94, 231, 197, .04)), #0e1421;
-      box-shadow: 0 12px 36px rgba(0, 0, 0, .32), inset 0 1px 0 rgba(255, 255, 255, .04);
-      color: #edf1fa;
+      padding: 10px 14px;
+      border: 1px solid rgba(94, 231, 197, .16);
+      border-radius: 24px;
+      background: #111925;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, .22);
+      color: #e7edf5;
       text-align: left;
-      font: 500 13px/1.5 Inter, sans-serif;
+      font: 500 12px/1.5 Inter, sans-serif;
       pointer-events: none;
       visibility: hidden;
       opacity: 0;
-      transform: translateY(10px);
-      transition: opacity .18s ease, transform .18s ease, visibility 0s .18s;
+      transition: opacity .16s ease, visibility 0s .16s;
     }
     .toast[data-tone="success"] { --toast-accent: #5ee7c5; }
     .toast[data-tone="warning"] { --toast-accent: #f0c77b; }
     .toast[data-tone="error"] { --toast-accent: #ff9aab; }
     .toast-icon {
-      display: grid;
-      place-items: center;
-      flex: 0 0 32px;
-      width: 32px;
-      height: 32px;
-      border: 1px solid rgba(139, 124, 255, .18);
-      border-radius: 11px;
-      background: rgba(139, 124, 255, .09);
+      display: flex;
+      flex: 0 0 16px;
       color: var(--toast-accent);
     }
-    .toast-icon svg { width: 18px; height: 18px; }
+    .toast-icon svg { width: 16px; height: 16px; }
     .toast-message { min-width: 0; overflow-wrap: anywhere; }
-    .toast::after {
-      content: "";
-      position: absolute;
-      bottom: 0;
-      left: 16px;
-      right: 16px;
-      height: 2px;
-      border-radius: 2px;
-      background: linear-gradient(90deg, var(--toast-accent), #5ee7c5);
-      opacity: .55;
-      transform-origin: left;
-    }
     .toast.show {
       visibility: visible;
       opacity: 1;
-      transform: translateY(0);
       transition-delay: 0s;
     }
-    .toast.show::after { animation: toast-countdown var(--toast-duration) linear forwards; }
-    @keyframes toast-countdown { to { transform: scaleX(0); } }
     @media (prefers-reduced-motion: reduce) {
-      .toast { transition: none; transform: none; }
-      .toast.show::after { animation: none; }
+      .toast { transition: none; }
     }
 
     @media(max-width: 850px) {
@@ -3282,9 +3259,7 @@
         z-index: 6000;
       }
 
-      .toast {
-        bottom: calc(96px + env(safe-area-inset-bottom));
-      }
+
     }
   </style>
   <style id="edunexus-dashboard-polish">
@@ -5153,14 +5128,21 @@
         warning: "M12 5v8M12 17v.5",
         info: "M12 7v.5M12 11v6"
       };
-      const message = raw.replace(/^(?:✅|❌|⚠️?|🚫|🚀|📚|🤖|🎯|⏳|📈|🎉|⏰)\s*/, "");
-      const duration = Math.min(6500, Math.max(3200, message.length * 42));
+      const message = raw.replace(/^(?:✅|❌|⚠️?|🚫|🚀|📚|🤖|🎯|⏳|📈|🎉|⏰)\s*/, "")
+        .replace(/^Initiating Interactive AI Quiz for (.+)\.\.\.$/, "Starting $1 quiz…")
+        .replace(/^Searching Vault for (.+)\.\.\.$/, "Finding $1 papers…")
+        .replace(/^Initializing AI Practice for (.+)\.\.\.$/, "Starting $1 practice…")
+        .replace(/^Initializing EduNexus Engine for (.+)\.\.\.$/, "Starting $1…")
+        .replace(/^Please enter a Chapter or Topic name!$/, "Enter a chapter or topic.")
+        .replace(/^Secure Login Initiated\.\.\.$/, "Signing you in…")
+        .replace(/^(?:Mobile )?Login Successful! Welcome /, "Welcome, ")
+        .replace(/^True AI Timetable Generated!$/, "Your study plan is ready")
+        .replace(/^Architecting True Vector PDF\.\.\.$/, "Preparing your PDF…")
+        .replace(/^Perfect PDF Generated!$/, "Your PDF is ready");
+      const duration = Math.min(6500, Math.max(2800, message.length * 42));
       t.dataset.tone = tone;
       t.querySelector(".toast-message").textContent = message;
       t.querySelector(".toast-symbol").setAttribute("d", icons[tone]);
-      t.style.setProperty("--toast-duration", duration + "ms");
-      // Restart this message's timer and subtle progress line on consecutive updates.
-      void t.offsetWidth;
       t.classList.add("show");
       window.toastTimer = setTimeout(() => t.classList.remove("show"), duration);
     }
