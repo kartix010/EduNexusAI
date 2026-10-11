@@ -1863,13 +1863,31 @@
       border-radius: 24px;
       background: #111925;
       box-shadow: 0 6px 20px rgba(0, 0, 0, .22);
-      color: #e7edf5;
+      color: #d8d0ff;
       text-align: left;
       font: 500 12px/1.5 Inter, sans-serif;
       pointer-events: none;
       visibility: hidden;
       opacity: 0;
       transition: opacity .16s ease, visibility 0s .16s;
+    }
+    .toast::after {
+      content: "";
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      bottom: 0;
+      height: 2px;
+      border-radius: 2px;
+      background: linear-gradient(90deg, #8b7cff, #5ee7c5);
+      transform: scaleX(1);
+      transform-origin: left center;
+    }
+    .toast.show::after {
+      animation: toast-countdown var(--toast-duration, 2800ms) linear forwards;
+    }
+    @keyframes toast-countdown {
+      to { transform: scaleX(0); }
     }
     .toast[data-tone="success"] { --toast-accent: #5ee7c5; }
     .toast[data-tone="warning"] { --toast-accent: #f0c77b; }
@@ -1888,6 +1906,7 @@
     }
     @media (prefers-reduced-motion: reduce) {
       .toast { transition: none; }
+      .toast::after { display: none; }
     }
 
     @media(max-width: 850px) {
@@ -5143,6 +5162,9 @@
       t.dataset.tone = tone;
       t.querySelector(".toast-message").textContent = message;
       t.querySelector(".toast-symbol").setAttribute("d", icons[tone]);
+      t.style.setProperty("--toast-duration", duration + "ms");
+      // Flush the hidden state so each new message restarts its countdown.
+      void t.offsetWidth;
       t.classList.add("show");
       window.toastTimer = setTimeout(() => t.classList.remove("show"), duration);
     }
