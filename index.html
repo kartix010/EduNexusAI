@@ -6052,6 +6052,7 @@
 
     // 🔥 NEW QUIZ LOGIC (Popup to Chatbot) 🔥
     // ग्लोबल वेरिएबल ताकि पता रहे कि किस सब्जेक्ट का क्विज़ चल रहा है
+    let activeQuizReview = null;
     let selectedSubjectForQuiz = ""; // इसे फंक्शन के ठीक ऊपर रखना
 
     function startCustomQuiz() {
@@ -6073,7 +6074,21 @@
       }, 600);
 
       setTimeout(() => {
-        let secretPrompt = `Act as a strict Class 12 examiner. Create a short interactive MCQ quiz with ${numQs} questions on the topic "${topic}" for ${sub}. Ask me QUESTION 1 first. Wait for my answer. If I am wrong, explain why and clear my doubt. Then move to the next. Do NOT give all questions at once. \n\nCRITICAL RULE: When the quiz finishes, you MUST end your final response exactly with this hidden tag: [SCORE: {my_score}/${numQs}]`;
+        activeQuizReview = { subject: sub, total: Number(numQs), history: [] };
+        const secretPrompt = `Act as a strict Class 12 examiner. Start a NEW interactive MCQ quiz with ${numQs} questions on "${topic}" for ${sub}. Ask QUESTION 1 with labelled options first. Wait for my answer. Ask ONE question at a time; explain mistakes briefly before moving on.
+Track questions, my actual answers and correct answers for THIS quiz only. Count skipped questions as unanswered.
+After the last answer, show:
+## Quiz result
+Score: X/${numQs}
+## Revise your mistakes
+For EACH wrong or skipped question, use this format without tables:
+### Q[number]. [Original question]
+**Your answer:** [My actual answer, or "Skipped"]
+**Correct answer:** [Correct option AND answer text]
+**Why:** [One or two clear sentences explaining the concept]
+Include only mistakes from this quiz. Never invent my answers or missing earlier details; say when a detail is unavailable. If all answers are correct, say "All answers correct — no mistakes to revise." and omit the mistake list.
+Do not start another quiz automatically.
+CRITICAL: Only AFTER the complete revision, end the final response with [SCORE: X/${numQs}], using the actual numeric score. Never emit this tag before the quiz finishes.`;
         askDemo(secretPrompt);
       }, 1200);
     }
@@ -6100,10 +6115,13 @@
       input.value = "";
       chatScroll.follow();
 
+      const quizSession = activeQuizReview;
+      const requestHistory = quizSession ? quizSession.history : chatMemory;
+
       // 🔥 SUPER MEMORY LOGIC 🔥
       let memoryText = "";
-      if (typeof chatMemory !== 'undefined' && chatMemory.length > 0) {
-        let pastConversations = chatMemory.map(m => {
+      if (requestHistory.length > 0) {
+        let pastConversations = requestHistory.map(m => {
           let speaker = m.role === 'user' ? "Student" : "AI Tutor";
           return `${speaker}: ${m.content.text}`;
         }).join('\n\n');
@@ -6115,7 +6133,7 @@
         message: memoryText + q,
         session_id: sessionId,
         user_name: localStorage.getItem('studymate_username') || "Student",
-        history: typeof chatMemory !== 'undefined' ? chatMemory : []
+        history: requestHistory
       };
 
       if (currentAttachmentBase64) {
@@ -6150,12 +6168,15 @@
 
         // 🕵️‍♂️ AI SCOUTER: Check if AI sent the secret [SCORE: X/Y] tag
         const scoreMatch = aiResponse.match(/\[SCORE:\s*(\d+)\/(\d+)\]/i);
-        if (scoreMatch) {
+        const completedQuiz = scoreMatch && quizSession && activeQuizReview === quizSession
+          && Number(scoreMatch[2]) === quizSession.total
+          && Number(scoreMatch[1]) <= quizSession.total;
+        if (completedQuiz) {
           const score = parseInt(scoreMatch[1]);
           const total = parseInt(scoreMatch[2]);
           const percentage = (score / total) * 100;
           // Track Quiz Result
-          trackUserActivity("QUIZ_COMPLETED", `Subject: ${selectedSubjectForQuiz} | Score: ${userScore}/${currentQuizData.length} (${percentage}%)`);
+          trackUserActivity("QUIZ_COMPLETED", `Subject: ${quizSession.subject} | Score: ${score}/${total} (${percentage}%)`);
 
           // 1. सीक्रेट टैग को चैट से हटा दो ताकि बच्चे को ना दिखे
           aiResponse = aiResponse.replace(/\[SCORE:\s*\d+\/\d+\]/i, '').trim();
@@ -6195,6 +6216,13 @@
         if (memImage) {
           userContent.image_data = memImage;
           userContent.mime_type = memImage.split(';')[0].split(':')[1];
+        }
+
+        // Retain all quiz turns for revision; normal tutor history stays short.
+        if (quizSession && activeQuizReview === quizSession) {
+          quizSession.history.push({ role: "user", content: userContent });
+          quizSession.history.push({ role: "model", content: { text: aiResponse } });
+          if (completedQuiz) activeQuizReview = null;
         }
 
         if (typeof chatMemory !== 'undefined') {
