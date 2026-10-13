@@ -3662,6 +3662,24 @@
 
 
 
+
+  <style id="chat-user-message-sizing">
+    #messages { min-width: 0; box-sizing: border-box; }
+    #messages .message.user {
+      min-width: 0;
+      width: fit-content;
+      max-width: min(82%, 38rem) !important;
+      flex-shrink: 0;
+    }
+    #messages .message.user > div {
+      min-width: 0;
+      max-width: 100%;
+      box-sizing: border-box;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      word-break: normal;
+    }
+  </style>
 </head>
 
 <body>
@@ -6073,7 +6091,7 @@
         if (doubtSection) doubtSection.scrollIntoView({ behavior: 'smooth' });
       }, 600);
 
-      setTimeout(() => {
+      {
         activeQuizReview = { subject: sub, total: Number(numQs), history: [] };
         const secretPrompt = `Act as a strict Class 12 examiner. Start a NEW interactive MCQ quiz with ${numQs} questions on "${topic}" for ${sub}. Ask QUESTION 1 with labelled options first. Wait for my answer. Ask ONE question at a time; explain mistakes briefly before moving on.
 Track questions, my actual answers and correct answers for THIS quiz only. Count skipped questions as unanswered.
@@ -6089,16 +6107,20 @@ For EACH wrong or skipped question, use this format without tables:
 Include only mistakes from this quiz. Never invent my answers or missing earlier details; say when a detail is unavailable. If all answers are correct, say "All answers correct — no mistakes to revise." and omit the mistake list.
 Do not start another quiz automatically.
 CRITICAL: Only AFTER the complete revision, end the final response with [SCORE: X/${numQs}], using the actual numeric score. Never emit this tag before the quiz finishes.`;
-        askDemo(secretPrompt);
-      }, 1200);
+        sendQuestion(new Event("submit"), {
+          prompt: secretPrompt,
+          displayText: `Start a ${numQs}-question quiz on ${topic} · ${sub}`
+        });
+      }
     }
 
 
 
-    async function sendQuestion(e) {
+    async function sendQuestion(e, generated = null) {
       e.preventDefault();
       const input = document.getElementById("question");
-      const q = input.value.trim();
+      const q = generated ? generated.prompt : input.value.trim();
+      const displayText = generated ? generated.displayText : q;
       if (!q && !currentAttachmentBase64) return;
       // Track AI Usage
 
@@ -6106,13 +6128,13 @@ CRITICAL: Only AFTER the complete revision, end the final response with [SCORE: 
       const wrap = document.getElementById("messages");
       const chatScroll = getChatScroll(wrap);
 
-      if (currentAttachmentBase64) {
-        wrap.insertAdjacentHTML('beforeend', `<div class="message user"><div><div style="font-size:10px; color:#5ee7c5; margin-bottom:6px; font-weight:700;">📎 Attached: ${currentAttachmentName}</div>${escapeHtml(q)}</div></div>`);
+      if (!generated && currentAttachmentBase64) {
+        wrap.insertAdjacentHTML('beforeend', `<div class="message user"><div><div style="font-size:10px; color:#5ee7c5; margin-bottom:6px; font-weight:700;">📎 Attached: ${escapeHtml(currentAttachmentName || "Attachment")}</div>${escapeHtml(displayText)}</div></div>`);
       } else {
-        wrap.insertAdjacentHTML('beforeend', `<div class="message user"><div>${escapeHtml(q)}</div></div>`);
+        wrap.insertAdjacentHTML('beforeend', `<div class="message user"><div>${escapeHtml(displayText)}</div></div>`);
       }
 
-      input.value = "";
+      if (!generated) input.value = "";
       chatScroll.follow();
 
       const quizSession = activeQuizReview;
@@ -6133,7 +6155,8 @@ CRITICAL: Only AFTER the complete revision, end the final response with [SCORE: 
         message: memoryText + q,
         session_id: sessionId,
         user_name: localStorage.getItem('studymate_username') || "Student",
-        history: requestHistory
+        // This backend reads context from message, not history; send it only once.
+        history: []
       };
 
       if (currentAttachmentBase64) {
@@ -6141,10 +6164,10 @@ CRITICAL: Only AFTER the complete revision, end the final response with [SCORE: 
         payload.file_name = currentAttachmentName;
       }
 
-      let memImage = currentAttachmentBase64;
-      let memName = currentAttachmentName;
+      let memImage = generated ? null : currentAttachmentBase64;
+      let memName = generated ? null : currentAttachmentName;
 
-      clearAttachment();
+      if (!generated) clearAttachment();
 
       const loadingId = "load-" + Date.now();
       wrap.insertAdjacentHTML('beforeend', `<div class="message ai" id="${loadingId}"><span class="msg-avatar">✦</span><div class="ai-thinking"><div class="ai-dots-container"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div></div>`);
