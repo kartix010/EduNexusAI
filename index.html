@@ -1313,7 +1313,57 @@
       font-weight: 500;
     }
 
-    #messages { scroll-behavior: auto; overflow-anchor: none; }
+    #messages {
+      position: relative;
+      min-height: 0;
+      scroll-behavior: auto;
+      overflow-anchor: none;
+      padding-bottom: 64px !important;
+    }
+    .chat-message-window {
+      position: relative;
+      display: flex;
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .chat-latest {
+      position: absolute;
+      left: 50%;
+      bottom: 10px;
+      transform: translateX(-50%);
+      z-index: 3;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 40px;
+      padding: 8px 14px;
+      border: 1px solid rgba(94, 231, 197, .35);
+      border-radius: 24px;
+      background: #0e1421;
+      color: #5ee7c5;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, .3);
+      font: 600 12px/1.4 Inter, sans-serif;
+      cursor: pointer;
+    }
+    .chat-latest[hidden] { display: none; }
+    .chat-latest:hover { background: #172235; }
+    .chat-latest:focus-visible { outline: 2px solid #8b7cff; outline-offset: 2px; }
+    .chat-latest svg { width: 14px; height: 14px; }
+    #messages .answer-heading {
+      margin: 14px 0 6px;
+      color: #d8d0ff;
+      font: 600 14px/1.5 'Space Grotesk', Inter, sans-serif;
+      letter-spacing: 0;
+      white-space: normal;
+    }
+    #messages .answer-heading:first-child { margin-top: 0; }
+    #messages .answer-divider {
+      height: 1px;
+      margin: 14px 0;
+      border: 0;
+      background: rgba(139, 124, 255, .22);
+    }
 
     .messages {
       padding: 22px;
@@ -4282,7 +4332,13 @@
             </div>
 
             <!-- 2. MESSAGES AREA -->
-            <div class="messages" id="messages"></div>
+            <div class="chat-message-window">
+              <div class="messages" id="messages" tabindex="0" role="region" aria-label="AI conversation"></div>
+              <button class="chat-latest" type="button" aria-label="Scroll to latest answer" aria-controls="messages" hidden>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14m-5-5 5 5 5-5"/></svg>
+                <span>Latest</span>
+              </button>
+            </div>
 
             <!-- 3. Attachment Preview -->
             <div id="attachment-preview" class="preview-pane" style="display: none;">
@@ -6153,32 +6209,16 @@
         }
         // 🔥 1. CLEAN SCORE TAG & BOLD TEXT 🔥
         aiResponse = aiResponse.replace(/\[SCORE:\s*\d+\/\d+\]/i, '').trim();
-        aiResponse = aiResponse.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
+
         // 👁️ GOD-EYE TRACKER: असली सवाल और जवाब Firebase में भेजो!
         trackUserActivity("ASKED_AI_TUTOR", `Question Length: ${q.length} chars`, q, aiResponse);
 
-        // 🔥 2. MERMAID DIAGRAM RENDERER (Bulletproof) 🔥
-        aiResponse = aiResponse.replace(/```mermaid[\s]*\n([\s\S]*?)```/gi, function (match, code) {
-          return `<div class="mermaid" style="background: #0e1421; padding: 15px; border-radius: 8px; border: 1px solid #5ee7c5; margin: 10px 0;">
-                ${code.trim()}
-            </div>`;
-        });
-
-        // 🔥 3. PREMIUM CODE BLOCK (EduNexus Theme Matched) 🔥
-        aiResponse = aiResponse.replace(/(?:```|'''|""")[^\n]*\n([\s\S]*?)(?:```|'''|""")/gi, function (match, code) {
-          return `<div style="background: #090d16; border-radius: 12px; margin: 15px 0; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 5px 20px rgba(0,0,0,0.3);">
-                <div style="background: #111826; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
-                    <span style="color: #727d91; font-size: 11px; font-family: 'Space Grotesk', sans-serif; letter-spacing: 1px; font-weight: 700;">&lt; / &gt; SOURCE CODE</span>
-                    <button onclick="navigator.clipboard.writeText(this.parentElement.nextElementSibling.innerText); this.innerText='✔ COPIED!'; this.style.background='rgba(94, 231, 197, 0.2)'; setTimeout(() => {this.innerText='📋 COPY'; this.style.background='rgba(94, 231, 197, 0.08)';}, 2000);" style="background: rgba(94, 231, 197, 0.08); border: 1px solid rgba(94, 231, 197, 0.2); color: #5ee7c5; cursor: pointer; font-size: 10px; font-weight: 800; padding: 5px 12px; border-radius: 6px; transition: 0.3s; letter-spacing: 0.5px;">📋 COPY</button>
-                </div>
-                <pre style="margin: 0; padding: 16px; overflow-x: auto; white-space: pre; font-family: monospace; color: #dce2ee; font-size: 13px; line-height: 1.6;"><code>${code.trim().replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code></pre>
-            </div>`;
-        });
+        aiResponse = formatTutorAnswer(aiResponse);
 
         // 🔥 STREAMING UI SETUP 🔥
         document.getElementById(loadingId).innerHTML = `
 <span class="msg-avatar">✦</span>
-<div id="stream-box-${loadingId}" style="flex:1; white-space: pre-wrap;"></div>
+<div id="stream-box-${loadingId}" class="answer-content" style="flex:1; min-width:0; white-space:pre-wrap;"></div>
 <button onclick="speakText(document.getElementById('stream-box-${loadingId}').innerText, this)" style="background:transparent; border:none; cursor:pointer; font-size:16px; padding:0; margin-left:8px; align-self:flex-start;" title="Listen to AI">🔊</button>
 `;
         // 🔥 START THE MAGIC STREAM 🔥
@@ -6225,27 +6265,13 @@
 
         // Score tag छुपाने का लॉजिक
         aiResponse = aiResponse.replace(/\[SCORE:\s*\d+\/\d+\]/i, '').trim();
-        aiResponse = aiResponse.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
-        // 🔥 1. MERMAID DIAGRAM RENDERER (Bulletproof) 🔥
-        aiResponse = aiResponse.replace(/```mermaid[\s]*\n([\s\S]*?)```/gi, function (match, code) {
-          return `<div class="mermaid" style="background: #0e1421; padding: 15px; border-radius: 8px; border: 1px solid #5ee7c5; margin: 10px 0;">
-                ${code.trim()}
-            </div>`;
-        });
 
-        // 🔥 3. PREMIUM CODE BLOCK (EduNexus Theme Matched) 🔥
-        aiResponse = aiResponse.replace(/(?:```|'''|""")[^\n]*\n([\s\S]*?)(?:```|'''|""")/gi, function (match, code) {
-          return `<div style="background: #090d16; border-radius: 12px; margin: 15px 0; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 5px 20px rgba(0,0,0,0.3);">
-                <div style="background: #111826; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
-                    <span style="color: #727d91; font-size: 11px; font-family: 'Space Grotesk', sans-serif; letter-spacing: 1px; font-weight: 700;">&lt; / &gt; SOURCE CODE</span>
-                    <button onclick="navigator.clipboard.writeText(this.parentElement.nextElementSibling.innerText); this.innerText='✔ COPIED!'; this.style.background='rgba(94, 231, 197, 0.2)'; setTimeout(() => {this.innerText='📋 COPY'; this.style.background='rgba(94, 231, 197, 0.08)';}, 2000);" style="background: rgba(94, 231, 197, 0.08); border: 1px solid rgba(94, 231, 197, 0.2); color: #5ee7c5; cursor: pointer; font-size: 10px; font-weight: 800; padding: 5px 12px; border-radius: 6px; transition: 0.3s; letter-spacing: 0.5px;">📋 COPY</button>
-                </div>
-                <pre style="margin: 0; padding: 16px; overflow-x: auto; white-space: pre; font-family: monospace; color: #dce2ee; font-size: 13px; line-height: 1.6;"><code>${code.trim().replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code></pre>
-            </div>`;
-        });// 🔥 STREAMING UI SETUP 🔥
+        aiResponse = formatTutorAnswer(aiResponse);
+
+        // 🔥 STREAMING UI SETUP 🔥
         document.getElementById(loadingId).innerHTML = `
 <span class="msg-avatar">✦</span>
-<div id="stream-box-${loadingId}" style="flex:1; white-space: pre-wrap;"></div>
+<div id="stream-box-${loadingId}" class="answer-content" style="flex:1; min-width:0; white-space:pre-wrap;"></div>
 <button onclick="speakText(document.getElementById('stream-box-${loadingId}').innerText, this)" style="background:transparent; border:none; cursor:pointer; font-size:16px; padding:0; margin-left:8px; align-self:flex-start;" title="Listen to AI">🔊</button>
 `;
         // 🔥 START THE MAGIC STREAM 🔥
@@ -6911,41 +6937,109 @@
         });
       });
     });
-    // Follow new content only while the reader stays at the bottom of this chat.
+    // Input is already escaped at the response boundary. Format prose, never code.
+    function formatTutorAnswer(escapedText) {
+      const prose = text => text
+        .replace(/\*\*([^\n]+?)\*\*/g, '<b>$1</b>')
+        .replace(/^ {0,3}(#{1,6})[ \t]+(.+?)(?:[ \t]+#+)?[ \t]*$/gm, (_, hashes, title) => {
+          const level = Math.min(6, Math.max(3, hashes.length + 1));
+          return `<h${level} class="answer-heading">${title}</h${level}>`;
+        })
+        .replace(/^ {0,3}(?:(?:-[ \t]*){3,}|(?:\*[ \t]*){3,}|(?:_[ \t]*){3,})$/gm, '<hr class="answer-divider">')
+        .replace(/\n{0,2}(<h[3-6] class="answer-heading">.*?<\/h[3-6]>)\n{0,2}/g, '$1')
+        .replace(/\n{0,2}(<hr class="answer-divider">)\n{0,2}/g, '$1');
+      const fence = /(`{3,}|(?:&#039;){3}|(?:&quot;){3})([^\n]*)\n([\s\S]*?)\1/g;
+      let result = '';
+      let cursor = 0;
+      let match;
+      while ((match = fence.exec(escapedText))) {
+        result += prose(escapedText.slice(cursor, match.index));
+        const language = match[2].trim().toLowerCase();
+        const code = match[3].trim();
+        if (language === 'mermaid') {
+          result += `<div class="mermaid" style="background:#0e1421;padding:15px;border-radius:8px;border:1px solid #5ee7c5;margin:10px 0;">${code}</div>`;
+        } else {
+          result += `<div style="background:#090d16;border-radius:12px;margin:15px 0;overflow:hidden;border:1px solid rgba(255,255,255,.08);">
+<div style="background:#111826;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;gap:8px;border-bottom:1px solid rgba(255,255,255,.05);">
+<span style="color:#9da8bd;font-size:11px;font-family:'Space Grotesk',sans-serif;letter-spacing:1px;font-weight:700;">&lt; / &gt; SOURCE CODE</span>
+<button type="button" onclick="copyTutorCode(this)" style="background:rgba(94,231,197,.08);border:1px solid rgba(94,231,197,.2);color:#5ee7c5;cursor:pointer;font-size:10px;font-weight:800;padding:6px 12px;border-radius:6px;">COPY</button>
+</div><pre style="margin:0;padding:16px;overflow-x:auto;white-space:pre;font-family:monospace;color:#dce2ee;font-size:13px;line-height:1.6;"><code>${code}</code></pre></div>`;
+        }
+        cursor = fence.lastIndex;
+      }
+      return result + prose(escapedText.slice(cursor));
+    }
+    async function copyTutorCode(button) {
+      const code = button.parentElement.nextElementSibling.textContent;
+      try {
+        await navigator.clipboard.writeText(code);
+        button.textContent = 'COPIED';
+      } catch {
+        button.textContent = 'TRY AGAIN';
+      }
+      clearTimeout(button.copyResetTimer);
+      button.copyResetTimer = setTimeout(() => { button.textContent = 'COPY'; }, 1600);
+    }
+
+    // Keep the start of a new answer readable; following the end is opt-in.
     const chatScrollStates = new WeakMap();
     function getChatScroll(wrap) {
       if (chatScrollStates.has(wrap)) return chatScrollStates.get(wrap);
-      const nearBottom = () => wrap.scrollHeight - wrap.clientHeight - wrap.scrollTop <= 48;
-      let following = nearBottom();
+      const latest = wrap.parentElement.querySelector('.chat-latest');
+      const nearBottom = () => wrap.scrollHeight - wrap.clientHeight - wrap.scrollTop <= 32;
+      let mode = nearBottom() ? 'tail' : 'free';
+      let anchor = null;
       let lastTop = wrap.scrollTop;
       let touchY = null;
+      const refresh = () => { if (latest) latest.hidden = nearBottom(); };
+      const pause = () => { mode = 'free'; anchor = null; };
       const state = {
-        follow() { following = true; state.pin(); },
+        follow() { mode = 'tail'; anchor = null; state.pin(); },
+        beginAnswer(element) {
+          const message = element.closest('.message') || element;
+          if (mode === 'tail' && message === wrap.lastElementChild) {
+            mode = 'answer';
+            anchor = message;
+          }
+        },
         pin() {
-          if (!following) return;
-          wrap.scrollTop = wrap.scrollHeight;
+          if (mode === 'tail') wrap.scrollTop = wrap.scrollHeight;
+          else if (mode === 'answer' && anchor?.isConnected) {
+            // #messages is the offset parent; offsetTop ignores entry transforms.
+            wrap.scrollTop = Math.max(0, anchor.offsetTop - 12);
+          }
           lastTop = wrap.scrollTop;
+          refresh();
         }
       };
       wrap.addEventListener('scroll', () => {
-        const top = wrap.scrollTop;
-        if (top < lastTop - 1) following = false;
-        else if (nearBottom()) following = true;
-        else following = false;
-        lastTop = top;
+        if (Math.abs(wrap.scrollTop - lastTop) > 1) {
+          pause();
+          if (nearBottom()) mode = 'tail';
+        }
+        lastTop = wrap.scrollTop;
+        refresh();
       }, { passive: true });
-      wrap.addEventListener('wheel', e => {
-        if (e.deltaY < 0) following = false;
-      }, { passive: true });
+      wrap.addEventListener('wheel', () => pause(), { passive: true });
       wrap.addEventListener('touchstart', e => {
         touchY = e.touches[0]?.clientY ?? null;
       }, { passive: true });
       wrap.addEventListener('touchmove', e => {
         const y = e.touches[0]?.clientY;
-        if (touchY !== null && y > touchY) following = false;
+        if (touchY !== null && Math.abs(y - touchY) > 2) pause();
         touchY = y ?? null;
       }, { passive: true });
+      wrap.addEventListener('keydown', e => {
+        if (['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '].includes(e.key)) pause();
+      });
+      latest?.addEventListener('click', () => {
+        state.follow();
+        // Move focus off the button before it disappears; never open the keyboard.
+        wrap.focus({ preventScroll: true });
+      });
+      if (typeof ResizeObserver !== 'undefined') new ResizeObserver(() => state.pin()).observe(wrap);
       chatScrollStates.set(wrap, state);
+      refresh();
       return state;
     }
 
@@ -6976,6 +7070,7 @@
         total += chars.length;
         node.data = '';
       }
+      scroll?.beginAnswer(element);
       const firstCount = Math.ceil(total * .4);
       const firstMs = Math.min(1800, firstCount * Math.max(1, speed));
       const restMs = Math.min(650, (total - firstCount) * 2);
