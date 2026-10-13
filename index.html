@@ -1313,6 +1313,8 @@
       font-weight: 500;
     }
 
+    #messages { scroll-behavior: auto; overflow-anchor: none; }
+
     .messages {
       padding: 22px;
       display: flex;
@@ -6036,6 +6038,7 @@
 
 
       const wrap = document.getElementById("messages");
+      const chatScroll = getChatScroll(wrap);
 
       if (currentAttachmentBase64) {
         wrap.insertAdjacentHTML('beforeend', `<div class="message user"><div><div style="font-size:10px; color:#5ee7c5; margin-bottom:6px; font-weight:700;">📎 Attached: ${currentAttachmentName}</div>${escapeHtml(q)}</div></div>`);
@@ -6044,7 +6047,7 @@
       }
 
       input.value = "";
-      wrap.scrollTop = wrap.scrollHeight;
+      chatScroll.follow();
 
       // 🔥 SUPER MEMORY LOGIC 🔥
       let memoryText = "";
@@ -6076,7 +6079,7 @@
 
       const loadingId = "load-" + Date.now();
       wrap.insertAdjacentHTML('beforeend', `<div class="message ai" id="${loadingId}"><span class="msg-avatar">✦</span><div class="ai-thinking"><div class="ai-dots-container"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div></div>`);
-      wrap.scrollTop = wrap.scrollHeight;
+      chatScroll.pin();
 
       try {
         const res = await fetch("https://edunexusai.onrender.com/chat", {
@@ -6087,7 +6090,7 @@
 
         if (!res.ok) {
           document.getElementById(loadingId).innerHTML = `<span class="msg-avatar">🚨</span><div style="color:#ffb86c;"><b>System Alert (${res.status}):</b> Server is waking up or busy. Please wait 10 seconds and try sending again!</div>`;
-          wrap.scrollTop = wrap.scrollHeight;
+          chatScroll.pin();
           return;
         }
 
@@ -6183,20 +6186,21 @@
       } catch (error) {
         document.getElementById(loadingId).innerHTML = `<span class="msg-avatar">🚨</span><div style="color:#ff4757; font-size:11px; line-height:1.5;"><b>Connection Blocked!</b><br>Browser blocked the request (CORS) because the server is offline or sleeping.</div>`;
       }
-      wrap.scrollTop = wrap.scrollHeight;
+      chatScroll.pin();
     }
     // 🔥 THE HIDDEN PROMPT ENGINE (Missing Function Fix) 🔥
     async function triggerHiddenAI(uiMessage, secretPrompt) {
       const wrap = document.getElementById("messages");
+      const chatScroll = getChatScroll(wrap);
       const loadingId = "load-" + Date.now();
 
       // 1. UI पर सिर्फ छोटा सा मैसेज प्रिंट करो
       wrap.insertAdjacentHTML('beforeend', `<div class="message user"><div>${escapeHtml(uiMessage)}</div></div>`);
-      wrap.scrollTop = wrap.scrollHeight;
+      chatScroll.follow();
 
       // 2. लोडिंग एनीमेशन दिखाओ
       wrap.insertAdjacentHTML('beforeend', `<div class="message ai" id="${loadingId}"><span class="msg-avatar">✦</span><div class="ai-thinking"><div class="ai-dots-container"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div></div>`);
-      wrap.scrollTop = wrap.scrollHeight;
+      chatScroll.pin();
 
       // 3. Backend को वो बड़ा वाला प्रॉम्प्ट भेजो
       const payload = {
@@ -6249,9 +6253,8 @@
       } catch (error) {
         document.getElementById(loadingId).innerHTML = `<span class="msg-avatar">🚨</span><div style="color:#ff4757;"><b>System Alert:</b> Engine is warming up. Please try again in 5 seconds.</div>`;
       }
-      wrap.scrollTop = wrap.scrollHeight;
-      // Render the diagrams on screen
-      setTimeout(() => { mermaid.init(undefined, document.querySelectorAll('.mermaid')); }, 100);
+      chatScroll.pin();
+
     }
 
 
@@ -6908,42 +6911,130 @@
         });
       });
     });
-    // 🔥 GOD-TIER AI STREAMING ENGINE (ChatGPT Style Typewriter) 
-    function typeHTML(element, html, speed = 12) {
-      let i = 0;
-      let isTag = false;
-      let currentText = "";
+    // Follow new content only while the reader stays at the bottom of this chat.
+    const chatScrollStates = new WeakMap();
+    function getChatScroll(wrap) {
+      if (chatScrollStates.has(wrap)) return chatScrollStates.get(wrap);
+      const nearBottom = () => wrap.scrollHeight - wrap.clientHeight - wrap.scrollTop <= 48;
+      let following = nearBottom();
+      let lastTop = wrap.scrollTop;
+      let touchY = null;
+      const state = {
+        follow() { following = true; state.pin(); },
+        pin() {
+          if (!following) return;
+          wrap.scrollTop = wrap.scrollHeight;
+          lastTop = wrap.scrollTop;
+        }
+      };
+      wrap.addEventListener('scroll', () => {
+        const top = wrap.scrollTop;
+        if (top < lastTop - 1) following = false;
+        else if (nearBottom()) following = true;
+        else following = false;
+        lastTop = top;
+      }, { passive: true });
+      wrap.addEventListener('wheel', e => {
+        if (e.deltaY < 0) following = false;
+      }, { passive: true });
+      wrap.addEventListener('touchstart', e => {
+        touchY = e.touches[0]?.clientY ?? null;
+      }, { passive: true });
+      wrap.addEventListener('touchmove', e => {
+        const y = e.touches[0]?.clientY;
+        if (touchY !== null && y > touchY) following = false;
+        touchY = y ?? null;
+      }, { passive: true });
+      chatScrollStates.set(wrap, state);
+      return state;
+    }
 
-      function type() {
-        if (i < html.length) {
-          let char = html.charAt(i);
-          if (char === '<') isTag = true;
-          if (char === '>') {
-            isTag = false;
-            currentText += char;
-            i++;
-            element.innerHTML = currentText;
-            type(); // Tags ko instantly render karo taaki user ko code na dikhe
-            return;
-          }
-          currentText += char;
-          i++;
-          if (!isTag) {
-            element.innerHTML = currentText;
-            setTimeout(type, speed); // Text ko type karo
-          } else {
-            type();
-          }
-        } else {
-          element.innerHTML = html; // Final render
-          // Mermaid diagrams aur copy buttons ko zinda karo
-          setTimeout(() => {
-            if (window.mermaid) mermaid.init(undefined, document.querySelectorAll('.mermaid'));
-          }, 100);
+    // Reveal existing text nodes: never reparse partial HTML or split an entity.
+    const activeAnswerReveals = new WeakMap();
+    function typeHTML(element, html, speed = 12) {
+      if (!element) return;
+      activeAnswerReveals.get(element)?.();
+      const wrap = element.closest('.messages');
+      const scroll = wrap ? getChatScroll(wrap) : null;
+      element.innerHTML = html;
+      const diagrams = Array.from(element.querySelectorAll('.mermaid'));
+      const diagramVisibility = diagrams.map(node => node.hidden);
+      diagrams.forEach(node => { node.hidden = true; });
+      const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+      const segmenter = typeof Intl.Segmenter === 'function'
+        ? new Intl.Segmenter(undefined, { granularity: 'grapheme' }) : null;
+      const parts = [];
+      let node;
+      let total = 0;
+      while ((node = walker.nextNode())) {
+        if (node.parentElement.closest('.mermaid, button, script, style')) continue;
+        const text = node.data;
+        if (!text.trim()) continue;
+        const chars = segmenter
+          ? Array.from(segmenter.segment(text), item => item.segment) : Array.from(text);
+        parts.push({ node, text, chars });
+        total += chars.length;
+        node.data = '';
+      }
+      const firstCount = Math.ceil(total * .4);
+      const firstMs = Math.min(1800, firstCount * Math.max(1, speed));
+      const restMs = Math.min(650, (total - firstCount) * 2);
+      const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+      let frame = 0;
+      let stopped = false;
+      let partIndex = 0;
+      let partOffset = 0;
+      let revealed = 0;
+      const started = performance.now();
+      function cleanup() {
+        cancelAnimationFrame(frame);
+        document.removeEventListener('visibilitychange', onVisibility);
+        motion.removeEventListener('change', onMotion);
+        activeAnswerReveals.delete(element);
+      }
+      function finish(renderDiagrams = true) {
+        if (stopped) return;
+        stopped = true;
+        cleanup();
+        parts.forEach(part => { part.node.data = part.text; });
+        diagrams.forEach((diagram, i) => { diagram.hidden = diagramVisibility[i]; });
+        if (!element.isConnected) return;
+        scroll?.pin();
+        if (renderDiagrams && diagrams.length && window.mermaid) {
+          // Render only this completed answer, not other answers still revealing.
+          Promise.resolve().then(() => window.mermaid.run({ nodes: diagrams }))
+            .then(() => { if (element.isConnected) scroll?.pin(); })
+            .catch(error => console.warn('Answer diagram could not render:', error));
         }
       }
-      type();
+      function onVisibility() { if (document.hidden) finish(); }
+      function onMotion() { if (motion.matches) finish(); }
+      function tick(now) {
+        if (!element.isConnected) { finish(false); return; }
+        const elapsed = Math.max(0, now - started);
+        const target = elapsed < firstMs
+          ? Math.floor(firstCount * elapsed / firstMs)
+          : firstCount + Math.floor((total - firstCount) * Math.min(1, (elapsed - firstMs) / (restMs || 1)));
+        while (revealed < target && partIndex < parts.length) {
+          const part = parts[partIndex];
+          const take = Math.min(target - revealed, part.chars.length - partOffset);
+          part.node.appendData(part.chars.slice(partOffset, partOffset + take).join(''));
+          partOffset += take;
+          revealed += take;
+          if (partOffset === part.chars.length) { partIndex++; partOffset = 0; }
+        }
+        scroll?.pin();
+        if (elapsed >= firstMs + restMs) finish();
+        else frame = requestAnimationFrame(tick);
+      }
+      activeAnswerReveals.set(element, () => finish(false));
+      if (!total || motion.matches || document.hidden) { finish(); return; }
+      document.addEventListener('visibilitychange', onVisibility);
+      motion.addEventListener('change', onMotion);
+      scroll?.pin();
+      frame = requestAnimationFrame(tick);
     }
+
   </script>
 
 
