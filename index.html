@@ -5637,59 +5637,47 @@
     };
 
     // 🔥 NAYA SAMPLE PAPER DATABASE 🔥
+    // Official Delhi DoE mid-term practice papers, session 2026-27.
     const sampleDatabase = {
-      "Class 12": {
-        "Mid-Term": {
-          "Physics": [
-            { year: "2024-2025", name: "Physics Mid-Term Sample Paper", link: "TERA_LINK_YAHAN" }
-          ],
-          "Chemistry": [
-            { year: "2024-2025", name: "Chemistry Mid-Term Sample Paper", link: "TERA_LINK_YAHAN" }
-          ]
-        },
-        "Board Exam": {
-          // Board ke sample papers baad me yahan daal dena
+  "Class 12": {
+    "Mid-Term": {
+      "Physics": [
+        {
+          "year": "2026-2027",
+          "name": "DoE Class 12 Physics Mid-Term Practice Paper (English)",
+          "link": "https://edustud.nic.in/edu/PracticePaper26_27/12/class%2012_Physics_PP_MT_EM_%202026-27.pdf"
         }
-      },
-      "Class 11": {
-        "Mid-Term": {
-          "Physics": [
-            { year: "2024-2025", name: "Class 11 Physics Sample Paper", link: "TERA_LINK_YAHAN" }
-          ],
-          "Chemistry": [
-            { year: "2024-2025", name: "Class 11 Chemistry Sample Paper", link: "TERA_LINK_YAHAN" }
-          ]
-        },
-        "Final Exam": {
+      ],
+      "Chemistry": [
+        {
+          "year": "2026-2027",
+          "name": "DoE Class 12 Chemistry Mid-Term Practice Paper (English)",
+          "link": "https://edustud.nic.in/edu/PracticePaper26_27/12/12_CHEM_EM.pdf"
         }
-      }
-    };
-    // 🔥 NAYA QUESTION BANK DATABASE 🔥
-    const qbankDatabase = {
-      "Class 12": {
-        "Mid-Term": {
-          "Physics": [
-            { year: "Latest", name: "Physics Chapter-wise Question Bank", link: "TERA_LINK_YAHAN" }
-          ],
-          "Chemistry": [
-            { year: "Latest", name: "Chemistry Chapter-wise Question Bank", link: "TERA_LINK_YAHAN" }
-          ]
-        },
-        "Board Exam": {
-          // Board ke question banks yahan aayenge
+      ]
+    }
+  },
+  "Class 11": {
+    "Mid-Term": {
+      "Physics": [
+        {
+          "year": "2026-2027",
+          "name": "DoE Class 11 Physics Mid-Term Practice Paper (English)",
+          "link": "https://edustud.nic.in/edu/PracticePaper26_27/11/class%2011_Physics_PP_MT_EM_%202026-27.pdf"
         }
-      },
-      "Class 11": {
-        "Mid-Term": {
-          "Physics": [
-            { year: "Latest", name: "Class 11 Physics Question Bank", link: "TERA_LINK_YAHAN" }
-          ],
-          "Mathematics": [
-            { year: "Latest", name: "Class 11 Maths Question Bank", link: "TERA_LINK_YAHAN" }
-          ]
+      ],
+      "Chemistry": [
+        {
+          "year": "2026-2027",
+          "name": "DoE Class 11 Chemistry Mid-Term Practice Paper (English)",
+          "link": "https://edustud.nic.in/edu/PracticePaper26_27/11/11_CHEMISTRY_EM.pdf"
         }
-      }
-    };
+      ]
+    }
+  }
+};
+    // Add question banks only when a published resource is available.
+    const qbankDatabase = {};
     function fetchPYQ() {
       const cls = $("pyqClass").value;
       const exam = $("pyqExam").value;
@@ -5721,6 +5709,13 @@
           foundLinks = []; // Agar data nahi mila
         }
 
+        // Never render placeholder, relative, or unsafe resource links.
+        foundLinks = foundLinks.filter(item => {
+          if (!item || typeof item.link !== "string" || !/^https:\/\//i.test(item.link)) return false;
+          try { return new URL(item.link).protocol === "https:"; }
+          catch { return false; }
+        });
+
         // Modal ki heading update karna
         let modeTitle = mode === "sample" ? "Sample Papers" : (mode === "qbank" ? "Question Bank" : "Original Papers");
         $("pyq-modal-title").textContent = `${cls} | ${sub} | ${exam} - ${modeTitle}`;
@@ -5731,10 +5726,10 @@
             container.innerHTML += `
                     <div style="background: #ffffff05; border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; transition: 0.3s;" onmouseover="this.style.borderColor='var(--accent2)'; this.style.background='rgba(94, 231, 197, 0.05)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.background='#ffffff05';">
                         <div>
-                            <div style="font-size: 10px; color: var(--accent2); font-weight: bold; letter-spacing: 1px; margin-bottom: 4px;">🎯 YEAR: ${item.year}</div>
-                            <div style="color: white; font-size: 14px; font-weight: 600;">${item.name}</div>
+                            <div style="font-size: 10px; color: var(--accent2); font-weight: bold; letter-spacing: 1px; margin-bottom: 4px;">🎯 YEAR: ${escapeHtml(item.year)}</div>
+                            <div style="color: white; font-size: 14px; font-weight: 600;">${escapeHtml(item.name)}</div>
                         </div>
-                        <a href="${item.link}" target="_blank" style="background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #000; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-weight: 800; font-size: 11px; box-shadow: 0 4px 15px rgba(94,231,197,0.3); transition: 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">Open PDF ↗</a>
+                        <a href="${escapeHtml(item.link)}" target="_blank" rel="noopener noreferrer" style="background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #000; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-weight: 800; font-size: 11px; box-shadow: 0 4px 15px rgba(94,231,197,0.3); transition: 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">Open PDF ↗</a>
                     </div>
                 `;
           });
@@ -5743,8 +5738,8 @@
           container.innerHTML = `
                 <div style="text-align: center; padding: 30px; background: #ffffff03; border-radius: 12px; border: 1px dashed rgba(255,255,255,0.05);">
                     <div style="font-size: 30px; margin-bottom: 10px;">🚧</div>
-                    <h4 style="color: white; margin: 0 0 5px; font-size: 15px;">Vault is Empty</h4>
-                    <p style="color: #7f8a9e; font-size: 12px; margin: 0;">We are currently scanning and uploading the ${modeTitle} for ${sub}. Check back soon!</p>
+                    <h4 style="color: white; margin: 0 0 5px; font-size: 15px;">No resources available yet</h4>
+                    <p style="color: #7f8a9e; font-size: 12px; margin: 0;">No ${modeTitle.toLowerCase()} are available for this selection yet. Try another subject, exam or resource type.</p>
                 </div>`;
         }
 
