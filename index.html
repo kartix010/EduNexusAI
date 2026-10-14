@@ -4086,7 +4086,7 @@
             <div class="quiz-box">
               <div style="display: flex; gap: 8px; margin-bottom: 12px;">
                 <div style="flex: 1;">
-                  <label>SELECT SUBJECT</label>
+                  <label for="quizSubject">Subject</label>
                   <select id="quizSubject" style="margin-bottom: 0;">
                     <option value="Physics">Physics</option>
                     <option value="Chemistry">Chemistry</option>
@@ -4096,11 +4096,11 @@
                   </select>
                 </div>
               </div>
-              <label>ENTER CHAPTER OR TOPIC</label>
-              <input type="text" id="quizTopic" placeholder="e.g., Capacitance, Matrices, SQL..." autocomplete="off">
+              <label for="quizTopic">Chapter or topic</label>
+              <input type="text" id="quizTopic" maxlength="200" aria-describedby="quizSetupStatus" placeholder="e.g., Capacitance, Matrices, SQL..." autocomplete="off">
               <div style="display: flex; gap: 8px;">
                 <div style="flex: 1;">
-                  <label>QUESTIONS</label>
+                  <label for="quizQuestions">Questions</label>
                   <select id="quizQuestions" style="margin-bottom: 0;">
                     <option value="3">3 Questions</option>
                     <option value="5" selected>5 Questions</option>
@@ -4108,20 +4108,16 @@
                   </select>
                 </div>
                 <div style="flex: 1;">
-                  <label>DURATION</label>
-                  <select id="quizTime" style="margin-bottom: 0;">
-                    <option value="5">5 Mins</option>
-                    <option value="10" selected>10 Mins</option>
-                    <option value="15">15 Mins</option>
-                  </select>
+                  <span class="quiz-mode-label">Mode</span>
+                  <div class="quiz-mode-value">Self-paced <span>•</span></div>
                 </div>
               </div>
-              <button onclick="startCustomQuiz()" class="btn primary full"
+              <button id="quizStartButton" type="button" onclick="startCustomQuiz()" class="btn primary full"
                 style="margin-top: 12px; padding: 12px; font-size: 11px;">Start Quiz ✦</button>
+              <p id="quizSetupStatus" role="status" aria-live="polite" aria-atomic="true" hidden></p>
             </div>
             <div class="ai-note"><span>✦</span>
-              <p><b>AI insight:</b> Taking a quiz will automatically test you and update your Subject Mastery in the
-                Adaptive Progress section!</p>
+              <p><b>Practice, then improve.</b> Answer one question at a time. Review mistakes when you finish.</p>
             </div>
           </div>
 
@@ -6121,20 +6117,36 @@
       return node;
     }
 
+    function setQuizSetupStatus(message, state = '') {
+      const status = document.getElementById('quizSetupStatus');
+      if (!status) return;
+      status.textContent = message;
+      status.hidden = !message;
+      status.dataset.state = state;
+    }
+
     async function startCustomQuiz() {
       if (quizRequestPending) return;
       const sub = document.getElementById('quizSubject').value;
       const topic = document.getElementById('quizTopic').value.trim();
       const count = Number(document.getElementById('quizQuestions').value);
       if (!topic || topic.length > 200) {
-        showToast('Enter a topic between 1 and 200 characters.');
+        setQuizSetupStatus('Enter a chapter or topic (up to 200 characters).', 'error');
+        document.getElementById('quizTopic').setAttribute('aria-invalid', 'true');
+        document.getElementById('quizTopic').focus();
         return;
       }
       if (activeQuizReview) {
-        showToast('Finish this quiz or type "stop quiz" before starting another.');
+        setQuizSetupStatus('A quiz is already open in AI Tutor. Finish it or type “stop quiz” first.', 'error');
         return;
       }
       quizRequestPending = true;
+      document.getElementById('quizTopic').removeAttribute('aria-invalid');
+      const startButton = document.getElementById('quizStartButton');
+      startButton.disabled = true;
+      startButton.setAttribute('aria-busy', 'true');
+      startButton.textContent = 'Preparing your quiz…';
+      setQuizSetupStatus('Preparing questions in AI Tutor…', 'loading');
       selectedSubjectForQuiz = sub;
       document.getElementById('doubt')?.scrollIntoView({ behavior: 'smooth' });
       quizChatMessage('user', escapeHtml(`Start a ${count}-question quiz on ${topic} · ${sub}`));
@@ -6147,6 +6159,7 @@
         const data = await response.json();
         if (!response.ok || !validateQuizBank(data.quiz, count)) {
           loading.querySelector('.answer-content').textContent = data.reply || 'Quiz unavailable. Please try again after the server update finishes.';
+          setQuizSetupStatus('Could not prepare this quiz. Please try again.', 'error');
           return;
         }
         loading.remove();
@@ -6155,10 +6168,15 @@
           answers: [], index: 0, finished: false, controls: null
         };
         showLocalQuizQuestion(activeQuizReview);
+        setQuizSetupStatus('Your quiz is ready in AI Tutor below.', 'success');
       } catch {
         loading.querySelector('.answer-content').textContent = 'Could not prepare the quiz. Please try again.';
+        setQuizSetupStatus('Connection interrupted. Please try again.', 'error');
       } finally {
         quizRequestPending = false;
+        startButton.disabled = false;
+        startButton.removeAttribute('aria-busy');
+        startButton.textContent = 'Start Quiz ✦';
       }
     }
 
@@ -7847,6 +7865,52 @@
 })();
 </script>
 
+<style id="quiz-setup-ui">
+#quiz-engine .quiz-mode-label {
+  display: block; color: #aeb7c8; font-size: 10px; font-weight: 800;
+  letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 6px;
+}
+#quiz-engine .quiz-mode-value {
+  display: flex; align-items: center; justify-content: space-between;
+  min-height: 46px; margin-top: 8px; padding: 10px 12px;
+  border: 1px solid rgba(94,231,197,.18); border-radius: 12px;
+  background: rgba(94,231,197,.04); color: #b7c4cf; font-size: 12px;
+}
+#quiz-engine .quiz-mode-value span { color: #5ee7c5; }
+#quizSetupStatus { margin: 12px 0 0; font-size: 12px; line-height: 1.6; color: #c1b8ff; overflow-wrap: anywhere; }
+#quizSetupStatus[hidden] { display: none; }
+#quizSetupStatus[data-state="error"] { color: #ffb8bc; }
+#quizSetupStatus[data-state="success"] { color: #5ee7c5; }
+#quiz-engine #quizTopic[aria-invalid="true"] { border-color: #ffb8bc !important; }
+#quizStartButton:disabled { opacity: .65; cursor: wait; transform: none; }
+@media (max-width: 850px) {
+  #quiz-engine { padding: 20px !important; border-radius: 24px !important; min-width: 0; }
+  #quiz-engine .card-top { gap: 12px; }
+  #quiz-engine .mini-label { color: #5ee7c5; font-size: 10px !important; letter-spacing: 1.5px; margin-bottom: 10px; }
+  #quiz-engine h3.gradient-title { font-size: clamp(22px, 5.5vw, 28px) !important; line-height: 1.2 !important; letter-spacing: -.6px; }
+  #quiz-engine .quiz-box { margin-top: 20px; padding: 0; border: 0; background: transparent; border-radius: 0 !important; }
+  #quiz-engine .quiz-box > div > div { min-width: 0; }
+  #quiz-engine .quiz-box label, #quiz-engine .quiz-mode-label { font-size: 10px; letter-spacing: 1px; color: #b7bfd0; }
+  #quiz-engine .quiz-box input, #quiz-engine .quiz-box select {
+    box-sizing: border-box; min-width: 0; width: 100%; min-height: 48px;
+    margin-top: 7px; padding: 12px; font-size: 16px; line-height: 1.4; border-radius: 12px;
+    background: #0e1421 !important;
+  }
+  #quiz-engine #quizTopic { margin-bottom: 16px; }
+  #quiz-engine #quizTopic::placeholder { color: #8491a8; font-size: 14px; }
+  #quiz-engine .quiz-box input:focus-visible, #quiz-engine .quiz-box select:focus-visible {
+    outline: 2px solid #8b7cff; outline-offset: 2px;
+  }
+  #quiz-engine .quiz-mode-value { box-sizing: border-box; min-height: 48px; margin-top: 7px; font-size: 14px; }
+  #quiz-engine #quizStartButton {
+    min-height: 48px; margin-top: 20px !important; padding: 12px 16px !important;
+    font-size: 14px !important; font-weight: 700; border-radius: 14px;
+  }
+  #quiz-engine .ai-note { margin-top: 16px; padding: 12px; border-radius: 12px; }
+  #quiz-engine .ai-note p { font-size: 12px; line-height: 1.6; color: #aeb7c8; }
+  #quiz-engine .ai-note b { color: #c1b8ff; }
+}
+</style>
 </body>
 
 </html>
