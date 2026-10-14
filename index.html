@@ -6914,33 +6914,12 @@
       // Har section par nazar rakho
       sections.forEach((sec) => observer.observe(sec));
     });
-    // 🔥 THE GOD-TIER ANTI-JUMP SCROLL FIX 🔥
-
-    // 1. Browser ki auto-scroll memory ko hamesha ke liye block kar do
-    if ('scrollRestoration' in history) {
-      history.scrollRestoration = 'manual';
-    }
-
-    // 2. URL mein agar koi purana #tag fasa hai, toh usko chup-chaap mita do
-    window.addEventListener('DOMContentLoaded', () => {
-      if (window.location.hash) {
-        window.history.replaceState(null, null, window.location.pathname);
-      }
-    });
-
-    // 3. Page load hote hi Lenis aur Browser dono ko zabardasti TOP par lock kar do
-    window.addEventListener('load', () => {
-      setTimeout(() => {
-        window.scrollTo(0, 0);
-        if (typeof lenis !== 'undefined') {
-          lenis.scrollTo(0, { immediate: true });
-        }
-      }, 10);
-    });
+    // Preserve native anchor navigation and browser Back/Forward positions.
+    if ('scrollRestoration' in history) history.scrollRestoration = 'auto';
   </script>
 
   <!-- 📱 2050 GOD-TIER MOBILE BOTTOM NAVIGATION (ONLY VISIBLE ON PHONE) 📱 -->
-  <div class="mobile-nav-bar">
+  <div class="mobile-nav-bar" role="navigation" aria-label="Study navigation">
     <a href="#dashboard" class="mobile-nav-item active" onclick="updateMobileNav(this)">
       <!-- Professional Home Icon -->
       <svg viewBox="0 0 24 24">
@@ -6959,7 +6938,7 @@
     </a>
 
     <!-- 🤖 THE GOD-TIER AI CENTER BUTTON 🤖 -->
-    <a href="#doubt" class="mobile-nav-ai" onclick="updateMobileNav(null)">
+    <a href="#doubt" class="mobile-nav-ai" aria-label="AI Tutor" onclick="updateMobileNav(this)">
       <!-- Sparkling AI Core Icon -->
       <svg viewBox="0 0 24 24">
         <path
@@ -6987,20 +6966,6 @@
   </div>
   <script>
 
-
-    /* 🔥 NATIVE KEYBOARD SENSOR (Hides Nav Bar when typing) 🔥 */
-    document.querySelectorAll('input, textarea').forEach(el => {
-      // Jab ungli input par lage (Keyboard khule) -> Nav Bar Hatao
-      el.addEventListener('focus', () => document.body.classList.add('typing-mode'));
-
-      // Jab typing khatam ho (Keyboard band ho) -> Nav Bar Wapas Lao
-      el.addEventListener('blur', () => {
-        setTimeout(() => document.body.classList.remove('typing-mode'), 100);
-      });
-    });
-  </script>
-  <script>
-
     // 🔥 1. GOD-TIER POP ANIMATION (UPDATED FOR MAKKHAN SMOOTHNESS) 🔥
     const popStyle = document.createElement('style');
     popStyle.innerHTML = `
@@ -7016,9 +6981,13 @@
 
     // 🔥 2. FLUID ANIMATION LOGIC FOR MOBILE NAV 🔥
     function updateMobileNav(clickedItem) {
-      document.querySelectorAll('.mobile-nav-item').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.mobile-nav-bar a').forEach(el => {
+        el.classList.remove('active');
+        el.removeAttribute('aria-current');
+      });
       if (clickedItem) {
         clickedItem.classList.add('active');
+        clickedItem.setAttribute('aria-current', 'location');
         triggerPop(clickedItem.getAttribute('href'));
       }
     }
@@ -7026,7 +6995,7 @@
     // 🔥 3. DESKTOP/LAPTOP NAV 🔥
     document.querySelectorAll('a[href^="#"]').forEach(link => {
       link.addEventListener('click', function (e) {
-        if (!this.classList.contains('mobile-nav-item')) {
+        if (!this.closest('.mobile-nav-bar')) {
           triggerPop(this.getAttribute('href'));
         }
       });
@@ -7665,14 +7634,8 @@
       if (!link || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || event.button > 0) return;
       const target = document.querySelector(link.getAttribute('href'));
       if (!target) return;
-      event.preventDefault();
       target.classList.add('active');
       if (typeof window.triggerPop === 'function' && !matchMedia('(prefers-reduced-motion: reduce)').matches) window.triggerPop(link.hash);
-      const navTarget = link.hash === '#quiz-engine' ? '#dashboard' : link.hash;
-      document.querySelectorAll('.mobile-nav-item').forEach(item => {
-        item.classList.toggle('active', item.getAttribute('href') === navTarget);
-      });
-      target.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
     });
     /* Pause decorative motion when it is offscreen or the tab is hidden. */
     let onScreen = true;
@@ -7781,6 +7744,108 @@
 
 
  
+
+<style id="edunexus-mobile-navigation-layout">
+@media (max-width: 850px) {
+  body { --study-header-height: 76px; --study-nav-clearance: calc(100px + env(safe-area-inset-bottom, 0px)); }
+  body.typing-mode { --study-nav-clearance: 0px; }
+  #main-content > main {
+    padding-bottom: var(--study-nav-clearance) !important;
+  }
+  #dashboard, #quiz-engine, #pyq-vault-section, #planner, #doubt, #progress {
+    scroll-margin-top: calc(var(--study-header-height) + 12px) !important;
+  }
+  .tutor {
+    height: max(260px, calc(var(--study-viewport-height, 100dvh) - var(--study-header-height) - var(--study-nav-clearance) - 24px)) !important;
+  }
+  .chat-input { flex-shrink: 0; }
+  .chat-input input, .chat-input textarea { min-width: 0; }
+  .mobile-nav-bar a:focus-visible {
+    outline: 2px solid #5ee7c5;
+    outline-offset: 3px;
+  }
+  .mobile-nav-ai[aria-current="location"] {
+    box-shadow: 0 0 0 2px #5ee7c5, 0 0 18px rgba(94, 231, 197, .25);
+  }
+}
+</style>
+<script id="edunexus-mobile-navigation">
+(() => {
+  const mobile = matchMedia('(max-width: 850px)');
+  const bar = document.querySelector('.mobile-nav-bar');
+  if (!bar) return;
+  const links = Array.from(bar.querySelectorAll('a[href^="#"]'));
+  const ids = ['dashboard', 'quiz-engine', 'pyq-vault-section', 'planner', 'doubt', 'progress'];
+  let frame = 0;
+  let headerHeight = 76;
+
+  function setActive(id) {
+    const hash = '#' + (id === 'quiz-engine' ? 'dashboard' : id);
+    links.forEach(link => {
+      const active = link.getAttribute('href') === hash;
+      link.classList.toggle('active', active);
+      if (active) link.setAttribute('aria-current', 'location');
+      else link.removeAttribute('aria-current');
+    });
+  }
+
+  function syncActive() {
+    frame = 0;
+    if (!mobile.matches) return;
+    const sections = ids.map(id => document.getElementById(id))
+      .filter(el => el && el.getClientRects().length);
+    // Use document order: Quiz belongs to Home, even when the viewport is tall.
+    sections.sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top);
+    let current = sections[0];
+    for (const section of sections) {
+      if (section.getBoundingClientRect().top <= headerHeight + 48) current = section;
+    }
+    if (current) setActive(current.id);
+  }
+
+  function scheduleActive() {
+    if (!frame) frame = requestAnimationFrame(syncActive);
+  }
+
+  function syncViewport() {
+    if (!mobile.matches) {
+      document.body.classList.remove('typing-mode');
+      document.body.style.removeProperty('--study-viewport-height');
+      return;
+    }
+    headerHeight = document.querySelector('.topbar-wrapper')?.getBoundingClientRect().height || 76;
+    document.body.style.setProperty('--study-header-height', headerHeight + 'px');
+    const height = window.visualViewport?.height || window.innerHeight;
+    document.body.style.setProperty('--study-viewport-height', height + 'px');
+    scheduleActive();
+  }
+
+  function syncFocus() {
+    const el = document.activeElement;
+    const editable = el && (el.isContentEditable ||
+      el.matches('textarea, input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]):not([type="hidden"])'));
+    document.body.classList.toggle('typing-mode', mobile.matches && !!editable);
+    syncViewport();
+  }
+
+  function syncHash() {
+    const id = location.hash.slice(1);
+    if (mobile.matches && ids.includes(id)) setActive(id);
+    scheduleActive();
+  }
+
+  document.addEventListener('focusin', syncFocus);
+  document.addEventListener('focusout', () => queueMicrotask(syncFocus));
+  window.addEventListener('scroll', scheduleActive, { passive: true });
+  window.addEventListener('resize', syncViewport, { passive: true });
+  window.visualViewport?.addEventListener('resize', syncViewport, { passive: true });
+  window.addEventListener('hashchange', syncHash);
+  window.addEventListener('pageshow', () => { syncFocus(); syncHash(); });
+  mobile.addEventListener('change', syncFocus);
+  syncFocus();
+  syncHash();
+})();
+</script>
 
 </body>
 
