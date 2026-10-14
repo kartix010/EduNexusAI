@@ -6369,7 +6369,7 @@
         if (tutorRequestPending || quizRequestPending || activeQuizReview) return;
         setTutorRequestPending(true);
         const row = document.getElementById(loadingId);
-        row.innerHTML = '<span class="msg-avatar">✦</span><div class="ai-thinking" role="status">Thinking…</div>';
+        row.innerHTML = '<span class="msg-avatar">✦</span><div class="ai-thinking" role="status" aria-label="Preparing AI reply"><div class="ai-dots-container" aria-hidden="true"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>';
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 90000);
       try {
