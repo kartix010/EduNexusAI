@@ -3680,6 +3680,13 @@
       word-break: normal;
     }
   </style>
+<style id="quiz-choice-styles">
+#messages .quiz-choice-group { display:grid; gap:8px; margin-top:14px; }
+#messages .quiz-choice { width:100%; min-width:0; min-height:44px; padding:10px 12px; text-align:left; font:inherit; color:inherit; background:#8b7cff12; border:1px solid #8b7cff40; border-radius:12px; white-space:normal; overflow-wrap:anywhere; cursor:pointer; }
+#messages .quiz-choice:focus-visible { outline:2px solid #5ee7c5; outline-offset:2px; }
+#messages .quiz-choice:disabled { opacity:.55; cursor:default; }
+#messages .quiz-review-item { padding:12px 0; border-top:1px solid #8b7cff30; }
+</style>
 </head>
 
 <body>
@@ -6073,48 +6080,174 @@
     let activeQuizReview = null;
     let selectedSubjectForQuiz = ""; // इसे फंक्शन के ठीक ऊपर रखना
 
-    function startCustomQuiz() {
-      const sub = document.getElementById("quizSubject").value;
-      const topic = document.getElementById("quizTopic").value.trim();
-      const numQs = document.getElementById("quizQuestions").value;
+    let quizRequestPending = false;
 
-      if (!topic) {
-        showToast("❌ Please enter a Chapter or Topic name!");
+    function validateQuizBank(bank, count) {
+      if (!bank || !Array.isArray(bank.questions) || bank.questions.length !== count) return false;
+      return bank.questions.every(q => q && typeof q.question === 'string' && q.question.trim()
+        && typeof q.explanation === 'string' && q.explanation.trim()
+        && Array.isArray(q.options) && q.options.length === 4
+        && q.options.every(o => typeof o === 'string' && o.trim())
+        && new Set(q.options.map(o => o.trim().toLowerCase())).size === 4
+        && Number.isInteger(q.answer_index) && q.answer_index >= 0 && q.answer_index < 4
+        && q.correct_answer === q.options[q.answer_index]);
+    }
+
+    function parseQuizChoice(text, options) {
+      const value = text.trim().toLowerCase();
+      if (value === 'skip') return -1;
+      const letter = value.match(/^(?:option\s+)?([a-d])\s*[).]?$/);
+      if (letter) return letter[1].charCodeAt(0) - 97;
+      const index = options.findIndex(o => o.trim().toLowerCase() === value);
+      return index < 0 ? null : index;
+    }
+
+    function quizChatMessage(role, html) {
+      const wrap = document.getElementById('messages');
+      const node = document.createElement('div');
+      node.className = `message ${role}`;
+      node.innerHTML = role === 'ai'
+        ? `<span class="msg-avatar">✦</span><div class="answer-content" style="min-width:0;flex:1">${html}</div>`
+        : `<div>${html}</div>`;
+      wrap.appendChild(node);
+      getChatScroll(wrap).follow();
+      return node;
+    }
+
+    async function startCustomQuiz() {
+      if (quizRequestPending) return;
+      const sub = document.getElementById('quizSubject').value;
+      const topic = document.getElementById('quizTopic').value.trim();
+      const count = Number(document.getElementById('quizQuestions').value);
+      if (!topic || topic.length > 200) {
+        showToast('Enter a topic between 1 and 200 characters.');
         return;
       }
-
-      selectedSubjectForQuiz = sub; // सब्जेक्ट याद कर लिया
-      showToast(`🚀 Initiating Interactive AI Quiz for ${sub}...`);
-
-      setTimeout(() => {
-        const doubtSection = document.getElementById('doubt');
-        if (doubtSection) doubtSection.scrollIntoView({ behavior: 'smooth' });
-      }, 600);
-
-      {
-        activeQuizReview = { subject: sub, total: Number(numQs), history: [] };
-        const secretPrompt = `Act as a strict Class 12 examiner. Start a NEW interactive MCQ quiz with ${numQs} questions on "${topic}" for ${sub}. Ask QUESTION 1 with labelled options first. Wait for my answer. Ask ONE question at a time; explain mistakes briefly before moving on.
-Track questions, my actual answers and correct answers for THIS quiz only. Count skipped questions as unanswered.
-After the last answer, show:
-## Quiz result
-Score: X/${numQs}
-## Revise your mistakes
-For EACH wrong or skipped question, use this format without tables:
-### Q[number]. [Original question]
-**Your answer:** [My actual answer, or "Skipped"]
-**Correct answer:** [Correct option AND answer text]
-**Why:** [One or two clear sentences explaining the concept]
-Include only mistakes from this quiz. Never invent my answers or missing earlier details; say when a detail is unavailable. If all answers are correct, say "All answers correct — no mistakes to revise." and omit the mistake list.
-Do not start another quiz automatically.
-CRITICAL: Only AFTER the complete revision, end the final response with [SCORE: X/${numQs}], using the actual numeric score. Never emit this tag before the quiz finishes.`;
-        sendQuestion(new Event("submit"), {
-          prompt: secretPrompt,
-          displayText: `Start a ${numQs}-question quiz on ${topic} · ${sub}`
+      if (activeQuizReview) {
+        showToast('Finish this quiz or type "stop quiz" before starting another.');
+        return;
+      }
+      quizRequestPending = true;
+      selectedSubjectForQuiz = sub;
+      document.getElementById('doubt')?.scrollIntoView({ behavior: 'smooth' });
+      quizChatMessage('user', escapeHtml(`Start a ${count}-question quiz on ${topic} · ${sub}`));
+      const loading = quizChatMessage('ai', 'Preparing your questions…');
+      try {
+        const response = await fetch('https://edunexusai.onrender.com/chat', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ quiz: { subject: sub, topic, count }, session_id: sessionId })
         });
+        const data = await response.json();
+        if (!response.ok || !validateQuizBank(data.quiz, count)) {
+          loading.querySelector('.answer-content').textContent = data.reply || 'Quiz unavailable. Please try again after the server update finishes.';
+          return;
+        }
+        loading.remove();
+        activeQuizReview = {
+          subject: sub, topic, questions: data.quiz.questions,
+          answers: [], index: 0, finished: false, controls: null
+        };
+        showLocalQuizQuestion(activeQuizReview);
+      } catch {
+        loading.querySelector('.answer-content').textContent = 'Could not prepare the quiz. Please try again.';
+      } finally {
+        quizRequestPending = false;
       }
     }
 
+    function showLocalQuizQuestion(session) {
+      const index = session.index;
+      const q = session.questions[index];
+      const node = quizChatMessage('ai', `<p><strong>Question ${index + 1} of ${session.questions.length}</strong></p><p>${escapeHtml(q.question)}</p>`);
+      const group = document.createElement('div');
+      group.className = 'quiz-choice-group';
+      [...q.options, 'Skip question', 'End quiz'].forEach((option, i) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'quiz-choice';
+        button.textContent = i < 4 ? `${String.fromCharCode(65 + i)}. ${option}` : option;
+        button.onclick = () => submitQuizChoice(i < 4 ? String.fromCharCode(65 + i) : i === 4 ? 'skip' : 'stop quiz', session, index);
+        group.appendChild(button);
+      });
+      node.querySelector('.answer-content').appendChild(group);
+      session.controls = group;
+    }
 
+    function submitQuizChoice(text, session = activeQuizReview, index = session?.index) {
+      if (!session || session !== activeQuizReview || session.finished || index !== session.index) return;
+      if (text.trim().toLowerCase() === 'stop quiz') {
+        session.controls?.querySelectorAll('button').forEach(b => { b.disabled = true; });
+        session.finished = true;
+        activeQuizReview = null;
+        quizChatMessage('ai', 'Quiz ended. This unfinished attempt has not changed your score.');
+        return;
+      }
+      const q = session.questions[index];
+      const choice = parseQuizChoice(text, q.options);
+      if (choice === null) {
+        showToast('Choose A, B, C or D; type "skip" or "stop quiz" if needed.');
+        return;
+      }
+      session.controls?.querySelectorAll('button').forEach(b => { b.disabled = true; });
+      session.answers.push(choice);
+      session.index++;
+      quizChatMessage('user', choice < 0 ? 'Skip question' : escapeHtml(`${String.fromCharCode(65 + choice)}. ${q.options[choice]}`));
+      const correct = choice === q.answer_index;
+      quizChatMessage('ai', `<p><strong style="color:${correct ? 'var(--accent2)' : '#ffb8bc'}">${correct ? 'Correct' : choice < 0 ? 'Skipped' : 'Incorrect'}</strong></p><p>Correct answer: <strong>${escapeHtml(String.fromCharCode(65 + q.answer_index) + '. ' + q.options[q.answer_index])}</strong></p><p>${escapeHtml(q.explanation)}</p>`);
+      if (session.index < session.questions.length) showLocalQuizQuestion(session);
+      else finishLocalQuiz(session);
+    }
+
+    function quizResult(session) {
+      const mistakes = [];
+      session.questions.forEach((q, i) => {
+        if (session.answers[i] !== q.answer_index) mistakes.push(i);
+      });
+      return { score: session.questions.length - mistakes.length, total: session.questions.length, mistakes };
+    }
+
+    function finishLocalQuiz(session) {
+      if (session.finished || session !== activeQuizReview) return;
+      session.finished = true;
+      activeQuizReview = null;
+      const { score, total, mistakes } = quizResult(session);
+      let html = `<h3>Quiz result · ${score}/${total}</h3>`;
+      if (!mistakes.length) html += '<p>All answers correct — no mistakes to revise.</p>';
+      else {
+        html += '<h3>Revise your mistakes</h3>';
+        for (const i of mistakes) {
+          const q = session.questions[i], choice = session.answers[i];
+          const answer = choice == null || choice < 0 ? 'Skipped' : `${String.fromCharCode(65 + choice)}. ${q.options[choice]}`;
+          html += `<section class="quiz-review-item"><p><strong>Q${i + 1}. ${escapeHtml(q.question)}</strong></p><p><strong>Your answer:</strong> ${escapeHtml(answer)}</p><p><strong>Correct answer:</strong> ${escapeHtml(String.fromCharCode(65 + q.answer_index) + '. ' + q.options[q.answer_index])}</p><p>${escapeHtml(q.explanation)}</p></section>`;
+        }
+      }
+      quizChatMessage('ai', html);
+      const summary = session.questions.map((q, i) => {
+        const selected = session.answers[i];
+        return `Q${i + 1}: ${q.question}\nYour answer: ${selected < 0 ? 'Skipped' : q.options[selected]}\nCorrect answer: ${q.correct_answer}\nExplanation: ${q.explanation}`;
+      }).join('\n\n');
+      chatMemory.push({ role: 'model', content: { text: escapeHtml(`Completed quiz: ${score}/${total}\n${summary}`) } });
+      if (chatMemory.length > 12) chatMemory = chatMemory.slice(-12);
+      const percentage = score / total * 100;
+      userStats.totalQuizzes += 1;
+      userStats.totalScorePerc += percentage;
+      if (percentage >= 80) userStats.topicsMastered += 1;
+      if (subjectMastery[session.subject] !== undefined) {
+        subjectMastery[session.subject] = Math.min(100, subjectMastery[session.subject] + Math.floor(percentage / 10));
+      }
+      try {
+        localStorage.setItem('edunexus_stats', JSON.stringify(userStats));
+        localStorage.setItem('edunexus_mastery', JSON.stringify(subjectMastery));
+      } catch { showToast('Result shown; browser storage could not save your progress.'); }
+      updateStatsUI();
+      updateProgressUI();
+      trackUserActivity('QUIZ_COMPLETED', `Subject: ${session.subject} | Score: ${score}/${total} (${percentage}%)`);
+      if (typeof firebase !== 'undefined' && firebase.auth().currentUser) {
+        firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).set({
+          masteryScores: subjectMastery, stats: userStats
+        }, { merge: true }).catch(() => showToast('Result saved on this device; cloud sync failed.'));
+      }
+    }
 
     async function sendQuestion(e, generated = null) {
       e.preventDefault();
@@ -6122,6 +6255,19 @@ CRITICAL: Only AFTER the complete revision, end the final response with [SCORE: 
       const q = generated ? generated.prompt : input.value.trim();
       const displayText = generated ? generated.displayText : q;
       if (!q && !currentAttachmentBase64) return;
+      if (quizRequestPending) {
+        showToast('Your quiz is being prepared. Please wait.');
+        return;
+      }
+      if (activeQuizReview) {
+        if (currentAttachmentBase64) {
+          showToast('For this quiz, choose an option or end the quiz before sending an attachment.');
+          return;
+        }
+        input.value = "";
+        submitQuizChoice(q);
+        return;
+      }
       // Track AI Usage
 
 
@@ -6137,8 +6283,7 @@ CRITICAL: Only AFTER the complete revision, end the final response with [SCORE: 
       if (!generated) input.value = "";
       chatScroll.follow();
 
-      const quizSession = activeQuizReview;
-      const requestHistory = quizSession ? quizSession.history : chatMemory;
+      const requestHistory = chatMemory;
 
       // 🔥 SUPER MEMORY LOGIC 🔥
       let memoryText = "";
@@ -6189,63 +6334,10 @@ CRITICAL: Only AFTER the complete revision, end the final response with [SCORE: 
         const data = await res.json();
         let aiResponse = escapeHtml(data.reply);
 
-        // 🕵️‍♂️ AI SCOUTER: Check if AI sent the secret [SCORE: X/Y] tag
-        const scoreMatch = aiResponse.match(/\[SCORE:\s*(\d+)\/(\d+)\]/i);
-        const completedQuiz = scoreMatch && quizSession && activeQuizReview === quizSession
-          && Number(scoreMatch[2]) === quizSession.total
-          && Number(scoreMatch[1]) <= quizSession.total;
-        if (completedQuiz) {
-          const score = parseInt(scoreMatch[1]);
-          const total = parseInt(scoreMatch[2]);
-          const percentage = (score / total) * 100;
-          // Track Quiz Result
-          trackUserActivity("QUIZ_COMPLETED", `Subject: ${quizSession.subject} | Score: ${score}/${total} (${percentage}%)`);
-
-          // 1. सीक्रेट टैग को चैट से हटा दो ताकि बच्चे को ना दिखे
-          aiResponse = aiResponse.replace(/\[SCORE:\s*\d+\/\d+\]/i, '').trim();
-
-          // 🔥 2. MAIN STATS UPDATE (Quizzes, Accuracy, Topics) 🔥
-          userStats.totalQuizzes += 1;
-          userStats.totalScorePerc += percentage;
-          if (percentage >= 80) {
-            userStats.topicsMastered += 1; // 80% se upar aaya toh master ban gaya!
-          }
-
-          // Browser ki memory me save karo aur UI update karo
-          localStorage.setItem('edunexus_stats', JSON.stringify(userStats));
-          if (typeof updateStatsUI === 'function') updateStatsUI();
-
-          // 🔥 3. SUBJECT MASTERY (Progress Bars) UPDATE 🔥
-          if (typeof selectedSubjectForQuiz !== 'undefined' && selectedSubjectForQuiz && typeof subjectMastery !== 'undefined') {
-            let boost = Math.floor(percentage / 10); // 100% स्कोर पर 10% मास्टरी बढ़ेगी
-            subjectMastery[selectedSubjectForQuiz] = Math.min(100, subjectMastery[selectedSubjectForQuiz] + boost);
-
-            localStorage.setItem('edunexus_mastery', JSON.stringify(subjectMastery));
-            if (typeof updateProgressUI === 'function') updateProgressUI();
-
-            showToast(`🎯 Quiz Complete! Scored ${score}/${total}. Progress & Stats updated!`);
-
-            // 🔥 4. FIREBASE CLOUD SYNC (Ab Stats bhi cloud par jayenge) 🔥
-            if (typeof firebase !== 'undefined' && firebase.auth().currentUser) {
-              firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).set({
-                masteryScores: subjectMastery,
-                stats: userStats // <-- NAYA: User Stats Database me gaye
-              }, { merge: true });
-            }
-          }
-        }
-
         let userContent = { text: q };
         if (memImage) {
           userContent.image_data = memImage;
           userContent.mime_type = memImage.split(';')[0].split(':')[1];
-        }
-
-        // Retain all quiz turns for revision; normal tutor history stays short.
-        if (quizSession && activeQuizReview === quizSession) {
-          quizSession.history.push({ role: "user", content: userContent });
-          quizSession.history.push({ role: "model", content: { text: aiResponse } });
-          if (completedQuiz) activeQuizReview = null;
         }
 
         if (typeof chatMemory !== 'undefined') {
