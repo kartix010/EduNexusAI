@@ -1335,21 +1335,21 @@
       z-index: 3;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      min-height: 40px;
-      padding: 8px 14px;
+      gap: 4px;
+      min-height: 30px;
+      padding: 4px 10px;
       border: 1px solid rgba(94, 231, 197, .35);
       border-radius: 24px;
       background: #0e1421;
       color: #5ee7c5;
       box-shadow: 0 4px 14px rgba(0, 0, 0, .3);
-      font: 600 12px/1.4 Inter, sans-serif;
+      font: 600 11px/1.4 Inter, sans-serif;
       cursor: pointer;
     }
     .chat-latest[hidden] { display: none; }
     .chat-latest:hover { background: #172235; }
     .chat-latest:focus-visible { outline: 2px solid #8b7cff; outline-offset: 2px; }
-    .chat-latest svg { width: 14px; height: 14px; }
+    .chat-latest svg { width: 12px; height: 12px; }
     #messages .answer-heading {
       margin: 14px 0 6px;
       color: #d8d0ff;
@@ -3681,6 +3681,13 @@
     }
   </style>
 <style id="quiz-choice-styles">
+#messages .quiz-result-heading { color:#c4baff; margin:0 0 10px; font-size:16px; line-height:1.4; }
+#messages .quiz-result-heading span { color:#5ee7c5; }
+#messages .quiz-review-heading { color:#b7aaff; margin:0 0 14px; font-size:15px; line-height:1.4; }
+#messages .quiz-your-answer { color:#e8b4c1; }
+#messages .quiz-correct-answer { color:#79e4cb; }
+#messages .quiz-review-item > p:first-child { color:#d3caff; }
+
 #messages .quiz-choice-group { display:grid; gap:8px; margin-top:14px; }
 #messages .quiz-choice { width:100%; min-width:0; min-height:44px; padding:10px 12px; text-align:left; font:inherit; color:inherit; background:#8b7cff12; border:1px solid #8b7cff40; border-radius:12px; white-space:normal; overflow-wrap:anywhere; cursor:pointer; }
 #messages .quiz-choice:focus-visible { outline:2px solid #5ee7c5; outline-offset:2px; }
@@ -6211,14 +6218,14 @@
       session.finished = true;
       activeQuizReview = null;
       const { score, total, mistakes } = quizResult(session);
-      let html = `<h3>Quiz result · ${score}/${total}</h3>`;
+      let html = `<h3 class="quiz-result-heading">Quiz result · <span>${score}/${total}</span></h3>`;
       if (!mistakes.length) html += '<p>All answers correct — no mistakes to revise.</p>';
       else {
-        html += '<h3>Revise your mistakes</h3>';
+        html += '<h3 class="quiz-review-heading">Revise your mistakes</h3>';
         for (const i of mistakes) {
           const q = session.questions[i], choice = session.answers[i];
           const answer = choice == null || choice < 0 ? 'Skipped' : `${String.fromCharCode(65 + choice)}. ${q.options[choice]}`;
-          html += `<section class="quiz-review-item"><p><strong>Q${i + 1}. ${escapeHtml(q.question)}</strong></p><p><strong>Your answer:</strong> ${escapeHtml(answer)}</p><p><strong>Correct answer:</strong> ${escapeHtml(String.fromCharCode(65 + q.answer_index) + '. ' + q.options[q.answer_index])}</p><p>${escapeHtml(q.explanation)}</p></section>`;
+          html += `<section class="quiz-review-item"><p><strong>Q${i + 1}. ${escapeHtml(q.question)}</strong></p><p class="quiz-your-answer"><strong>Your answer:</strong> ${escapeHtml(answer)}</p><p class="quiz-correct-answer"><strong>Correct answer:</strong> ${escapeHtml(String.fromCharCode(65 + q.answer_index) + '. ' + q.options[q.answer_index])}</p><p>${escapeHtml(q.explanation)}</p></section>`;
         }
       }
       quizChatMessage('ai', html);
