@@ -4807,14 +4807,43 @@
       "Economics": ["National Income", "Money & Banking", "Income & Employment", "Government Budget", "Balance of Payments", "Indian Economy (1947-90)", "Economic Reforms (1991)", "Human Capital", "Rural Dev.", "Employment", "Sustainable Dev."]
     };
 
-    let subjectMastery = JSON.parse(localStorage.getItem('edunexus_mastery')) || {
-      "Physics": 0,
-      "Chemistry": 0,
-      "Mathematics": 0,
-      "Computer Science": 0,
-      "English": 0,
-      "Economics": 0
-    };
+    const defaultMastery = () => ({ Physics: 0, Chemistry: 0, Mathematics: 0, 'Computer Science': 0, English: 0, Economics: 0 });
+    const defaultStats = () => ({ totalQuizzes: 0, topicsMastered: 0, totalScorePerc: 0, streak: 1 });
+    let progressOwner = null;
+    let progressRevision = 0;
+    function progressKey(kind) { return 'edunexus_' + kind + ':' + progressOwner; }
+    function cleanProgress(value, defaults) {
+      const result = { ...defaults };
+      for (const key of Object.keys(result)) {
+        const n = value?.[key];
+        if (typeof n === 'number' && Number.isFinite(n) && n >= 0) result[key] = n;
+      }
+      return result;
+    }
+    function readProgress(kind, defaults) {
+      if (!progressOwner) return defaults;
+      try { return cleanProgress(JSON.parse(localStorage.getItem(progressKey(kind))), defaults); }
+      catch { return defaults; }
+    }
+    function saveProgress(kind, value) {
+      progressRevision++;
+      if (progressOwner && firebase.auth().currentUser?.uid === progressOwner)
+        localStorage.setItem(progressKey(kind), JSON.stringify(value));
+    }
+    function selectProgressAccount(uid) {
+      if (uid === progressOwner) return;
+      progressOwner = uid;
+      progressRevision++;
+      subjectMastery = readProgress('mastery', defaultMastery());
+      userStats = readProgress('stats', defaultStats());
+      if (activeQuizReview) {
+        activeQuizReview.controls?.querySelectorAll('button').forEach(b => { b.disabled = true; });
+        activeQuizReview = null;
+      }
+      updateProgressUI();
+      updateStatsUI();
+    }
+    let subjectMastery = defaultMastery();
 
 
 
@@ -4913,6 +4942,7 @@
     });
 
     firebase.auth().onAuthStateChanged((user) => {
+      selectProgressAccount(user?.uid || null);
       if (user) {
         // 🎯 1. SMART PERSONAL TARGET RECEIVER (NO UGLY POPUPS)
         firebase.firestore().collection('users').doc(user.uid).collection('live_alerts')
@@ -5033,17 +5063,20 @@
         }
 
         const db = firebase.firestore();
+        const progressLoadRevision = progressRevision;
         db.collection('users').doc(user.uid).get().then((doc) => {
+          if (progressOwner !== user.uid || firebase.auth().currentUser?.uid !== user.uid) return;
           if (doc.exists) {
             const data = doc.data();
-            if (data.masteryScores) {
-              subjectMastery = data.masteryScores;
-              localStorage.setItem('edunexus_mastery', JSON.stringify(subjectMastery));
+            const canLoadProgress = progressRevision === progressLoadRevision;
+            if (canLoadProgress && data.masteryScores) {
+              subjectMastery = cleanProgress(data.masteryScores, defaultMastery());
+              saveProgress('mastery', subjectMastery);
               updateProgressUI();
             }
-            if (data.stats) {
-              userStats = data.stats;
-              localStorage.setItem('edunexus_stats', JSON.stringify(userStats));
+            if (canLoadProgress && data.stats) {
+              userStats = cleanProgress(data.stats, defaultStats());
+              saveProgress('stats', userStats);
               updateStatsUI();
             }
             if (data.classGrade) {
@@ -5800,7 +5833,7 @@
     }
 
     // 🔥 NEXT-GEN QUIZ ENGINE LOGIC & REAL STATS 🔥
-    let userStats = JSON.parse(localStorage.getItem('edunexus_stats')) || { totalQuizzes: 0, topicsMastered: 0, totalScorePerc: 0, streak: 1 };
+    let userStats = defaultStats();
 
     function updateStatsUI() {
       if (document.getElementById('stat-quizzes')) {
@@ -5928,12 +5961,12 @@
       userStats.totalScorePerc += percentage;
       if (percentage >= 80) userStats.topicsMastered += 1;
 
-      localStorage.setItem('edunexus_stats', JSON.stringify(userStats));
+      saveProgress('stats', userStats);
       updateStatsUI();
 
       if (subjectMastery[selectedSubjectForQuiz] !== undefined) {
         subjectMastery[selectedSubjectForQuiz] = Math.min(100, subjectMastery[selectedSubjectForQuiz] + boost);
-        localStorage.setItem('edunexus_mastery', JSON.stringify(subjectMastery));
+        saveProgress('mastery', subjectMastery);
         updateProgressUI();
         showToast(`📈 Live Tracking: Stats updated and ${selectedSubjectForQuiz} mastery increased!`);
         if (firebase.auth().currentUser) {
@@ -6144,6 +6177,7 @@
         setQuizSetupStatus('A quiz is already open in AI Tutor. Finish it or type “stop quiz” first.', 'error');
         return;
       }
+      const quizOwner = progressOwner;
       quizRequestPending = true;
       document.getElementById('quizTopic').removeAttribute('aria-invalid');
       const startButton = document.getElementById('quizStartButton');
@@ -6161,6 +6195,7 @@
           body: JSON.stringify({ quiz: { subject: sub, topic, count }, session_id: sessionId })
         });
         const data = await response.json();
+        if (quizOwner !== progressOwner) { loading.remove(); return; }
         if (!response.ok || !validateQuizBank(data.quiz, count)) {
           loading.querySelector('.answer-content').textContent = data.reply || 'Quiz unavailable. Please try again after the server update finishes.';
           setQuizSetupStatus('Could not prepare this quiz. Please try again.', 'error');
@@ -6168,7 +6203,7 @@
         }
         loading.remove();
         activeQuizReview = {
-          subject: sub, topic, questions: data.quiz.questions,
+          owner: quizOwner, subject: sub, topic, questions: data.quiz.questions,
           answers: [], index: 0, finished: false, controls: null
         };
         showLocalQuizQuestion(activeQuizReview);
@@ -6236,7 +6271,8 @@
     }
 
     function finishLocalQuiz(session) {
-      if (session.finished || session !== activeQuizReview) return;
+      if (session.finished || session !== activeQuizReview || session.owner !== progressOwner
+          || session.owner !== (firebase.auth().currentUser?.uid || null)) return;
       session.finished = true;
       activeQuizReview = null;
       const { score, total, mistakes } = quizResult(session);
@@ -6265,8 +6301,8 @@
         subjectMastery[session.subject] = Math.min(100, subjectMastery[session.subject] + Math.floor(percentage / 10));
       }
       try {
-        localStorage.setItem('edunexus_stats', JSON.stringify(userStats));
-        localStorage.setItem('edunexus_mastery', JSON.stringify(subjectMastery));
+        saveProgress('stats', userStats);
+        saveProgress('mastery', subjectMastery);
       } catch { showToast('Result shown; browser storage could not save your progress.'); }
       updateStatsUI();
       updateProgressUI();
@@ -7351,23 +7387,11 @@
       function normVal(v) {
         if (v && typeof v === 'object') v = v.mastery ?? v.percent ?? v.score ?? v.value ?? 0;
         v = Number(v) || 0;
-        if (v > 0 && v <= 1) v *= 100;
         return Math.max(0, Math.min(100, v));
       }
 
-      // Tera mastery data dhoondhta hai (subjectMastery ya localStorage)
-      function getMastery() {
-        if (window.subjectMastery && typeof window.subjectMastery === 'object') return window.subjectMastery;
-        try {
-          for (const k of Object.keys(localStorage)) {
-            if (/mastery|progress/i.test(k)) {
-              const v = JSON.parse(localStorage.getItem(k));
-              if (v && typeof v === 'object') return v;
-            }
-          }
-        } catch (e) { }
-        return null;
-      }
+      // Only the currently selected account's validated in-memory progress.
+      function getMastery() { return subjectMastery; }
 
       // Purani flat bars ka container dhoondhta hai
       function findBars() {
