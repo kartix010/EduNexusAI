@@ -4312,57 +4312,15 @@
 
         <div class="tutor panel glass">
 
-          <!-- LEFT SIDE: TUTOR SUGGESTIONS -->
-          <div class="tutor-side">
-            <img src="https://i.ibb.co/Kz0LvSg9/logo.png" class="tutor-logo" alt="EduNexus AI">
-            <h3 class="gradient-title">KX Neural Core</h3>
-            <p>From Physics derivations to Python logic—decode complex concepts instantly, then test your mastery.</p>
-            <div class="suggestions">
-              <button onclick="askDemo('Analyze my handwriting step by step')">Analyze my handwriting step</button>
-              <button onclick="askDemo('Analyze this Physics circuit diagram')">Analyze this Physics circuit</button>
-              <button onclick="askDemo('Summarize key points from this PDF')">Summarize key points from this
-                PDF</button>
-            </div>
-          </div>
-
-          <!-- RIGHT SIDE: THE CHAT AREA -->
           <div class="chat">
-            <!-- 1. Premium Neon Header (Purple Gradient Name + Online Badge) -->
-            <div class="chat-head"
-              style="display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); background: rgba(14, 20, 33, 0.4);">
-
-              <!-- Left Side: Icon & PURPLE GRADIENT Name -->
-              <div style="display: flex; align-items: center; gap: 10px;">
-                <div
-                  style="width: 32px; height: 32px; border-radius: 8px; background: rgba(139, 124, 255, 0.15); border: 1px solid rgba(139, 124, 255, 0.3); display: grid; place-items: center; color: #8b7cff; box-shadow: 0 0 15px rgba(139, 124, 255, 0.1);">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    style="width: 16px; height: 16px;">
-                    <path
-                      d="M12 2a2 2 0 0 1 2 2c0 1.1-.9 2-2 2s-2-.9-2-2c0-1.1.9-2 2-2zM4.5 10A1.5 1.5 0 0 1 6 8.5h12A1.5 1.5 0 0 1 19.5 10v9A1.5 1.5 0 0 1 18 20.5H6A1.5 1.5 0 0 1 4.5 19v-9zM2 13h2.5M19.5 13H22" />
-                  </svg>
-                </div>
-                <!-- 🔥 YAHAN TERA GRADIENT A GAYA 🔥 -->
-                <h3 class="gradient-title"
-                  style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 16px; letter-spacing: 0.5px;">
-                  KX Core!</h3>
+            <header class="chat-head kx-workspace-head">
+              <div class="kx-workspace-brand"><span class="kx-workspace-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5Z"/></svg></span><div><h3>KX Core<span class="kx-ready-dot" aria-hidden="true"></span></h3><span class="kx-workspace-caption">Your AI workspace</span></div></div>
+              <div class="kx-workspace-actions">
+                <button type="button" id="study-history-open" class="kx-icon-button" aria-label="Saved chats" title="Saved chats" data-tip="Saved chats" aria-haspopup="dialog" aria-controls="study-history-dialog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11a9 9 0 1 1 2.6 7M3 4v7h7"/><path d="M12 7v5l3 2"/></svg></button>
+                <button type="button" id="study-chat-new" class="kx-icon-button" aria-label="New chat" title="New chat" data-tip="New chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4H5a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h13a2 2 0 0 0 2-2v-7"/><path d="m16 3 5 5-10 10-5 1 1-5Z"/></svg></button>
               </div>
-
-              <!-- Right Side: Online Badge -->
-              <div
-                style="display: flex; align-items: center; gap: 8px; background: rgba(94, 231, 197, 0.1); padding: 5px 12px; border-radius: 20px; border: 1px solid rgba(94, 231, 197, 0.25); box-shadow: 0 4px 15px rgba(94, 231, 197, 0.1);">
-                <div class="pulse"
-                  style="width: 8px; height: 8px; margin: 0; background: var(--accent2); animation-duration: 1.5s;">
-                </div>
-                <span
-                  style="color: var(--accent2); font-size: 10px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase;">Online</span>
-              </div>
-
-            </div>
-
-<div class="study-chat-toolbar">
-  <span id="study-chat-status" role="status" aria-live="polite">Chats saved on this device</span>
-  <div><button type="button" id="study-history-open" aria-haspopup="dialog" aria-controls="study-history-dialog">History</button><button type="button" id="study-chat-new">＋ New chat</button></div>
-</div>
+            </header>
+            <span id="study-chat-status" class="kx-storage-status" role="status" aria-live="polite">Chats saved on this device</span>
             <!-- 2. MESSAGES AREA -->
             <div class="chat-message-window">
               <div class="messages" id="messages" tabindex="0" role="region" aria-label="AI conversation"></div>
@@ -4390,25 +4348,29 @@
               <input type="file" id="file-upload" accept=".pdf,.txt,.doc,.docx" style="display:none;"
                 onchange="handleAttachment(event, 'file')">
 
-              <button type="button" class="attach-btn" onclick="document.getElementById('file-upload').click()"
-                title="Attach File">
+              <details class="kx-attachments" id="kx-attachments">
+                <summary aria-label="Add attachment" title="Add attachment"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary>
+                <div class="kx-attachment-options">              <button type="button" class="attach-btn" onclick="document.getElementById('file-upload').click()"
+                aria-label="Attach document">
                 <svg viewBox="0 0 24 24">
                   <path
                     d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5a2.5 2.5 0 0 1 5 0v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5a2.5 2.5 0 0 0 5 0V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.31 2.69 6 6 6s6-2.69 6-6V6h-1.5z" />
-                </svg>
+                </svg><span>Attach document</span>
               </button>
 
               <button type="button" class="attach-btn" onclick="document.getElementById('image-upload').click()"
-                title="Upload Image">
+                aria-label="Camera or image">
                 <svg viewBox="0 0 24 24">
                   <path
                     d="M4 4h3l2-2h6l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm8 3a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0 2a3 3 0 1 1 0 6 3 3 0 0 1 0-6z" />
-                </svg>
+                </svg><span>Camera or image</span>
               </button>
 
+</div>
+              </details>
               <div class="input-wrapper">
-                <textarea id="question" placeholder="Ask KX Core..." rows="1"></textarea>
-                <button type="button" id="mic-btn" onclick="toggleMic()" title="Click to speak">
+                <textarea id="question" aria-label="Message KX Core" placeholder="Ask anything…" rows="1"></textarea>
+                <button type="button" id="mic-btn" onclick="toggleMic()" aria-label="Dictate message" title="Dictate message">
                   <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z" />
                     <path
@@ -4417,7 +4379,7 @@
                 </button>
               </div>
 
-              <button type="submit" title="Send message">
+              <button type="submit" aria-label="Send message" title="Send message">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
                   stroke-linejoin="round">
                   <line x1="12" y1="19" x2="12" y2="5"></line>
@@ -6146,6 +6108,7 @@
 
     function quizChatMessage(role, html) {
       const wrap = document.getElementById('messages');
+      wrap.querySelector('.study-chat-empty')?.remove();
       const node = document.createElement('div');
       node.className = `message ${role}`;
       node.innerHTML = role === 'ai'
@@ -6517,6 +6480,7 @@
       recognition.onresult = (event) => {
         const transcript = event.results[0][0].transcript;
         document.getElementById('question').value = transcript;
+        document.getElementById('question').dispatchEvent(new Event('input', {bubbles:true}));
         stopMic();
       };
 
@@ -8017,6 +7981,19 @@
 #messages .answer-content { min-width:0;overflow-wrap:anywhere; }
 @media(max-width:380px) { .study-chat-toolbar { flex-wrap:wrap; } .study-chat-toolbar > span {max-width:100%;} #study-history-dialog {padding:16px;} }
 </style>
+
+<template id="kx-welcome-template">
+  <div class="kx-welcome-emblem" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5Z"/></svg></div>
+  <p class="kx-welcome-kicker">A LITTLE CURIOSITY. A NEW POSSIBILITY.</p>
+  <h3>What are we<br><span>working on?</span></h3>
+  <p class="kx-welcome-description">Untangle a concept. Build something.<br>Find your next answer.</p>
+  <div class="kx-starters" aria-label="Ways to get started">
+    <button type="button" data-kx-draft="explain"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6m-5 3h4M8 14a6 6 0 1 1 8 0l-1 2H9Z"/></svg><span>Explain</span></button>
+    <button type="button" data-kx-draft="code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8 7-5 5 5 5m8-10 5 5-5 5m-3-14-2 18"/></svg><span>Code</span></button>
+    <a href="#quiz-engine"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 11 2 2 4-4M8 3h8v3H8Zm-2 1H5v17h14V4h-1"/></svg><span>Practise</span></a>
+  </div>
+</template>
+
 <script id="study-history-script">
 // Account-scoped, on-device transcripts. Stored text is always escaped on render.
 window.studyChats = (() => {
@@ -8096,7 +8073,9 @@ window.studyChats = (() => {
     if (!current.messages.length) {
       const greeting=document.createElement('div');
       greeting.className='study-chat-empty';
-      greeting.textContent='A fresh start. Ask a question or share your code.';
+      const welcome=document.getElementById('kx-welcome-template');
+      if(welcome) greeting.append(welcome.content.cloneNode(true));
+      else greeting.textContent='What are we working on?';
       wrap().append(greeting);
     }
     for (const m of current.messages) {
@@ -8121,6 +8100,7 @@ window.studyChats = (() => {
     }
     clearAttachment();
     document.getElementById('question').value='';
+    document.getElementById('question').dispatchEvent(new Event('input', {bubbles:true}));
     getChatScroll(wrap()).follow();
     announce(current.messages.length ? 'Saved on this device · files are not retained' : 'New chat · saved on this device');
   }
@@ -8233,6 +8213,141 @@ window.studyChats = (() => {
   };
 })();
 </script>
+<style id="kx-chat-workspace-style">
+/* Chat workspace: scoped to the Tutor, preserving Home, quiz and motion styles. */
+#doubt .tutor { display:block; padding:0; min-width:0; border-radius:24px; background:#0e1421; }
+#doubt .chat { min-width:0; min-height:0; transform:none; }
+#doubt .kx-workspace-head { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-shrink:0; min-height:68px; padding:10px 18px; background:#0e1421; border-bottom:1px solid #ffffff0d; z-index:5; }
+.kx-workspace-brand { display:flex; align-items:center; gap:10px; min-width:0; }
+.kx-workspace-mark { display:grid; place-items:center; width:36px; height:36px; border-radius:12px; color:#b8acff; background:linear-gradient(145deg,#8b7cff22,#5ee7c50a); border:1px solid #8b7cff35; }
+.kx-workspace-mark svg { width:22px; height:22px; }
+#doubt .kx-workspace-brand h3 { display:flex; align-items:center; gap:8px; margin:0; color:#e9e5ff; font:600 17px/1.3 'Space Grotesk',sans-serif; letter-spacing:-.3px; }
+.kx-ready-dot { width:6px; height:6px; border-radius:50%; background:#5ee7c5; box-shadow:0 0 8px #5ee7c545; }
+.kx-workspace-caption { display:block; margin-top:2px; font:400 11px/1.4 Inter,sans-serif; color:#95a3ba; }
+.kx-workspace-actions { display:flex; gap:5px; }
+#doubt .kx-icon-button { position:relative; display:grid; place-items:center; width:44px; height:44px; padding:0; color:#aebbd0; background:transparent; border:1px solid transparent; border-radius:12px; cursor:pointer; transition:background .16s,color .16s,border-color .16s; }
+#doubt .kx-icon-button svg { width:20px; height:20px; }
+#doubt #study-chat-new { color:#5ee7c5; background:#5ee7c50a; border-color:#5ee7c521; }
+#doubt .kx-icon-button:active, #doubt .kx-starters :is(button,a):active { background:#8b7cff26; }
+#doubt :is(button,a,summary):focus-visible { outline:2px solid #5ee7c5; outline-offset:3px; }
+#doubt .kx-storage-status { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+#doubt .kx-storage-status.is-warning { position:static; width:auto; height:auto; margin:0; padding:8px 16px; clip-path:none; white-space:normal; flex-shrink:0; background:#33242d; color:#ffd1d6; font-size:12px; line-height:1.5; }
+#doubt .chat-message-window { background:radial-gradient(ellipse at 50% 20%,#8b7cff08,transparent 70%); }
+#doubt #messages { padding:22px 20px 48px !important; width:100%; }
+#doubt #messages:has(>.study-chat-empty:only-child) { padding:20px !important; }
+#doubt .study-chat-empty { flex:0 0 auto; width:100%; margin:auto; padding:16px 0; text-align:center; }
+.kx-welcome-emblem { display:grid; place-items:center; width:56px; height:56px; margin:0 auto 22px; border-radius:19px; background:linear-gradient(140deg,#8b7cff25,#5ee7c510); border:1px solid #8b7cff32; box-shadow:0 0 36px #8b7cff0c; color:#b5a7ff; }
+.kx-welcome-emblem svg { width:30px; height:30px; }
+#doubt .kx-welcome-kicker { margin:0 0 12px; font:600 9px/1.5 Inter,sans-serif; letter-spacing:1.5px; color:#7f96a8; }
+#doubt .study-chat-empty h3 { margin:0; color:#eeeaff; font:600 clamp(26px,4vw,38px)/1.14 'Space Grotesk',sans-serif; letter-spacing:-1px; }
+#doubt .study-chat-empty h3 span { background:linear-gradient(100deg,#a99bff,#5ee7c5); background-clip:text; -webkit-background-clip:text; color:transparent; }
+#doubt .kx-welcome-description { margin:14px 0 24px; color:#9daac0; font:400 13px/1.65 Inter,sans-serif; }
+.kx-starters { display:flex; justify-content:center; flex-wrap:wrap; gap:8px; }
+#doubt .kx-starters :is(button,a) { display:inline-flex; align-items:center; justify-content:center; gap:7px; min-height:44px; padding:9px 13px; border:1px solid #8b7cff30; border-radius:13px; background:#141a2a; color:#d2caff; font:500 12px/1.3 Inter,sans-serif; cursor:pointer; text-decoration:none; transition:background .16s,border-color .16s; }
+.kx-starters svg { width:16px; height:16px; }
+#doubt .chat-input { padding:12px !important; gap:8px; align-items:flex-end; background:#0b101b; border-top:1px solid #ffffff0d; overflow:visible; z-index:4; }
+#doubt .input-wrapper { align-items:flex-end; }
+#doubt #question { min-height:46px; max-height:132px; padding:12px 44px 12px 14px; border-radius:17px; background:#131b29; border-color:#ffffff12; font-size:16px; line-height:1.45; scrollbar-width:thin; scrollbar-color:#8b7cff55 transparent; }
+#doubt #question::placeholder { color:#8b98ad; }
+#doubt #question:focus { border-color:#8b7cff80; box-shadow:0 0 0 3px #8b7cff0b; }
+#doubt #mic-btn { width:40px; height:44px; right:2px; bottom:2px; }
+#doubt .chat-input button[type=submit] { width:46px; height:46px; }
+.kx-attachments { position:relative; flex-shrink:0; }
+#doubt .kx-attachments summary { list-style:none; display:grid; place-items:center; width:44px; height:46px; border:1px solid #ffffff0e; border-radius:14px; background:#141b28; color:#bcc8da; cursor:pointer; }
+.kx-attachments summary::-webkit-details-marker { display:none; }
+.kx-attachments summary svg { width:22px; height:22px; transition:transform .16s; }
+.kx-attachments[open] summary svg { transform:rotate(45deg); }
+.kx-attachment-options { position:absolute; bottom:calc(100% + 10px); left:0; width:210px; padding:6px; border:1px solid #8b7cff40; border-radius:15px; background:#151c2c; box-shadow:0 12px 40px #0008; }
+#doubt .kx-attachment-options .attach-btn { display:flex; justify-content:flex-start; gap:12px; width:100%; height:46px; padding:10px 12px; border-radius:10px; color:#d7dfef; font:400 13px Inter,sans-serif; }
+#doubt .kx-attachment-options svg { width:19px; height:19px; color:#a99bff; }
+#doubt .preview-pane { flex-shrink:0; max-height:88px; }
+@media(hover:hover) {
+  #doubt .kx-icon-button:hover, #doubt .kx-attachments summary:hover { color:#5ee7c5; background:#5ee7c514; border-color:#5ee7c540; }
+  #doubt .kx-starters :is(button,a):hover { background:#8b7cff1c; border-color:#8b7cff70; }
+  #doubt [data-tip]::after { content:attr(data-tip); position:absolute; right:0; top:100%; width:max-content; padding:6px 9px; background:#202a3e; border:1px solid #8b7cff40; border-radius:8px; color:#e8edf7; font:500 11px/1.4 Inter,sans-serif; opacity:0; visibility:hidden; pointer-events:none; }
+  #doubt [data-tip]:is(:hover,:focus-visible)::after { opacity:1; visibility:visible; pointer-events:auto; }
+  #doubt.kx-tips-dismissed [data-tip]::after { opacity:0; visibility:hidden; }
+}
+@media(max-width:850px) {
+  #doubt { padding:8px 10px 16px !important; scroll-margin-top:var(--study-header-height,76px) !important; }
+  #doubt>.section-heading { display:none; }
+  #doubt .tutor { height:max(230px,calc(var(--study-viewport-height,100dvh) - var(--study-header-height,76px) - var(--study-nav-clearance,100px) - 16px)) !important; min-height:0 !important; border-radius:20px; }
+  #doubt .kx-workspace-head { min-height:64px; padding:8px 12px; }
+  #doubt #messages { padding:16px 12px 44px !important; }
+  #doubt .chat-input { padding:8px !important; gap:6px; }
+  #doubt .kx-welcome-kicker { font-size:8px; letter-spacing:1.2px; }
+  #doubt .study-chat-empty h3 { font-size:29px; }
+  #doubt .kx-welcome-description { font-size:12px; }
+  body.typing-mode #doubt .kx-welcome-emblem, body.typing-mode #doubt .kx-welcome-kicker { display:none; }
+  body.typing-mode #doubt .study-chat-empty { padding:4px 0; }
+  body.typing-mode #doubt .study-chat-empty h3 { font-size:23px; }
+  body.typing-mode #doubt .kx-welcome-description { margin:8px 0 12px; }
+}
+@media(max-width:360px) {
+  #doubt { padding-left:6px !important; padding-right:6px !important; }
+  #doubt .kx-starters :is(button,a) { padding:9px 10px; gap:5px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  #doubt .kx-icon-button, #doubt .kx-starters :is(button,a), .kx-attachments summary svg { transition:none; }
+}
+
+</style>
+<script id="kx-chat-workspace-script">
+(() => {
+  const section=document.getElementById('doubt');
+  const input=document.getElementById('question');
+  const attachments=document.getElementById('kx-attachments');
+  const status=document.getElementById('study-chat-status');
+  if(!section||!input||!attachments||!status)return;
+  const fitInput=()=>{
+    input.style.height='auto';
+    input.style.height=Math.min(132,Math.max(46,input.scrollHeight+2))+'px';
+  };
+  input.addEventListener('input',fitInput);
+  input.addEventListener('focus',fitInput);
+  input.addEventListener('keydown',()=>queueMicrotask(fitInput));
+  section.querySelector('.chat-input').addEventListener('submit',()=>queueMicrotask(fitInput));
+  window.addEventListener('resize',fitInput,{passive:true});
+  section.addEventListener('click',event=>{
+    const starter=event.target.closest('[data-kx-draft]');
+    if(starter) {
+      // Draft only: a starter must never send a request or replace typed work.
+      if(!input.value.trim()) {
+        input.value=starter.dataset.kxDraft==='code'
+          ? 'Help me write or debug this code:\n'
+          : 'Explain this concept step by step: ';
+        input.dispatchEvent(new Event('input',{bubbles:true}));
+      }
+      input.focus();
+      input.setSelectionRange(input.value.length,input.value.length);
+    }
+    if(event.target.closest('.kx-attachment-options button')){
+      attachments.open=false;
+      attachments.querySelector('summary').focus();
+    }
+    queueMicrotask(fitInput);
+  });
+  document.addEventListener('click',event=>{
+    if(attachments.open&&!attachments.contains(event.target))attachments.open=false;
+  });
+  document.addEventListener('keydown',event=>{
+    if(event.key!=='Escape')return;
+    section.classList.add('kx-tips-dismissed');
+    if(attachments.open){attachments.open=false;attachments.querySelector('summary').focus();}
+  });
+  section.addEventListener('pointerover',event=>{
+    if(event.target.closest('[data-tip]'))section.classList.remove('kx-tips-dismissed');
+  });
+  section.addEventListener('focusin',()=>section.classList.remove('kx-tips-dismissed'));
+  // Keep failed persistence visible even though routine save messages are compact.
+  const syncStatus=()=>status.classList.toggle('is-warning',/not saved|unavailable|deleted/i.test(status.textContent));
+  new MutationObserver(syncStatus).observe(status,{childList:true,characterData:true,subtree:true});
+  syncStatus();
+  fitInput();
+})();
+
+</script>
 </body>
 
 </html>
+
