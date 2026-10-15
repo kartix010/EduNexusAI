@@ -6429,6 +6429,7 @@
 `;
         // 🔥 START THE MAGIC STREAM 🔥
         typeHTML(document.getElementById(`stream-box-${loadingId}`), aiResponse, 12);
+        window.attachAnswerCopy?.(document.getElementById(`stream-box-${loadingId}`), data.reply.replace(/\[SCORE:\s*\d+\/\d+\]/i, '').trim());
       } catch (error) {
         if (window.studyChats && !window.studyChats.matches(historyToken)) return;
         window.studyChats?.failed(historyToken, historyMessageId);
@@ -7987,6 +7988,77 @@
   <h3 class="kx-welcome-title">How can I help?</h3>
 </template>
 
+<span id="kx-copy-announcement" role="status" aria-live="polite"></span>
+<style id="kx-answer-copy-style">
+#messages .kx-copyable-answer { position:relative; }
+#messages .kx-answer-copy { position:absolute; z-index:3; top:0; right:8px; transform:translateY(-75%); display:grid; place-items:center; width:36px; height:36px; padding:8px; margin:0; border:1px solid #5ee7c53d; border-radius:11px; background:#14202c; color:#a9b9cf; box-shadow:0 3px 10px #0004; cursor:pointer; opacity:0; pointer-events:none; transition:opacity .14s,color .14s; }
+#messages .kx-answer-copy svg { width:18px; height:18px; }
+#messages .kx-copyable-answer:focus-within .kx-answer-copy, #messages .kx-copy-selected .kx-answer-copy, #messages .kx-answer-copy.is-copied { opacity:1; visibility:visible; pointer-events:auto; }
+#messages .kx-answer-copy:focus-visible { opacity:1; pointer-events:auto; outline:2px solid #8b7cff; outline-offset:3px; }
+#messages .kx-answer-copy.is-copied { color:#5ee7c5; border-color:#5ee7c580; }
+@media(hover:hover) { #messages .message.ai:hover .kx-answer-copy { opacity:1; pointer-events:auto; } #messages .kx-answer-copy:hover { color:#5ee7c5; background:#1a2c36; } }
+@media(pointer:coarse) { #messages .kx-answer-copy { width:44px; height:44px; padding:12px; transform:translateY(-82%); } }
+@media(prefers-reduced-motion:reduce) { #messages .kx-answer-copy { transition:none; } }
+#kx-copy-announcement { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+</style>
+<script id="kx-answer-copy-script">
+// A transient, in-bubble action: no toolbar and no layout shift.
+window.attachAnswerCopy = (content, text) => {
+  if (!content || typeof text !== 'string' || !text.trim() || content.querySelector('.kx-answer-copy')) return;
+  const row=content.closest('.message.ai');
+  if(!row)return;
+  content.classList.add('kx-copyable-answer');
+  const button=document.createElement('button');
+  button.type='button';button.className='kx-answer-copy';
+  const copyIcon='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg>';
+  const checkIcon='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>';
+  const reset=()=>{button.innerHTML=copyIcon;button.setAttribute('aria-label','Copy answer');button.title='Copy answer';button.classList.remove('is-copied');};
+  let copying=false,resetTimer;
+  reset();
+  button.addEventListener('click',async event=>{
+    event.stopPropagation();
+    if(copying)return;
+    copying=true;
+    clearTimeout(resetTimer);reset();
+    document.getElementById('kx-copy-announcement').textContent='';
+    try {
+      if(!navigator.clipboard?.writeText)throw new Error('Clipboard unavailable');
+      await navigator.clipboard.writeText(text);
+      if(!button.isConnected)return;
+      button.innerHTML=checkIcon;button.setAttribute('aria-label','Answer copied');button.title='Copied';button.classList.add('is-copied');
+      document.getElementById('kx-copy-announcement').textContent='Answer copied.';
+      clearTimeout(resetTimer);resetTimer=setTimeout(reset,1800);
+    } catch {
+      if(button.isConnected){
+        button.setAttribute('aria-label','Copy failed. Try again');button.title='Copy failed — try again';
+        document.getElementById('kx-copy-announcement').textContent='Could not copy. Try again or select the answer text.';
+        if(typeof showToast==='function')showToast('Could not copy. Try again or select the answer text.');
+        clearTimeout(resetTimer);resetTimer=setTimeout(reset,2400);
+      }
+    } finally { copying=false; }
+  });
+  content.append(button);
+};
+(() => {
+  const messages=document.getElementById('messages');
+  if(!messages)return;
+  messages.addEventListener('click',event=>{
+    if(event.target.closest('button,a,input,textarea,select,pre,code'))return;
+    if(window.getSelection()?.toString())return;
+    const answer=event.target.closest('.kx-copyable-answer');
+    if(!answer)return;
+    const selected=!answer.classList.contains('kx-copy-selected');
+    messages.querySelectorAll('.kx-copy-selected').forEach(el=>el.classList.remove('kx-copy-selected'));
+    answer.classList.toggle('kx-copy-selected',selected);
+  });
+  document.addEventListener('click',event=>{
+    if(!event.target.closest('.kx-copyable-answer'))messages.querySelectorAll('.kx-copy-selected').forEach(el=>el.classList.remove('kx-copy-selected'));
+  });
+  messages.addEventListener('keydown',event=>{
+    if(event.key==='Escape')messages.querySelectorAll('.kx-copy-selected').forEach(el=>el.classList.remove('kx-copy-selected'));
+  });
+})();
+</script>
 <script id="study-history-script">
 // Account-scoped, on-device transcripts. Stored text is always escaped on render.
 window.studyChats = (() => {
@@ -8085,6 +8157,7 @@ window.studyChats = (() => {
         note.textContent='Reply not saved. Send this question again; reattach any file.';content.append(note);
       }
       row.append(content);wrap().append(row);
+      if(m.role==='ai' && m.state!=='pending' && m.state!=='failed') window.attachAnswerCopy?.(content,m.text);
     }
     if(current.messages.some(m=>m.format==='quiz')) {
       const note=document.createElement('p');note.className='study-history-note';
