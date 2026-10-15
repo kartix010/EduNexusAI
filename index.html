@@ -7007,6 +7007,18 @@
   <script>
 
     // 🔥 1. GOD-TIER POP ANIMATION (UPDATED FOR MAKKHAN SMOOTHNESS) 🔥
+    const popStyle = document.createElement('style');
+    popStyle.innerHTML = `
+      @keyframes godTierPop {
+        0% { opacity: 0; transform: translateY(30px) scale(0.95); }
+        100% { opacity: 1; transform: translateY(0) scale(1); }
+      }
+      .force-pop {
+        animation: godTierPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
+      }
+    `;
+    document.head.appendChild(popStyle);
+
     // 🔥 2. FLUID ANIMATION LOGIC FOR MOBILE NAV 🔥
     function updateMobileNav(clickedItem) {
       document.querySelectorAll('.mobile-nav-bar a').forEach(el => {
@@ -7044,12 +7056,15 @@
       }
 
       targets.forEach(el => {
-        // Reveal an anchor destination without hiding already visible content.
+        if (!el) return;
+
+        // 🔥 THE FIX: Faltu ka 350ms delay aur opacity:0 hata diya. 
+        // Ab click karte hi instant smooth pop hoga bina screen blank kiye.
         el.classList.remove('force-pop');
-        el.classList.add('active');
+        void el.offsetWidth;
+        el.classList.add('force-pop');
       });
     }
-
     // 🔥 LIQUID GLASS MOUSE TRACKER (CARDS PAR LIGHT FOLLOW KAREGA) 🔥
     document.addEventListener('DOMContentLoaded', () => {
       const glassElements = document.querySelectorAll('.glass');
