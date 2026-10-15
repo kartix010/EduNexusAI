@@ -7007,18 +7007,6 @@
   <script>
 
     // 🔥 1. GOD-TIER POP ANIMATION (UPDATED FOR MAKKHAN SMOOTHNESS) 🔥
-    const popStyle = document.createElement('style');
-    popStyle.innerHTML = `
-      @keyframes godTierPop {
-        0% { opacity: 0; transform: translateY(30px) scale(0.95); }
-        100% { opacity: 1; transform: translateY(0) scale(1); }
-      }
-      .force-pop {
-        animation: godTierPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
-      }
-    `;
-    document.head.appendChild(popStyle);
-
     // 🔥 2. FLUID ANIMATION LOGIC FOR MOBILE NAV 🔥
     function updateMobileNav(clickedItem) {
       document.querySelectorAll('.mobile-nav-bar a').forEach(el => {
@@ -7056,15 +7044,12 @@
       }
 
       targets.forEach(el => {
-        if (!el) return;
-
-        // 🔥 THE FIX: Faltu ka 350ms delay aur opacity:0 hata diya. 
-        // Ab click karte hi instant smooth pop hoga bina screen blank kiye.
+        // Reveal an anchor destination without hiding already visible content.
         el.classList.remove('force-pop');
-        void el.offsetWidth;
-        el.classList.add('force-pop');
+        el.classList.add('active');
       });
     }
+
     // 🔥 LIQUID GLASS MOUSE TRACKER (CARDS PAR LIGHT FOLLOW KAREGA) 🔥
     document.addEventListener('DOMContentLoaded', () => {
       const glassElements = document.querySelectorAll('.glass');
@@ -7441,15 +7426,36 @@
         });
       }
 
+      const ringMotion = matchMedia('(prefers-reduced-motion: reduce)');
+      function settleRings() {
+        Object.values(cards).forEach(c => {
+          cancelAnimationFrame(c.frame);
+          if (c.target === undefined) return;
+          c.cur = c.target;
+          c.num.textContent = Math.round(c.target) + '%';
+        });
+      }
+      document.addEventListener('visibilitychange', () => { if (document.hidden) settleRings(); });
+      ringMotion.addEventListener('change', () => { if (ringMotion.matches) settleRings(); });
+
       function setRing(key, pct, first) {
         const c = cards[key]; if (!c) return;
+        cancelAnimationFrame(c.frame);
+        c.target = pct;
         c.val.style.strokeDashoffset = C - (C * pct / 100);
-        const from = first ? 0 : c.cur, to = pct, t0 = performance.now();
-        (function tick(t) {
+        if (document.hidden || ringMotion.matches) {
+          c.cur = pct;
+          c.num.textContent = Math.round(pct) + '%';
+          return;
+        }
+        const from = c.cur, to = pct, t0 = performance.now();
+        function tick(t) {
           const p = Math.min(1, (t - t0) / 1400), e = 1 - Math.pow(1 - p, 3);
-          c.num.textContent = Math.round(from + (to - from) * e) + '%';
-          if (p < 1) requestAnimationFrame(tick); else c.cur = to;
-        })(t0);
+          c.cur = from + (to - from) * e;
+          c.num.textContent = Math.round(c.cur) + '%';
+          if (p < 1) c.frame = requestAnimationFrame(tick);
+        }
+        c.frame = requestAnimationFrame(tick);
       }
 
       function render(first) {
@@ -7667,7 +7673,10 @@
     });
     /* Pause decorative motion when it is offscreen or the tab is hidden. */
     let onScreen = true;
-    const syncMotion = () => lead.classList.toggle('enh-motion-paused', !onScreen || document.hidden);
+    const syncMotion = () => {
+      lead.classList.toggle('enh-motion-paused', !onScreen || document.hidden);
+      document.documentElement.classList.toggle('study-tab-hidden', document.hidden);
+    };
     if ('IntersectionObserver' in window) {
       new IntersectionObserver(([entry]) => { onScreen = entry.isIntersecting; syncMotion(); }).observe(lead);
     }
@@ -7927,6 +7936,15 @@
 .tutor-retry-button { min-height: 44px; padding: 8px 18px; border: 1px solid rgba(94,231,197,.4); border-radius: 12px; background: #0e1421; color: #5ee7c5; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
 .tutor-retry-button:focus-visible { outline: 2px solid #8b7cff; outline-offset: 3px; }
 .tutor-retry-button:disabled, .chat-input button[type="submit"]:disabled { opacity: .55; cursor: wait; }
+</style>
+<style id="study-motion-fixes">
+.enh-motion-paused .kx-orbit,
+.study-tab-hidden .mobile-nav-ai { animation-play-state: paused !important; }
+@media (prefers-reduced-motion: reduce) {
+  .kx-orbit, .mobile-nav-ai, .kx-rings { animation: none !important; }
+  .reveal { opacity: 1; transform: none; transition: none; pointer-events: auto; }
+  .kx-ring-val { transition: none !important; }
+}
 </style>
 </body>
 
