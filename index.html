@@ -6342,6 +6342,7 @@
         wrap.insertAdjacentHTML('beforeend', `<div class="message user"><div>${escapeHtml(displayText)}</div></div>`);
       }
 
+      window.attachAnswerCopy?.(wrap.lastElementChild.querySelector('div'), (!generated && currentAttachmentName ? 'Attached: ' + currentAttachmentName + '\n' : '') + displayText);
       if(!generated && !currentAttachmentBase64) window.kxMessageEdit?.attach(wrap.lastElementChild, displayText);
       if (!generated) {
         window.kxMessageEdit?.reset();
@@ -7995,29 +7996,48 @@
 
 <span id="kx-copy-announcement" role="status" aria-live="polite"></span>
 <style id="kx-answer-copy-style">
-#messages .kx-copyable-answer { position:relative; }
-#messages .kx-answer-copy { position:absolute; z-index:3; top:0; right:8px; transform:translateY(-75%); display:grid; place-items:center; width:36px; height:36px; padding:8px; margin:0; border:1px solid #5ee7c53d; border-radius:11px; background:#14202c; color:#a9b9cf; box-shadow:0 3px 10px #0004; cursor:pointer; opacity:0; pointer-events:none; transition:opacity .14s,color .14s; }
-#messages .kx-answer-copy svg { width:18px; height:18px; }
-#messages .kx-copyable-answer:focus-within .kx-answer-copy, #messages .kx-copy-selected .kx-answer-copy, #messages .kx-answer-copy.is-copied { opacity:1; visibility:visible; pointer-events:auto; }
-#messages .kx-answer-copy:focus-visible { opacity:1; pointer-events:auto; outline:2px solid #8b7cff; outline-offset:3px; }
-#messages .kx-answer-copy.is-copied { color:#5ee7c5; border-color:#5ee7c580; }
-@media(hover:hover) { #messages .message.ai:hover .kx-answer-copy { opacity:1; pointer-events:auto; } #messages .kx-answer-copy:hover { color:#5ee7c5; background:#1a2c36; } }
-@media(pointer:coarse) { #messages .kx-answer-copy { width:44px; height:44px; padding:12px; transform:translateY(-82%); } }
-@media(prefers-reduced-motion:reduce) { #messages .kx-answer-copy { transition:none; } }
-#kx-copy-announcement { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+#messages .message.kx-has-actions { display:grid;grid-template-columns:25px minmax(0,1fr);column-gap:9px;row-gap:3px; }
+#messages .message.ai.kx-has-actions>.msg-avatar { grid-column:1;grid-row:1; }
+#messages .message.ai.kx-has-actions>.answer-content { grid-column:2;grid-row:1; }
+#messages .message.user.kx-has-actions { grid-template-columns:minmax(0,1fr);row-gap:3px; }
+#messages .message.user.kx-has-actions>div { grid-column:1;grid-row:1;justify-self:end; }
+#messages .kx-message-actions { display:flex;align-items:center;gap:2px;grid-column:2;grid-row:2;justify-self:start;min-height:30px;opacity:0;pointer-events:none;transition:opacity .12s; }
+#messages .message.user>.kx-message-actions { grid-column:1;justify-self:end; }
+#messages .kx-message-actions button { position:static;transform:none;display:grid;place-items:center;width:30px;height:30px;margin:0;padding:7px;border:0;border-radius:6px;background:transparent;box-shadow:none;color:#8f9db3;cursor:pointer;font:14px/1 Inter,sans-serif; }
+#messages .kx-message-actions svg { width:15px;height:15px; }
+#messages .kx-has-actions:is(.kx-actions-open,:focus-within)>.kx-message-actions,#messages .kx-message-actions:has(.is-copied) { opacity:1;pointer-events:auto; }
+#messages .kx-message-actions button:focus-visible { outline:2px solid #8b7cff;outline-offset:1px;color:#5ee7c5; }
+#messages .kx-message-actions button.is-copied { color:#5ee7c5; }
+@media(hover:hover){ #messages .kx-has-actions:hover>.kx-message-actions { opacity:1;pointer-events:auto; } #messages .kx-message-actions button:hover { color:#5ee7c5;background:#5ee7c50b; } }
+@media(pointer:coarse){ #messages .kx-message-actions { min-height:36px;gap:4px; } #messages .kx-message-actions button { width:36px;height:36px;padding:10px; } }
+@media(prefers-reduced-motion:reduce){ #messages .kx-message-actions { transition:none; } }
+#kx-copy-announcement { position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap; }
 </style>
 <script id="kx-answer-copy-script">
-// A transient, in-bubble action: no toolbar and no layout shift.
+// Compact actions under each message; no bubble overlap.
+window.kxMessageActions = row => {
+ let actions=row.querySelector(':scope > .kx-message-actions');
+ if(!actions){
+   actions=document.createElement('span');actions.className='kx-message-actions';
+   actions.setAttribute('role','group');actions.setAttribute('aria-label','Message actions');
+   row.classList.add('kx-has-actions');row.append(actions);
+   const listen=row.querySelector(':scope > button[title="Listen to AI"]');
+   if(listen){listen.removeAttribute('style');listen.setAttribute('aria-label','Listen to answer');actions.append(listen);}
+ }
+ return actions;
+};
 window.attachAnswerCopy = (content, text) => {
-  if (!content || typeof text !== 'string' || !text.trim() || content.querySelector('.kx-answer-copy')) return;
-  const row=content.closest('.message.ai');
+  if (!content || typeof text !== 'string' || !text.trim()) return;
+  const row=content.closest('.message');
   if(!row)return;
-  content.classList.add('kx-copyable-answer');
+  const noun=row.classList.contains('user')?'message':'answer';
+  const actions=window.kxMessageActions(row);
+  if(actions.querySelector('.kx-answer-copy'))return;
   const button=document.createElement('button');
   button.type='button';button.className='kx-answer-copy';
   const copyIcon='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg>';
   const checkIcon='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>';
-  const reset=()=>{button.innerHTML=copyIcon;button.setAttribute('aria-label','Copy answer');button.title='Copy answer';button.classList.remove('is-copied');};
+  const reset=()=>{button.innerHTML=copyIcon;button.setAttribute('aria-label','Copy '+noun);button.title='Copy '+noun;button.classList.remove('is-copied');};
   let copying=false,resetTimer;
   reset();
   button.addEventListener('click',async event=>{
@@ -8030,7 +8050,7 @@ window.attachAnswerCopy = (content, text) => {
       if(!navigator.clipboard?.writeText)throw new Error('Clipboard unavailable');
       await navigator.clipboard.writeText(text);
       if(!button.isConnected)return;
-      button.innerHTML=checkIcon;button.setAttribute('aria-label','Answer copied');button.title='Copied';button.classList.add('is-copied');
+      button.innerHTML=checkIcon;button.setAttribute('aria-label',noun==='message'?'Message copied':'Answer copied');button.title='Copied';button.classList.add('is-copied');
       document.getElementById('kx-copy-announcement').textContent='Answer copied.';
       clearTimeout(resetTimer);resetTimer=setTimeout(reset,1800);
     } catch {
@@ -8042,44 +8062,35 @@ window.attachAnswerCopy = (content, text) => {
       }
     } finally { copying=false; }
   });
-  content.append(button);
+  actions.prepend(button);
 };
 (() => {
-  const messages=document.getElementById('messages');
-  if(!messages)return;
-  messages.addEventListener('click',event=>{
-    if(event.target.closest('button,a,input,textarea,select,pre,code'))return;
-    if(window.getSelection()?.toString())return;
-    const answer=event.target.closest('.kx-copyable-answer');
-    if(!answer)return;
-    const selected=!answer.classList.contains('kx-copy-selected');
-    messages.querySelectorAll('.kx-copy-selected').forEach(el=>el.classList.remove('kx-copy-selected'));
-    answer.classList.toggle('kx-copy-selected',selected);
-  });
-  document.addEventListener('click',event=>{
-    if(!event.target.closest('.kx-copyable-answer'))messages.querySelectorAll('.kx-copy-selected').forEach(el=>el.classList.remove('kx-copy-selected'));
-  });
-  messages.addEventListener('keydown',event=>{
-    if(event.key==='Escape')messages.querySelectorAll('.kx-copy-selected').forEach(el=>el.classList.remove('kx-copy-selected'));
-  });
+ const messages=document.getElementById('messages');
+ if(!messages)return;
+ messages.addEventListener('click',event=>{
+   if(event.target.closest('button,a,input,textarea,select,pre,code')||window.getSelection()?.toString())return;
+   const row=event.target.closest('.kx-has-actions');
+   if(!row)return;
+   const open=!row.classList.contains('kx-actions-open');
+   messages.querySelectorAll('.kx-actions-open').forEach(el=>el.classList.remove('kx-actions-open'));
+   row.classList.toggle('kx-actions-open',open);
+ });
+ document.addEventListener('click',event=>{
+   if(!event.target.closest('.kx-has-actions'))messages.querySelectorAll('.kx-actions-open').forEach(el=>el.classList.remove('kx-actions-open'));
+ });
+ messages.addEventListener('keydown',event=>{
+   if(event.key==='Escape')messages.querySelectorAll('.kx-actions-open').forEach(el=>el.classList.remove('kx-actions-open'));
+ });
 })();
 </script>
 <span id="kx-edit-status" role="status" aria-live="polite"></span>
 <style id="kx-message-edit-style">
-#messages .kx-editable-message { position:relative; }
-#messages .kx-user-edit { position:absolute; top:0; right:8px; transform:translateY(-78%); z-index:3; display:grid; place-items:center; width:36px; height:36px; padding:8px; border:1px solid #8b7cff70; border-radius:11px; background:#1e2037; color:#c6bcff; cursor:pointer; opacity:0; pointer-events:none; transition:opacity .14s; }
-#messages .kx-user-edit svg { width:18px; height:18px; }
-#messages .kx-edit-selected .kx-user-edit,#messages .kx-user-edit:focus-visible { opacity:1;pointer-events:auto; }
-#messages .kx-user-edit:focus-visible { outline:2px solid #5ee7c5;outline-offset:3px; }
 #doubt .kx-editing #question { border-color:#8b7cff;box-shadow:0 0 0 2px #8b7cff18; }
 #doubt .kx-editing #mic-btn { display:none; }
 #doubt .kx-edit-cancel { position:absolute;right:2px;bottom:2px;width:40px;height:44px;padding:11px;border:0;border-radius:12px;background:transparent;color:#c6bcff;cursor:pointer; }
 #doubt .kx-edit-cancel[hidden] { display:none; }
 .kx-edit-cancel svg { width:18px;height:18px; }
 #kx-edit-status { position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap; }
-@media(hover:hover){ #messages .kx-editable-message:hover .kx-user-edit { opacity:1;pointer-events:auto; } }
-@media(pointer:coarse){ #messages .kx-user-edit { width:44px;height:44px;padding:12px;transform:translateY(-82%); } }
-@media(prefers-reduced-motion:reduce){ #messages .kx-user-edit { transition:none; } }
 </style>
 <script id="kx-message-edit-script">
 window.kxMessageEdit=(()=>{
@@ -8104,7 +8115,7 @@ window.kxMessageEdit=(()=>{
    button.setAttribute('aria-label','Edit and resend message');button.title='Edit & resend';
    button.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 3 5 5-11 11-6 1 1-6Z"/><path d="m14 5 5 5"/></svg>';
    row.classList.add('kx-editable-message');
-   row.append(button);
+   window.kxMessageActions(row).append(button);
    button.onclick=e=>{
      e.stopPropagation();
      if(tutorRequestPending||quizRequestPending||activeQuizReview){showToast('Finish the current reply or quiz before editing.');return;}
@@ -8117,13 +8128,6 @@ window.kxMessageEdit=(()=>{
      input.focus();input.setSelectionRange(text.length,text.length);
    };
  }
- messages.addEventListener('click',e=>{
-   if(e.target.closest('button,a,pre,code')||window.getSelection()?.toString())return;
-   const row=e.target.closest('.kx-editable-message');
-   messages.querySelectorAll('.kx-edit-selected').forEach(n=>{if(n!==row)n.classList.remove('kx-edit-selected');});
-   row?.classList.toggle('kx-edit-selected');
- });
- document.addEventListener('click',e=>{if(!e.target.closest('.kx-editable-message'))messages.querySelectorAll('.kx-edit-selected').forEach(n=>n.classList.remove('kx-edit-selected'));});
  return {attach,reset};
 })();</script>
 <script id="study-history-script">
@@ -8226,7 +8230,7 @@ window.studyChats = (() => {
       }
       row.append(content);wrap().append(row);
       if(m.role==='user' && m.editable===true) window.kxMessageEdit?.attach(row,m.text);
-      if(m.role==='ai' && m.state!=='pending' && m.state!=='failed') window.attachAnswerCopy?.(content,m.text);
+      if(m.role==='user' || (m.role==='ai' && m.state!=='pending' && m.state!=='failed')) window.attachAnswerCopy?.(content,m.text);
     }
     if(current.messages.some(m=>m.format==='quiz')) {
       const note=document.createElement('p');note.className='study-history-note';
