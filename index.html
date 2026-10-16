@@ -6295,7 +6295,7 @@
         button.disabled = pending;
         button.setAttribute('aria-busy', String(pending));
       }
-      document.querySelectorAll('.tutor-retry-button').forEach(button => {
+      document.querySelectorAll('.tutor-retry-button, .kx-regenerate').forEach(button => {
         button.disabled = pending;
       });
     }
@@ -6386,12 +6386,19 @@
       wrap.insertAdjacentHTML('beforeend', `<div class="message ai" id="${loadingId}"><span class="msg-avatar">✦</span><div class="ai-thinking"><div class="ai-dots-container"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div></div>`);
       chatScroll.pin();
 
-      async function requestReply() {
+      let savedReplyId = null;
+      let completedReply = false;
+      async function requestReply(regenerate = false) {
         if (tutorRequestPending || quizRequestPending || activeQuizReview) return;
         if (window.studyChats && !window.studyChats.matches(historyToken)) return;
-        setTutorRequestPending(true);
         const row = document.getElementById(loadingId);
-        row.innerHTML = '<span class="msg-avatar">✦</span><div class="ai-thinking" role="status" aria-label="Preparing AI reply"><div class="ai-dots-container" aria-hidden="true"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>';
+        if(!row || (regenerate && (!completedReply || row !== wrap.lastElementChild))) {
+          if(regenerate) showToast('Regenerate the latest answer before sending another message.');
+          return;
+        }
+        setTutorRequestPending(true);
+        row.setAttribute('aria-busy','true');
+        if(!completedReply) row.innerHTML = '<span class="msg-avatar">✦</span><div class="ai-thinking" role="status" aria-label="Preparing AI reply"><div class="ai-dots-container" aria-hidden="true"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>';
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 90000);
       try {
@@ -6414,11 +6421,17 @@
         }
 
         if (typeof chatMemory !== 'undefined') {
-          chatMemory.push({ role: "user", content: userContent });
-          chatMemory.push({ role: "model", content: { text: aiResponse } });
+          if(completedReply) chatMemory[chatMemory.length - 1] = { role: "model", content: { text: aiResponse } };
+          else {
+            chatMemory.push({ role: "user", content: userContent });
+            chatMemory.push({ role: "model", content: { text: aiResponse } });
+          }
           if (chatMemory.length > 12) chatMemory = chatMemory.slice(chatMemory.length - 12);
         }
-        window.studyChats?.complete(historyToken, historyMessageId, data.reply.replace(/\[SCORE:\s*\d+\/\d+\]/i, '').trim());
+        const cleanReply = data.reply.replace(/\[SCORE:\s*\d+\/\d+\]/i, '').trim();
+        if(completedReply) window.studyChats?.replaceReply(historyToken, savedReplyId, cleanReply);
+        else savedReplyId = window.studyChats?.complete(historyToken, historyMessageId, cleanReply);
+        completedReply = true;
         // 🔥 1. CLEAN SCORE TAG & BOLD TEXT 🔥
         aiResponse = aiResponse.replace(/\[SCORE:\s*\d+\/\d+\]/i, '').trim();
 
@@ -6435,9 +6448,14 @@
 `;
         // 🔥 START THE MAGIC STREAM 🔥
         typeHTML(document.getElementById(`stream-box-${loadingId}`), aiResponse, 12);
-        window.attachAnswerCopy?.(document.getElementById(`stream-box-${loadingId}`), data.reply.replace(/\[SCORE:\s*\d+\/\d+\]/i, '').trim());
+        window.attachAnswerCopy?.(document.getElementById(`stream-box-${loadingId}`), cleanReply);
+        window.attachRegenerate?.(row, () => requestReply(true));
       } catch (error) {
         if (window.studyChats && !window.studyChats.matches(historyToken)) return;
+        if(completedReply) {
+          showToast('Could not regenerate. Your previous answer is still here; try again.');
+          return;
+        }
         window.studyChats?.failed(historyToken, historyMessageId);
         row.replaceChildren();
         const avatar = document.createElement('span');
@@ -6454,11 +6472,12 @@
         retry.type = 'button';
         retry.className = 'tutor-retry-button';
         retry.textContent = 'Retry';
-        retry.onclick = requestReply;
+        retry.onclick = () => requestReply();
         panel.append(message, retry);
         row.append(avatar, panel);
       } finally {
         clearTimeout(timeout);
+        row.removeAttribute('aria-busy');
         setTutorRequestPending(false);
       }
       chatScroll.pin();
@@ -8333,7 +8352,13 @@ window.studyChats = (() => {
     complete(t,messageId,text){
       if(!matches(t))return;
       const message=current.messages.find(m=>m.id===messageId);if(message)message.state='complete';
-      add('ai',text,'markdown');memory();persist();
+      const replyId=add('ai',text,'markdown');memory();persist();return replyId;
+    },
+    replaceReply(t,replyId,text){
+      if(!matches(t))return;
+      const last=current.messages[current.messages.length-1];
+      if(!last || last.id!==replyId || last.role!=='ai')return;
+      last.text=text;memory();persist();
     },
     failed(t,messageId){if(!matches(t))return;const m=current.messages.find(m=>m.id===messageId);if(m)m.state='failed';persist();},
     quiz(role,html){
@@ -8463,6 +8488,25 @@ window.studyChats = (() => {
   fitInput();
 })();
 
+</script>
+<style id="kx-regenerate-style">
+#messages .kx-message-actions button:disabled { cursor:wait;opacity:.4; }
+#messages .message[aria-busy=true] .kx-regenerate svg { animation:kx-regenerating 1.2s linear infinite; }
+#messages .message[aria-busy=true]>.kx-message-actions { opacity:1;pointer-events:auto; }
+@keyframes kx-regenerating { to { transform:rotate(360deg); } }
+@media(prefers-reduced-motion:reduce){ #messages .message[aria-busy=true] .kx-regenerate svg { animation:none; } }
+</style>
+<script id="kx-regenerate-script">
+window.attachRegenerate=(row,run)=>{
+ document.querySelectorAll('#messages .kx-regenerate').forEach(button=>button.remove());
+ const button=document.createElement('button');
+ button.type='button';button.className='kx-regenerate';
+ button.title='Regenerate answer';button.setAttribute('aria-label','Regenerate answer');
+ button.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M6 7a7 7 0 0 1 12-1l2 3M4 15l2 3a7 7 0 0 0 12-1"/></svg>';
+ button.disabled=tutorRequestPending;
+ button.onclick=event=>{event.stopPropagation();run();};
+ window.kxMessageActions(row).append(button);
+};
 </script>
 </body>
 
