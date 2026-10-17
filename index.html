@@ -5337,7 +5337,7 @@
   </div>
 </div>`;
 
-      setTimeout(() => { $("planResult").scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+      setTimeout(() => { if (!window.studyNavigation?.isMobile() || window.studyNavigation.current() === 'planner') $("planResult").scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
 
       try {
         // 🔥 CALL THE NEW RENDER API SERVER (WITH IMAGE SUPPORT) 🔥
@@ -5468,7 +5468,7 @@
 
       setTimeout(() => {
         const doubtSection = document.getElementById('doubt');
-        if (doubtSection) doubtSection.scrollIntoView({ behavior: 'smooth' });
+        if (doubtSection) window.openStudySection('doubt');
       }, 500);
 
       setTimeout(() => {
@@ -5780,7 +5780,7 @@
         showToast(`🤖 Initializing AI Practice for ${cls} ${sub} ${exam}...`);
         setTimeout(() => {
           const doubtSection = document.getElementById('doubt');
-          if (doubtSection) doubtSection.scrollIntoView({ behavior: 'smooth' });
+          if (doubtSection) window.openStudySection('doubt');
         }, 600);
 
         setTimeout(() => {
@@ -6157,7 +6157,7 @@
       startButton.textContent = 'Preparing your quiz…';
       setQuizSetupStatus('Preparing questions in AI Tutor…', 'loading');
       selectedSubjectForQuiz = sub;
-      document.getElementById('doubt')?.scrollIntoView({ behavior: 'smooth' });
+      window.openStudySection('doubt');
       quizChatMessage('user', escapeHtml(`Start a ${count}-question quiz on ${topic} · ${sub}`));
       const loading = quizChatMessage('ai', 'Preparing your questions…');
       try {
@@ -6993,7 +6993,7 @@
 
       const observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
+          if (entry.isIntersecting && !window.studyNavigation?.isMobile()) {
             // Saare links se dot hatao
             navLinks.forEach((link) => link.classList.remove("active-link"));
 
@@ -7080,7 +7080,7 @@
       });
       if (clickedItem) {
         clickedItem.classList.add('active');
-        clickedItem.setAttribute('aria-current', 'location');
+        clickedItem.setAttribute('aria-current', document.body.classList.contains('study-screens') ? 'page' : 'location');
         triggerPop(clickedItem.getAttribute('href'));
       }
     }
@@ -7568,7 +7568,10 @@
       window.addEventListener('load', () => { hook(); setTimeout(() => render(true), 300); });
     })();
   </script>
-  <!-- EDUNEXUS MOBILE HOME — paste this entire block ONCE, immediately before </body>. -->
+  <!-- EDUNEXUS MOBILE HOME — paste this entire block ONCE, immediately before 
+
+
+</body>. -->
 <style id="enh-mobile-home-style">
   /* All additions are hidden on desktop. Original theme variables are reused. */
   .enh-lead, .enh-toolkit { display: none; }
@@ -7893,80 +7896,145 @@
 }
 </style>
 <script id="edunexus-mobile-navigation">
+
 (() => {
   const mobile = matchMedia('(max-width: 850px)');
   const bar = document.querySelector('.mobile-nav-bar');
-  if (!bar) return;
+  const main = document.querySelector('#main-content > main');
+  if (!bar || !main) return;
+  const ids = ['dashboard','quiz-engine','pyq-vault-section','planner','doubt','progress'];
   const links = Array.from(bar.querySelectorAll('a[href^="#"]'));
-  const ids = ['dashboard', 'quiz-engine', 'pyq-vault-section', 'planner', 'doubt', 'progress'];
-  let frame = 0;
+  const dashboard = document.getElementById('dashboard');
+  const pitch = main.querySelector('.pitch');
+  const groups = [
+    [dashboard, ['dashboard','quiz-engine','pyq-vault-section']],
+    [dashboard.querySelector('.hero-copy'), ['dashboard']],
+    [dashboard.querySelector('.hero-right-panels'), ['quiz-engine','pyq-vault-section']],
+    [document.getElementById('quiz-engine'), ['quiz-engine']],
+    [document.getElementById('pyq-vault-section'), ['pyq-vault-section']],
+    ...['planner','doubt','progress'].map(id=>[document.getElementById(id),[id]]),
+    [pitch, ['dashboard']],
+    [document.querySelector('#main-content > footer'), []],
+    ...Array.from(dashboard.querySelectorAll('.hero-feature-text')).map(el=>[el,[]])
+  ].filter(([el])=>el);
+  const originalInert = new Map(groups.map(([el])=>[el,el.hasAttribute('inert')]));
+  const positions = new Map();
+  const previousRestoration = history.scrollRestoration;
+  let active = null;
+  let enabled = false;
   let headerHeight = 76;
 
   function setActive(id) {
-    const hash = '#' + (id === 'quiz-engine' ? 'dashboard' : id);
-    links.forEach(link => {
-      const active = link.getAttribute('href') === hash;
-      link.classList.toggle('active', active);
-      if (active) link.setAttribute('aria-current', 'location');
+    const hash = '#' + (id==='quiz-engine' ? 'dashboard' : id);
+    links.forEach(link=>{
+      const selected=link.getAttribute('href')===hash;
+      link.classList.toggle('active',selected);
+      if(selected)link.setAttribute('aria-current','page');
       else link.removeAttribute('aria-current');
     });
+    document.querySelectorAll('nav a[href^="#"]').forEach(link=>{
+      link.classList.toggle('active-link',link.getAttribute('href')==='#'+id);
+    });
   }
-
-  function syncActive() {
-    frame = 0;
-    if (!mobile.matches) return;
-    const sections = ids.map(id => document.getElementById(id))
-      .filter(el => el && el.getClientRects().length);
-    // Use document order: Quiz belongs to Home, even when the viewport is tall.
-    sections.sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top);
-    let current = sections[0];
-    for (const section of sections) {
-      if (section.getBoundingClientRect().top <= headerHeight + 48) current = section;
+  function scrollPage(top) {
+    // Reset the smooth-scroll target too, so old page momentum cannot leak into a new screen.
+    if(typeof lenis!=='undefined') {
+      lenis.resize?.();
+      lenis.scrollTo(top,{immediate:true,force:true});
+    } else window.scrollTo({top,behavior:'instant'});
+  }
+  function navigate(id,{historyMode='push',restore=false,focus=false}={}) {
+    if(!ids.includes(id))return false;
+    if(!mobile.matches) {
+      document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'});
+      return true;
     }
-    if (current) setActive(current.id);
+    if(active)positions.set(active,window.scrollY);
+    active=id;
+    document.body.classList.add('study-screens');
+    document.body.dataset.studyScreen=id;
+    groups.forEach(([el,screens])=>{
+      const visible=screens.includes(id);
+      el.toggleAttribute('data-study-hidden',!visible);
+      el.toggleAttribute('inert',!visible || originalInert.get(el));
+      if(visible) {
+        if(el.classList.contains('reveal'))el.classList.add('active');
+        el.querySelectorAll('.reveal').forEach(child=>child.classList.add('active'));
+      }
+    });
+    const focused=document.activeElement;
+    if(focused?.closest('[data-study-hidden]'))focused.blur();
+    syncFocus();
+    setActive(id);
+    if(historyMode==='push' && location.hash!=='#'+id)
+      history.pushState(history.state,'','#'+id);
+    scrollPage(restore ? positions.get(id)||0 : 0);
+    if(focus) {
+      const target=document.getElementById(id);
+      target.setAttribute('tabindex','-1');
+      target.focus({preventScroll:true});
+    }
+    return true;
   }
-
-  function scheduleActive() {
-    if (!frame) frame = requestAnimationFrame(syncActive);
-  }
-
   function syncViewport() {
-    if (!mobile.matches) {
+    if(!mobile.matches) {
       document.body.classList.remove('typing-mode');
       document.body.style.removeProperty('--study-viewport-height');
       return;
     }
-    headerHeight = document.querySelector('.topbar-wrapper')?.getBoundingClientRect().height || 76;
-    document.body.style.setProperty('--study-header-height', headerHeight + 'px');
-    const height = window.visualViewport?.height || window.innerHeight;
-    document.body.style.setProperty('--study-viewport-height', height + 'px');
-    scheduleActive();
+    headerHeight=document.querySelector('.topbar-wrapper')?.getBoundingClientRect().height||76;
+    document.body.style.setProperty('--study-header-height',headerHeight+'px');
+    document.body.style.setProperty('--study-viewport-height',(window.visualViewport?.height||window.innerHeight)+'px');
   }
-
   function syncFocus() {
-    const el = document.activeElement;
-    const editable = el && (el.isContentEditable ||
+    const el=document.activeElement;
+    const editable=el && (el.isContentEditable ||
       el.matches('textarea, input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]):not([type="hidden"])'));
-    document.body.classList.toggle('typing-mode', mobile.matches && !!editable);
+    document.body.classList.toggle('typing-mode',mobile.matches && !!editable);
     syncViewport();
   }
-
-  function syncHash() {
-    const id = location.hash.slice(1);
-    if (mobile.matches && ids.includes(id)) setActive(id);
-    scheduleActive();
+  function fromLocation(restore=false) {
+    const id=location.hash.slice(1);
+    navigate(ids.includes(id)?id:'dashboard',{historyMode:'none',restore});
   }
-
-  document.addEventListener('focusin', syncFocus);
-  document.addEventListener('focusout', () => queueMicrotask(syncFocus));
-  window.addEventListener('scroll', scheduleActive, { passive: true });
-  window.addEventListener('resize', syncViewport, { passive: true });
-  window.visualViewport?.addEventListener('resize', syncViewport, { passive: true });
-  window.addEventListener('hashchange', syncHash);
-  window.addEventListener('pageshow', () => { syncFocus(); syncHash(); });
-  mobile.addEventListener('change', syncFocus);
-  syncFocus();
-  syncHash();
+  function syncMode() {
+    if(mobile.matches) {
+      if(!enabled) {
+        enabled=true;
+        if('scrollRestoration' in history)history.scrollRestoration='manual';
+        fromLocation();
+      }
+    } else if(enabled) {
+      enabled=false;
+      document.body.classList.remove('study-screens');
+      delete document.body.dataset.studyScreen;
+      groups.forEach(([el])=>{el.removeAttribute('data-study-hidden');el.toggleAttribute('inert',originalInert.get(el));});
+      if('scrollRestoration' in history)history.scrollRestoration=previousRestoration;
+      if(typeof lenis!=='undefined')lenis.resize?.();
+    }
+    syncFocus();
+  }
+  // Capture before existing pop/menu listeners; their animations still run.
+  document.addEventListener('click',event=>{
+    if(!mobile.matches || event.defaultPrevented || event.button>0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey)return;
+    const link=event.target.closest?.('a[href^="#"]');
+    if(!link || link.hasAttribute('download') || (link.target && link.target!=='_self'))return;
+    const id=link.classList.contains('brand')?'dashboard':link.getAttribute('href').slice(1);
+    if(!ids.includes(id))return;
+    event.preventDefault();
+    navigate(id,{focus:event.detail===0});
+  },true);
+  document.addEventListener('focusin',syncFocus);
+  document.addEventListener('focusout',()=>queueMicrotask(syncFocus));
+  window.addEventListener('resize',syncViewport,{passive:true});
+  window.visualViewport?.addEventListener('resize',syncViewport,{passive:true});
+  window.addEventListener('popstate',()=>{if(mobile.matches)fromLocation(true);});
+  window.addEventListener('hashchange',()=>{if(mobile.matches && location.hash!=='#'+active)fromLocation(true);});
+  window.addEventListener('pageshow',()=>{syncMode();if(mobile.matches)fromLocation(true);});
+  mobile.addEventListener('change',syncMode);
+  window.studyNavigation={open:navigate,current:()=>active,isMobile:()=>mobile.matches};
+  window.openStudySection=id=>navigate(id);
+  syncMode();
 })();
 </script>
 
@@ -8632,6 +8700,31 @@ document.querySelector('.chat-input button[type="submit"]')?.addEventListener('c
   cancelTutorReply();
 },true);
 </script>
+<style id="study-screen-layout">
+@media(max-width:850px) {
+  body.study-screens [data-study-hidden] { display:none !important; }
+  body.study-screens #main-content > main {
+    box-sizing:border-box;min-height:var(--study-viewport-height,100dvh);
+    padding-top:var(--study-header-height,76px);
+    padding-bottom:var(--study-nav-clearance,100px) !important;
+  }
+  body.study-screens #planner, body.study-screens #progress { padding-top:24px; }
+  body.study-screens #dashboard { grid-template-columns:minmax(0,1fr); }
+  body.study-screens:not([data-study-screen="dashboard"]) #dashboard { display:block; }
+  body.study-screens #dashboard .hero-right-panels { margin:0;gap:0; }
+  body.study-screens .pitch { padding-top:24px; }
+  body.study-screens[data-study-screen="doubt"] { overflow-y:hidden; }
+  body.study-screens[data-study-screen="doubt"] #main-content > main {
+    height:var(--study-viewport-height,100dvh);min-height:0;overflow:hidden;
+  }
+  body.study-screens[data-study-screen="doubt"] #doubt {
+    box-sizing:border-box;height:100%;min-height:0;padding:8px 10px 12px !important;
+  }
+  body.study-screens[data-study-screen="doubt"] #doubt .tutor { height:100% !important;min-height:0 !important; }
+  body.study-screens #doubt #messages { overscroll-behavior-y:contain !important; }
+  .mobile-nav-ai[aria-current="page"] { box-shadow:0 0 0 2px #5ee7c5,0 0 18px #5ee7c540; }
+}
+</style>
 </body>
 
 </html>
