@@ -7202,6 +7202,12 @@
       const pause = () => { mode = 'free'; anchor = null; };
       const state = {
         follow() { mode = 'tail'; anchor = null; state.pin(); },
+        seek(message) {
+          pause();
+          wrap.scrollTop = Math.max(0, message.offsetTop - 12);
+          lastTop = wrap.scrollTop;
+          refresh();
+        },
         beginAnswer(element) {
           const message = element.closest('.message') || element;
           if (mode === 'tail' && message === wrap.lastElementChild) {
@@ -8030,7 +8036,8 @@
  <header><div><p class="study-history-eyebrow">YOUR WORKSPACE</p><h2 id="study-history-title">Saved chats</h2></div><button type="button" id="study-history-close" aria-label="Close saved chats">×</button></header>
  <p class="study-history-subtitle">For this account, on this device. Files are not retained. Clearing browser data removes these chats.</p>
  <label class="study-history-search-label" for="study-history-search">Find a conversation</label>
- <input id="study-history-search" type="search" placeholder="Search chat titles…" autocomplete="off">
+ <input id="study-history-search" type="search" placeholder="Search titles, questions or answers…" autocomplete="off" maxlength="160" aria-describedby="study-history-results">
+ <p id="study-history-results" class="study-history-results" role="status" aria-live="polite"></p>
  <div id="study-history-list" data-lenis-prevent></div>
 </dialog>
 <style id="study-history-style">
@@ -8054,6 +8061,13 @@
 .study-history-open span { display:block;margin-top:5px;color:#8f9db5;font-size:11px; }
 #study-history-dialog .study-history-open[aria-current] { background:#8b7cff12; }
 #study-history-dialog .study-history-delete { color:#ffb8bc;border-color:#ffb8bc25;background:transparent; }
+#study-history-dialog mark { color:#93f5db;background:#5ee7c51a;border-radius:3px; }
+#study-history-dialog .study-history-preview { color:#b8c2d3;font-size:12px;line-height:1.55;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden; }
+#study-history-dialog .study-history-preview span { display:inline;margin:0;font:inherit;color:inherit; }
+#study-history-dialog .study-history-role { color:#b6aaff; }
+.study-history-results { margin:-6px 0 12px;color:#aab6cc;font-size:12px; }
+.study-history-results:empty { display:none; }
+#messages .study-search-hit > .answer-content { outline:1px solid #5ee7c566;outline-offset:3px; }
 .study-history-row > span { font-size:12px;flex:1; }
 .study-history-note { display:block;font-size:11px;line-height:1.5;color:#c5bcff;margin:10px 0; }
 .study-chat-empty { padding:24px 12px;color:#aab6cc;text-align:center;font-size:13px; }
@@ -8275,7 +8289,7 @@ window.studyChats = (() => {
   function memory() {
     current.memory = chatMemory.slice(-12).map(m=>({role:m.role,content:{text:m.content.text}}));
   }
-  function render() {
+  function render(focusMessageId = null) {
     window.kxMessageEdit?.reset(true);
     window.speechSynthesis?.cancel();
     wrap().replaceChildren();
@@ -8290,6 +8304,8 @@ window.studyChats = (() => {
     }
     for (const m of current.messages) {
       const row=document.createElement('div'); row.className='message '+m.role;
+      if(m.id) row.dataset.savedMessageId=m.id;
+      if(focusMessageId && m.id===focusMessageId) row.classList.add('study-search-hit');
       const content=document.createElement('div'); content.className='answer-content';
       content.style.whiteSpace='pre-wrap';
       if (m.role==='ai') {
@@ -8317,7 +8333,9 @@ window.studyChats = (() => {
     clearAttachment();
     document.getElementById('question').value='';
     document.getElementById('question').dispatchEvent(new Event('input', {bubbles:true}));
-    getChatScroll(wrap()).follow();
+    const hit=Array.from(wrap().children).find(row=>focusMessageId && row.dataset.savedMessageId===focusMessageId);
+    if(hit) getChatScroll(wrap()).seek(hit);
+    else getChatScroll(wrap()).follow();
     announce(current.messages.length ? 'Saved on this device · files are not retained' : 'New chat · saved on this device');
   }
   function canLeave(allowUnsaved = false) {
@@ -8330,24 +8348,50 @@ window.studyChats = (() => {
     }
     return true;
   }
+  const searchText = text => text.replace(/\s+/g,' ').trim();
+  function appendMatch(target,text,query) {
+    const at=query ? text.toLowerCase().indexOf(query) : -1;
+    if(at<0){target.textContent=text;return;}
+    const mark=document.createElement('mark');
+    mark.textContent=text.slice(at,at+query.length);
+    target.append(document.createTextNode(text.slice(0,at)),mark,document.createTextNode(text.slice(at+query.length)));
+  }
+  function searchHit(chat,query) {
+    if(!query)return {chat,message:null};
+    const message=chat.messages.find(m=>searchText(m.text).toLowerCase().includes(query));
+    return message || searchText(chat.title).toLowerCase().includes(query) ? {chat,message} : null;
+  }
   function drawList() {
     list.replaceChildren();
-    const query=search.value.trim().toLowerCase();
-    const chats=records().filter(c=>c.title.toLowerCase().includes(query));
+    const query=searchText(search.value).toLowerCase();
+    const chats=records().map(chat=>searchHit(chat,query)).filter(Boolean);
+    const results=document.getElementById('study-history-results');
+    if(results)results.textContent=query ? chats.length+' matching '+(chats.length===1?'chat':'chats') : '';
     if(!chats.length) {
       const empty=document.createElement('p');empty.className='study-history-empty';
-      empty.textContent=query?'No matching chats.':'Your conversations will appear here after your first message.';
+      empty.textContent=query?'No matching chats. Try a word from your question or answer.':'Your conversations will appear here after your first message.';
       list.append(empty);return;
     }
-    for(const chat of chats) {
+    for(const {chat,message} of chats) {
       const row=document.createElement('div');row.className='study-history-row';
       const open=document.createElement('button');open.type='button';open.className='study-history-open';
       if(chat.id===current?.id)open.setAttribute('aria-current','true');
-      const title=document.createElement('strong');title.textContent=chat.title;
+      const title=document.createElement('strong');appendMatch(title,searchText(chat.title),query);
       const detail=document.createElement('span');
       detail.textContent=new Date(chat.updated).toLocaleDateString(undefined,{month:'short',day:'numeric'})+' · '+chat.messages.length+' messages';
       open.append(title,detail);
-      open.onclick=()=>{if(!canLeave())return;epoch++;current=chat;rememberActive();render();dialog.close();};
+      if(message) {
+        const text=searchText(message.text),at=text.toLowerCase().indexOf(query);
+        const start=Math.max(0,at-45),end=Math.min(text.length,Math.max(start+155,at+query.length+30));
+        const preview=document.createElement('span');preview.className='study-history-preview';
+        const label=document.createElement('span');label.className='study-history-role';
+        label.textContent=message.role==='user'?'You: ':'KX: ';
+        preview.append(label);
+        const excerpt=document.createElement('span');
+        appendMatch(excerpt,(start?'…':'')+text.slice(start,end)+(end<text.length?'…':''),query);
+        preview.append(excerpt);open.append(preview);
+      }
+      open.onclick=()=>{if(!canLeave())return;epoch++;current=chat;rememberActive();render(message?.id);dialog.close();};
       const remove=document.createElement('button');remove.type='button';remove.className='study-history-delete';
       remove.textContent='Delete';remove.setAttribute('aria-label','Delete '+chat.title);
       remove.onclick=()=>{
