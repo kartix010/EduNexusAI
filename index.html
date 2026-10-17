@@ -7915,7 +7915,7 @@
     ...['planner','doubt','progress'].map(id=>[document.getElementById(id),[id]]),
     [pitch, ['dashboard']],
     [document.querySelector('#main-content > footer'), []],
-    ...Array.from(dashboard.querySelectorAll('.hero-feature-text')).map(el=>[el,[]])
+    ...Array.from(dashboard.querySelectorAll('.hero-feature-text')).map(el=>[el,el.classList.contains('mobile-only')?['pyq-vault-section']:[]])
   ].filter(([el])=>el);
   const originalInert = new Map(groups.map(([el])=>[el,el.hasAttribute('inert')]));
   const positions = new Map();
@@ -8720,7 +8720,13 @@ document.querySelector('.chat-input button[type="submit"]')?.addEventListener('c
   body.study-screens[data-study-screen="doubt"] #doubt {
     box-sizing:border-box;height:100%;min-height:0;padding:8px 10px 12px !important;
   }
+  body.study-screens[data-study-screen="pyq-vault-section"] .hero-feature-text.mobile-only {
+    margin:0 0 24px !important;padding:0 !important;
+  }
+  body.study-screens[data-study-screen="doubt"] #doubt > .section-heading { display:none !important; }
   body.study-screens[data-study-screen="doubt"] #doubt .tutor { height:100% !important;min-height:0 !important; }
+  body.study-screens[data-study-screen="doubt"] #doubt .chat { min-height:0 !important; }
+  body.study-screens[data-study-screen="doubt"] #doubt .chat-input { flex:0 0 auto; }
   body.study-screens #doubt #messages { overscroll-behavior-y:contain !important; }
   .mobile-nav-ai[aria-current="page"] { box-shadow:0 0 0 2px #5ee7c5,0 0 18px #5ee7c540; }
 }
