@@ -7969,6 +7969,7 @@
     if(historyMode==='push' && location.hash!=='#'+id)
       history.pushState(history.state,'','#'+id);
     scrollPage(restore ? positions.get(id)||0 : 0);
+    window.dispatchEvent(new Event('study:screenchange'));
     if(focus) {
       const target=document.getElementById(id);
       target.setAttribute('tabindex','-1');
@@ -8724,6 +8725,80 @@ document.querySelector('.chat-input button[type="submit"]')?.addEventListener('c
   .mobile-nav-ai[aria-current="page"] { box-shadow:0 0 0 2px #5ee7c5,0 0 18px #5ee7c540; }
 }
 </style>
+
+<style id="study-scroll-chrome-style">
+@media(max-width:850px) {
+  body.study-screens .topbar-wrapper,
+  body.study-screens .mobile-nav-bar {
+    translate:0 0;
+    transition:translate 280ms cubic-bezier(.22,1,.36,1),opacity 180ms ease;
+  }
+  body.study-screens.study-chrome-hidden .topbar-wrapper {
+    translate:0 calc(-100% - 8px);opacity:0;pointer-events:none;
+  }
+  body.study-screens.study-chrome-hidden .mobile-nav-bar {
+    translate:0 calc(100% + 40px + env(safe-area-inset-bottom,0px));opacity:0;pointer-events:none;
+  }
+}
+@media(prefers-reduced-motion:reduce) {
+  body.study-screens .topbar-wrapper,body.study-screens .mobile-nav-bar { transition:none; }
+}
+</style>
+<script id="study-scroll-chrome-script">
+(() => {
+  const body=document.body,header=document.querySelector('.topbar-wrapper'),nav=document.querySelector('.mobile-nav-bar');
+  if(!header||!nav)return;
+  const mobile=matchMedia('(max-width:850px)');
+  let previous=window.scrollY,distance=0,direction=0,frame=0,holdUntil=0;
+  const overlays=Array.from(document.querySelectorAll('#mobile-menu-overlay,.modal-overlay,#zen-mode-overlay,dialog'));
+  function locked() {
+    return !mobile.matches||!body.classList.contains('study-screens')||
+      body.classList.contains('typing-mode')||
+      document.getElementById('main-content')?.classList.contains('blurred')||
+      overlays.some(el=>el.classList.contains('active')||el.classList.contains('show')||el.hasAttribute('open'))||
+      !!document.activeElement?.closest('.topbar-wrapper,.mobile-nav-bar');
+  }
+  function show() { body.classList.remove('study-chrome-hidden'); }
+  function reset() {
+    show();previous=window.scrollY;distance=0;direction=0;holdUntil=performance.now()+300;
+  }
+  function update() {
+    frame=0;
+    const maximum=Math.max(0,document.documentElement.scrollHeight-window.innerHeight);
+    const y=Math.max(0,Math.min(maximum,window.scrollY));
+    const delta=y-previous;previous=y;
+    if(locked()||performance.now()<holdUntil||y<=16||maximum-y<=12) {
+      show();distance=0;direction=0;return;
+    }
+    if(Math.abs(delta)<1)return;
+    const next=delta>0?1:-1;
+    if(next!==direction){direction=next;distance=0;}
+    distance+=Math.abs(delta);
+    if(next>0&&distance>=40)body.classList.add('study-chrome-hidden');
+    else if(next<0&&distance>=12)show();
+  }
+  // Only document scrolling controls chrome; nested chat/history scrolling does not.
+  window.addEventListener('scroll',event=>{
+    if(event.target!==document&&event.target!==window)return;
+    if(!frame)frame=requestAnimationFrame(update);
+  },{passive:true});
+  window.addEventListener('study:screenchange',reset);
+  window.addEventListener('resize',reset,{passive:true});
+  window.addEventListener('pageshow',reset);
+  window.visualViewport?.addEventListener('resize',reset,{passive:true});
+  document.addEventListener('focusin',reset);
+  document.addEventListener('focusout',()=>queueMicrotask(reset));
+  // Touch/mouse navigation should not leave a hidden focus lock; keyboard focus stays visible.
+  document.addEventListener('pointerdown',event=>{
+    const focused=document.activeElement;
+    if(focused?.closest('.topbar-wrapper,.mobile-nav-bar')&&!event.target.closest('.topbar-wrapper,.mobile-nav-bar'))focused.blur();
+  },{passive:true});
+  const observer=new MutationObserver(reset);
+  overlays.forEach(el=>observer.observe(el,{attributes:true,attributeFilter:['class','open']}));
+  mobile.addEventListener('change',reset);
+  reset();
+})();
+</script>
 </body>
 
 </html>
