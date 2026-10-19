@@ -7946,6 +7946,8 @@
   function navigate(id,{historyMode='push',restore=false,focus=false}={}) {
     if(!ids.includes(id))return false;
     if(!mobile.matches) {
+      window.dispatchEvent(new CustomEvent('study:screenchange',{detail:{id}}));
+      if(id==='doubt'&&window.studyDesktop?.active()){if(location.hash!=='#doubt')history.pushState(history.state,'','#doubt');return true;}
       document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'});
       return true;
     }
@@ -8103,46 +8105,47 @@
 </style>
 <dialog id="study-history-dialog" aria-labelledby="study-history-title">
  <header><div><p class="study-history-eyebrow">YOUR WORKSPACE</p><h2 id="study-history-title">Saved chats</h2></div><button type="button" id="study-history-close" aria-label="Close saved chats">×</button></header>
- <p class="study-history-subtitle">For this account, on this device. Files are not retained. Clearing browser data removes these chats.</p>
+ <p class="study-history-subtitle">Chats sync across devices for this account. Offline changes sync when you reconnect. Files are not retained.</p>
  <label class="study-history-search-label" for="study-history-search">Find a conversation</label>
  <input id="study-history-search" type="search" placeholder="Search titles, questions or answers…" autocomplete="off" maxlength="160" aria-describedby="study-history-results">
  <p id="study-history-results" class="study-history-results" role="status" aria-live="polite"></p>
  <div id="study-history-list" data-lenis-prevent></div>
+ <button type="button" id="study-history-more" hidden>Load older chats</button>
 </dialog>
 <style id="study-history-style">
 .study-chat-toolbar { display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 14px;border-bottom:1px solid #ffffff0d;flex-shrink:0;background:#0e1421; }
 .study-chat-toolbar > span { font-size:10px;line-height:1.4;color:#aab6cc;max-width:45%; }
 .study-chat-toolbar > div { display:flex;gap:6px;flex-shrink:0; }
-.study-chat-toolbar button, #study-history-dialog button { font:inherit;font-size:12px;cursor:pointer;color:#c5bcff;background:#8b7cff10;border:1px solid #8b7cff35;border-radius:10px;min-height:40px;padding:8px 12px; }
+.study-chat-toolbar button, :is(#study-history-dialog,#kx-history-sidebar) button { font:inherit;font-size:12px;cursor:pointer;color:#c5bcff;background:#8b7cff10;border:1px solid #8b7cff35;border-radius:10px;min-height:40px;padding:8px 12px; }
 #study-chat-new { color:#5ee7c5;border-color:#5ee7c540;background:#5ee7c50a; }
-#study-history-dialog { box-sizing:border-box;width:min(520px,calc(100% - 24px));max-height:80dvh;padding:22px;margin:auto;border:1px solid #8b7cff40;border-radius:22px;background:#0e1421;color:#e8ecf5;box-shadow:0 24px 80px #0009;overflow:auto; }
+:is(#study-history-dialog,#kx-history-sidebar) { box-sizing:border-box;width:min(520px,calc(100% - 24px));max-height:80dvh;padding:22px;margin:auto;border:1px solid #8b7cff40;border-radius:22px;background:#0e1421;color:#e8ecf5;box-shadow:0 24px 80px #0009;overflow:auto; }
 #study-history-dialog::backdrop { background:#03060cb8;backdrop-filter:blur(5px); }
-#study-history-dialog header { display:flex;justify-content:space-between;align-items:center;gap:12px; }
-#study-history-dialog h2 { margin:4px 0;font:600 24px 'Space Grotesk',sans-serif; }
+:is(#study-history-dialog,#kx-history-sidebar) header { display:flex;justify-content:space-between;align-items:center;gap:12px; }
+:is(#study-history-dialog,#kx-history-sidebar) h2 { margin:4px 0;font:600 24px 'Space Grotesk',sans-serif; }
 .study-history-eyebrow { margin:0;color:#5ee7c5;font-size:10px;letter-spacing:1.5px; }
 .study-history-subtitle,.study-history-empty { color:#aab6cc;font-size:12px;line-height:1.6; }
 .study-history-search-label { display:block;font-size:12px;margin-top:18px;color:#c5bcff; }
 #study-history-search { box-sizing:border-box;width:100%;min-height:44px;font-size:16px;margin:8px 0 16px; }
 #study-history-list { display:grid;gap:8px; }
 .study-history-row { display:flex;align-items:center;gap:8px;border:1px solid #ffffff0d;border-radius:12px;padding:6px; }
-#study-history-dialog .study-history-open { text-align:left;flex:1;min-width:0;border:0;background:transparent; }
+:is(#study-history-dialog,#kx-history-sidebar) .study-history-open { text-align:left;flex:1;min-width:0;border:0;background:transparent; }
 .study-history-open strong { display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;color:#e8ecf5; }
 .study-history-open span { display:block;margin-top:5px;color:#8f9db5;font-size:11px; }
-#study-history-dialog .study-history-open[aria-current] { background:#8b7cff12; }
-#study-history-dialog .study-history-delete { color:#ffb8bc;border-color:#ffb8bc25;background:transparent; }
-#study-history-dialog mark { color:#93f5db;background:#5ee7c51a;border-radius:3px; }
-#study-history-dialog .study-history-preview { color:#b8c2d3;font-size:12px;line-height:1.55;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden; }
-#study-history-dialog .study-history-preview span { display:inline;margin:0;font:inherit;color:inherit; }
-#study-history-dialog .study-history-role { color:#b6aaff; }
+:is(#study-history-dialog,#kx-history-sidebar) .study-history-open[aria-current] { background:#8b7cff12; }
+:is(#study-history-dialog,#kx-history-sidebar) .study-history-delete { color:#ffb8bc;border-color:#ffb8bc25;background:transparent; }
+:is(#study-history-dialog,#kx-history-sidebar) mark { color:#93f5db;background:#5ee7c51a;border-radius:3px; }
+:is(#study-history-dialog,#kx-history-sidebar) .study-history-preview { color:#b8c2d3;font-size:12px;line-height:1.55;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden; }
+:is(#study-history-dialog,#kx-history-sidebar) .study-history-preview span { display:inline;margin:0;font:inherit;color:inherit; }
+:is(#study-history-dialog,#kx-history-sidebar) .study-history-role { color:#b6aaff; }
 .study-history-results { margin:-6px 0 12px;color:#aab6cc;font-size:12px; }
 .study-history-results:empty { display:none; }
 #messages .study-search-hit > .answer-content { outline:1px solid #5ee7c566;outline-offset:3px; }
 .study-history-row > span { font-size:12px;flex:1; }
 .study-history-note { display:block;font-size:11px;line-height:1.5;color:#c5bcff;margin:10px 0; }
 .study-chat-empty { padding:24px 12px;color:#aab6cc;text-align:center;font-size:13px; }
-.study-chat-toolbar button:focus-visible,#study-history-dialog button:focus-visible { outline:2px solid #5ee7c5;outline-offset:2px; }
+.study-chat-toolbar button:focus-visible,:is(#study-history-dialog,#kx-history-sidebar) button:focus-visible { outline:2px solid #5ee7c5;outline-offset:2px; }
 #messages .answer-content { min-width:0;overflow-wrap:anywhere; }
-@media(max-width:380px) { .study-chat-toolbar { flex-wrap:wrap; } .study-chat-toolbar > span {max-width:100%;} #study-history-dialog {padding:16px;} }
+@media(max-width:380px) { .study-chat-toolbar { flex-wrap:wrap; } .study-chat-toolbar > span {max-width:100%;} :is(#study-history-dialog,#kx-history-sidebar) {padding:16px;} }
 </style>
 
 <template id="kx-welcome-template">
@@ -8286,6 +8289,133 @@ window.kxMessageEdit=(()=>{
  }
  return {attach,reset};
 })();</script>
+<script id="study-cloud-script">
+// Bounded Firestore transcripts; local storage remains the offline outbox.
+window.createStudyChatSync = function createStudyChatSync(hooks) {
+  const PAGE_SIZE=40,MAX_BYTES=650000;
+  let owner=null,generation=0,unsubscribe=null,timer=null,running=false,cursor=null,hasMore=false,cacheFailed=false;
+  const queue=new Map(),blocked=new Map();
+  const clone=value=>JSON.parse(JSON.stringify(value));
+  const collection=uid=>firebase.firestore().collection('chat_accounts').doc(uid).collection('conversations');
+  const live=(uid,gen)=>owner===uid&&generation===gen&&firebase.auth().currentUser?.uid===uid;
+  const notify=text=>hooks.status(text);
+  const cache=chat=>{try{hooks.write(chat);return true;}catch{cacheFailed=true;notify('Cloud chat could not be cached · browser storage is full');return false;}};
+  const settled=()=>notify(cacheFailed?'Some cloud chats could not be cached · browser storage is full':blocked.size?'Some chats are too large to sync · saved on this device':'Chats synced · files are not retained');
+  function stop(){generation++;owner=null;unsubscribe?.();unsubscribe=null;clearTimeout(timer);queue.clear();blocked.clear();cursor=null;hasMore=false;running=false;cacheFailed=false;}
+  function schedule(){clearTimeout(timer);timer=setTimeout(flush,700);}
+  function save(chat){
+    if(!owner||chat.owner!==owner||chat.cloudVersion===chat.version)return;
+    if(blocked.get(chat.id)===chat.version)return;
+    blocked.delete(chat.id);
+    queue.set(chat.id,clone(chat));notify(navigator.onLine?'Syncing chats…':'Offline · saved on this device');schedule();
+  }
+  function unpack(doc){
+    const data=doc.data();
+    if(data.schema!==1||data.owner!==owner||data.id!==doc.id||typeof data.version!=='string'||typeof data.title!=='string'||!Number.isSafeInteger(data.clientUpdated)||typeof data.deleted!=='boolean'||typeof data.payload!=='string')return null;
+    try{
+      const payload=JSON.parse(data.payload);
+      if(!Array.isArray(payload.messages)||!Array.isArray(payload.memory)||!payload.messages.every(m=>m&&['user','ai'].includes(m.role)&&typeof m.text==='string'))return null;
+      return {owner,id:doc.id,title:data.title,updated:data.clientUpdated,messages:payload.messages,memory:payload.memory,version:data.version,cloudVersion:data.version,deleted:data.deleted};
+    }catch{return null;}
+  }
+  function receive(doc){
+    const remote=unpack(doc);if(!remote)return;
+    const local=hooks.read(remote.id);
+    if(remote.deleted){queue.delete(remote.id);blocked.delete(remote.id);cache(remote);hooks.deleted(remote.id);hooks.changed();return;}
+    if(local?.deleted){save(local);return;}
+    if(local&&local.version!==local.cloudVersion&&local.version!==remote.version)return;
+    if(!cache(remote))return;
+    if(local?.version===remote.version)hooks.ack(remote.id,remote.id,remote.version);
+    else hooks.remote?.(remote);
+    hooks.changed();
+  }
+  function wire(chat,uid,id=chat.id){
+    const payload=JSON.stringify({messages:chat.deleted?[]:chat.messages,memory:chat.deleted?[]:chat.memory});
+    if(new TextEncoder().encode(payload).length>MAX_BYTES)throw new Error('chat-too-large');
+    return {schema:1,owner:uid,id,title:chat.deleted?'Deleted chat':chat.title.slice(0,100),version:chat.version,
+      clientUpdated:chat.updated,updatedAt:firebase.firestore.FieldValue.serverTimestamp(),deleted:!!chat.deleted,payload};
+  }
+  async function flush(){
+    const uid=owner,gen=generation;
+    if(!uid||running||!navigator.onLine)return;
+    running=true;
+    try{
+      while(queue.size&&live(uid,gen)){
+        const [chatId,chat]=queue.entries().next().value;
+        queue.delete(chatId);
+        const forkId=crypto.randomUUID();
+        try{
+          const outgoing=wire(chat,uid);
+          const result=await firebase.firestore().runTransaction(async tx=>{
+            if(!live(uid,gen))throw new Error('account-changed');
+            const ref=collection(uid).doc(chatId),snapshot=await tx.get(ref);
+            const remote=snapshot.exists?snapshot.data():null;
+            if(remote?.deleted&&!chat.deleted)return {deleted:true};
+            if(remote?.version===chat.version)return {id:chatId};
+            // Concurrent devices keep both branches; never overwrite an unseen reply.
+            if(remote&&!chat.deleted&&remote.version!==chat.cloudVersion){
+              const fork={...outgoing,id:forkId,title:(chat.title.slice(0,85)+' (continued)').slice(0,100)};
+              tx.set(collection(uid).doc(forkId),fork);return {id:forkId,remote:snapshot};
+            }
+            tx.set(ref,outgoing);return {id:chatId};
+          });
+          if(!live(uid,gen))return;
+          if(result.deleted){
+            queue.delete(chatId);cache({...chat,messages:[],memory:[],deleted:true,cloudVersion:chat.version});hooks.deleted(chatId);continue;
+          }
+          // Use the latest local copy if another message arrived during the transaction.
+          const latest=hooks.read(chatId)||chat;
+          const next={...latest,id:result.id,cloudVersion:chat.version};
+          if(result.id!==chatId){
+            next.title=(latest.title.slice(0,85)+' (continued)').slice(0,100);
+            if(!cache(next))return;
+            queue.delete(chatId);hooks.erase(chatId);
+          }
+          if(!cache(next))return;
+          hooks.ack(chatId,result.id,chat.version,next.title);
+          if(result.remote)receive(result.remote);
+          hooks.changed();
+          if(next.version!==chat.version)queue.set(next.id,next);
+        }catch(error){
+          if(!live(uid,gen))return;
+          if(error.message==='chat-too-large'){blocked.set(chatId,chat.version);notify('Chat is too large to sync · saved on this device');continue;}
+          if(!queue.has(chatId))queue.set(chatId,chat);
+          notify(error.message==='chat-too-large'?'Chat is too large to sync · saved on this device':
+            error.code==='permission-denied'?'Cloud sync unavailable · saved on this device':'Sync paused · saved on this device');
+          return;
+        }
+      }
+      if(live(uid,gen))settled();
+    }finally{if(live(uid,gen))running=false;}
+  }
+  function start(uid){
+    stop();if(!uid)return;
+    owner=uid;const gen=generation;
+    hooks.records(true).forEach(chat=>{if(!chat.version){chat.version=crypto.randomUUID();if(!cache(chat))return;}save(chat);});
+    const query=collection(uid).orderBy('updatedAt','desc').limit(PAGE_SIZE);
+    unsubscribe=query.onSnapshot(snapshot=>{
+      if(!live(uid,gen)||snapshot.metadata.hasPendingWrites)return;
+      snapshot.docs.forEach(receive);
+      if(!cursor){cursor=snapshot.docs.at(-1)||null;hasMore=snapshot.size===PAGE_SIZE;}
+      hooks.changed();
+      if(!queue.size&&!running){if(snapshot.metadata.fromCache)notify('Showing cached chats · connecting…');else settled();}
+    },()=>{if(live(uid,gen))notify('Cloud sync unavailable · saved on this device');});
+  }
+  async function more(){
+    if(!owner||!hasMore||!cursor)return;
+    const uid=owner,gen=generation;
+    try{
+      const snapshot=await collection(uid).orderBy('updatedAt','desc').startAfter(cursor).limit(PAGE_SIZE).get();
+      if(!live(uid,gen))return;
+      snapshot.docs.forEach(receive);cursor=snapshot.docs.at(-1)||cursor;hasMore=snapshot.size===PAGE_SIZE;hooks.changed();
+    }catch{if(live(uid,gen))notify('Could not load older chats. Try again when online.');}
+  }
+  window.addEventListener('online',()=>{if(owner){hooks.records(true).forEach(save);flush();}});
+  window.addEventListener('offline',()=>{if(owner)notify('Offline · saved on this device');});
+  return {start,stop,save,more,hasMore:()=>hasMore,retry:()=>{if(owner){hooks.records(true).forEach(save);flush();}}};
+};
+
+</script>
 <script id="study-history-script">
 // Account-scoped, on-device transcripts. Stored text is always escaped on render.
 window.studyChats = (() => {
@@ -8328,19 +8458,20 @@ window.studyChats = (() => {
       current.version=nextVersion;
       failedSave = false;
       announce('Saved on this device');
+      cloud.save(current);drawList();
     } catch {
       failedSave = true;
       announce('Not saved — browser storage is unavailable or full.');
     }
   }
-  function records() {
+  function records(includeDeleted = false) {
     if (!owned()) return [];
     const items = [];
     try {
       for (let i=0; i<localStorage.length; i++) {
         const k=localStorage.key(i);
         if (!k.startsWith(prefix())) continue;
-        try { const value=JSON.parse(localStorage.getItem(k)); if(valid(value)) items.push(value); } catch {}
+        try { const value=JSON.parse(localStorage.getItem(k)); if(valid(value) && (includeDeleted || !value.deleted)) items.push(value); } catch {}
       }
     } catch { announce('Saved chats are unavailable in this browser.'); }
     return items.sort((a,b)=>b.updated-a.updated);
@@ -8431,6 +8562,7 @@ window.studyChats = (() => {
     return message || searchText(chat.title).toLowerCase().includes(query) ? {chat,message} : null;
   }
   function drawList() {
+    const more=document.getElementById("study-history-more");if(more)more.hidden=!cloud.hasMore();
     list.replaceChildren();
     const query=searchText(search.value).toLowerCase();
     const chats=records().map(chat=>searchHit(chat,query)).filter(Boolean);
@@ -8460,18 +8592,18 @@ window.studyChats = (() => {
         appendMatch(excerpt,(start?'…':'')+text.slice(start,end)+(end<text.length?'…':''),query);
         preview.append(excerpt);open.append(preview);
       }
-      open.onclick=()=>{if(!canLeave())return;epoch++;current=chat;rememberActive();render(message?.id);dialog.close();};
+      open.onclick=()=>{if(!canLeave())return;epoch++;current=chat;rememberActive();render(message?.id);drawList();if(!window.studyDesktop?.active())dialog.close();};
       const remove=document.createElement('button');remove.type='button';remove.className='study-history-delete';
       remove.textContent='Delete';remove.setAttribute('aria-label','Delete '+chat.title);
       remove.onclick=()=>{
         if(!canLeave(true))return;
         row.replaceChildren();
-        const question=document.createElement('span');question.textContent='Delete this chat from this device?';
+        const question=document.createElement('span');question.textContent='Delete this chat on your synced devices?';
         const cancel=document.createElement('button');cancel.type='button';cancel.textContent='Keep';
         cancel.onclick=drawList;
         const confirm=document.createElement('button');confirm.type='button';confirm.className='study-history-delete';confirm.textContent='Delete';
         confirm.onclick=()=>{
-          try { localStorage.removeItem(key(chat.id)); }
+          try { const removed={...chat,deleted:true,messages:[],memory:[],updated:Date.now(),version:id()};localStorage.setItem(key(chat.id),JSON.stringify(removed));cloud.save(removed); }
           catch { announce('Could not delete this chat.');return; }
           if(current?.id===chat.id){epoch++;failedSave=false;fresh();chatMemory=[];render();}
           else if(failedSave) persist();
@@ -8484,16 +8616,17 @@ window.studyChats = (() => {
   }
   document.getElementById('study-history-open').onclick=()=>{
     if(!owned()){showToast('Sign in to view your saved chats.');return;}
-    search.value='';drawList();dialog.showModal();search.focus();
+    search.value='';drawList();cloud.retry();if(window.studyDesktop?.active())window.studyDesktop.open();else dialog.showModal();search.focus();
   };
-  document.getElementById('study-history-close').onclick=()=>dialog.close();
+  document.getElementById('study-history-close').onclick=()=>{if(window.studyDesktop?.active())window.studyDesktop.close();else dialog.close();};
   search.addEventListener('input',drawList);
+  document.getElementById('study-history-more').onclick=async event=>{event.target.disabled=true;await cloud.more();event.target.disabled=false;};
   document.getElementById('study-chat-new').onclick=()=>{
     if(!owned()||!canLeave())return;
-    epoch++;fresh();chatMemory=[];render();document.getElementById('question').focus();
+    epoch++;fresh();chatMemory=[];render();drawList();document.getElementById('question').focus();
   };
   window.addEventListener('storage',event=>{
-    if(!owned() || (event.key!==null && event.key!==key(current?.id)) || event.newValue!==null)return;
+    if(!owned() || (event.key!==null && event.key!==key(current?.id)) || event.newValue!==null && !(() => {try{return JSON.parse(event.newValue)?.deleted===true;}catch{return false;}})())return;
     // A deleted chat in another tab must not be silently resurrected by a late reply.
     if(activeQuizReview) {
       activeQuizReview.controls?.querySelectorAll('button').forEach(b=>{b.disabled=true;});
@@ -8506,19 +8639,44 @@ window.studyChats = (() => {
     if(next===owner)return;
     if(typeof cancelTutorReply==='function')cancelTutorReply(true);
     window.kxMessageEdit?.reset(true);
-    owner=next;epoch++;failedSave=false;chatMemory=[];
+    cloud.stop();owner=next;epoch++;failedSave=false;chatMemory=[];
     if(dialog.open)dialog.close();
-    if(!owner){current=null;wrap().replaceChildren();clearAttachment();announce('Sign in to save chats');return;}
+    if(!owner){current=null;list.replaceChildren();wrap().replaceChildren();clearAttachment();announce('Sign in to save chats');return;}
     let active;
     try { active=sessionStorage.getItem(prefix()+'active'); } catch {}
     const saved=records();
     current=saved.find(c=>c.id===active)||(!active?saved[0]:null);
     if(!current)fresh();else rememberActive();
-    render();
+    render();drawList();cloud.start(owner);
   }
+  const cloud=window.createStudyChatSync({
+    records,
+    read(chatId){try{return JSON.parse(localStorage.getItem(key(chatId))||'null');}catch{return null;}},
+    write(chat){if(chat.owner===owner)localStorage.setItem(key(chat.id),JSON.stringify(chat));},
+    erase(chatId){localStorage.removeItem(key(chatId));},
+    ack(oldId,newId,version,title){
+      if(current?.id!==oldId)return;
+      current.id=newId;current.cloudVersion=version;
+      if(title)current.title=title;
+      rememberActive();
+    },
+    changed:()=>drawList(),
+    remote(chat){
+      if(current?.id!==chat.id||tutorRequestPending||quizRequestPending||activeQuizReview||document.getElementById('question').value.trim()||currentAttachmentBase64)return;
+      if(current.version!==current.cloudVersion)return;
+      epoch++;current=chat;rememberActive();render();
+    },
+    status:announce,
+    deleted(chatId){
+      if(current?.id!==chatId)return;
+      if(typeof cancelTutorReply==='function')cancelTutorReply(true);
+      if(activeQuizReview){activeQuizReview.controls?.querySelectorAll('button').forEach(b=>b.disabled=true);activeQuizReview=null;}
+      epoch++;fresh();chatMemory=[];render();drawList();announce('Chat deleted on another device.');
+    }
+  });
   firebase.auth().onAuthStateChanged(account);
   return {
-    token,matches,
+    token,matches,refreshList:drawList,
     ready:owned,
     add,
     complete(t,messageId,text){
@@ -8664,7 +8822,7 @@ window.studyChats = (() => {
   });
   section.addEventListener('focusin',()=>section.classList.remove('kx-tips-dismissed'));
   // Keep failed persistence visible even though routine save messages are compact.
-  const syncStatus=()=>status.classList.toggle('is-warning',/not saved|unavailable|deleted/i.test(status.textContent));
+  const syncStatus=()=>status.classList.toggle('is-warning',/not saved|unavailable|deleted|paused|too large/i.test(status.textContent));
   new MutationObserver(syncStatus).observe(status,{childList:true,characterData:true,subtree:true});
   syncStatus();
   fitInput();
@@ -8799,7 +8957,100 @@ document.querySelector('.chat-input button[type="submit"]')?.addEventListener('c
   reset();
 })();
 </script>
+<style id="kx-desktop-style">
+#kx-history-sidebar { display:none; }
+@media(min-width:851px) {
+ body.kx-desktop-ai { overflow:hidden; }
+ body.kx-desktop-ai #doubt {
+   position:fixed;inset:76px 0 0;z-index:1000;max-width:none;width:100%;height:auto;
+   margin:0;padding:16px 24px 20px;box-sizing:border-box;opacity:1;transform:none !important;
+   background:#070a12;overflow:hidden;
+ }
+ body.kx-desktop-ai #doubt > .section-heading { display:none !important; }
+ body.kx-desktop-ai #doubt .tutor {
+   display:grid !important;grid-template-columns:260px minmax(0,1fr);height:100% !important;
+   min-height:0 !important;max-width:1600px;margin:0 auto;padding:0;border-radius:22px !important;
+   border:1px solid #8b7cff24;box-shadow:0 16px 64px #0004;overflow:hidden;transition:none;
+ }
+ body.kx-desktop-ai #doubt .chat { min-width:0;min-height:0;height:100%;background:#0b111d; }
+ body.kx-desktop-ai #doubt .kx-workspace-head { background:#0b111d;min-height:68px;padding:12px 24px; }
+ body.kx-desktop-ai #doubt .chat-message-window { min-height:0; }
+ body.kx-desktop-ai #doubt #messages { box-sizing:border-box;padding:28px max(24px,calc((100% - 820px)/2)) 52px !important;gap:24px; }
+ body.kx-desktop-ai #doubt #messages .message { width:100%;max-width:100%;flex-shrink:0;font-size:15px;line-height:1.75;color:#c5cfdf; }
+ body.kx-desktop-ai #doubt #messages .message.ai > .answer-content { background:transparent;border:0;box-shadow:none;padding:4px 0 12px;line-height:1.8; }
+ body.kx-desktop-ai #doubt #messages .message.user > .answer-content { width:fit-content;max-width:80%;padding:12px 18px;border-radius:20px 20px 6px 20px; }
+ body.kx-desktop-ai #doubt .chat-input { box-sizing:border-box;flex:0 0 auto;width:min(100%,868px);margin:0 auto;padding:14px 24px 18px !important;border-top:0;background:transparent; }
+ body.kx-desktop-ai #doubt #question { max-height:132px; }
+ body.kx-desktop-ai #kx-history-sidebar { display:flex;flex-direction:column;width:auto;height:100%;max-height:none;margin:0;border-radius:0;box-shadow:none;border:0;min-height:0;min-width:0;overflow:hidden;background:#0e1421;border-right:1px solid #ffffff0b;padding:22px 14px 14px; }
+ #kx-history-sidebar header { display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 8px; }
+ #kx-history-sidebar h2 { font:600 18px 'Space Grotesk',sans-serif;margin:6px 0 16px; }
+ #kx-history-sidebar .study-history-eyebrow { font-size:9px; }
+ #kx-history-sidebar #study-history-close { font-size:20px;width:32px;min-height:32px;padding:0; }
+ #kx-history-sidebar .study-history-subtitle { font-size:11px;line-height:1.5;margin:8px; }
+ #kx-history-sidebar .study-history-search-label { margin:16px 8px 0;font-size:11px; }
+ #kx-history-sidebar #study-history-search { font-size:13px;margin:8px 0 12px;min-height:40px; }
+ #kx-history-sidebar #study-history-list { overflow-y:auto;overscroll-behavior:contain;min-height:0;flex:1;display:flex;flex-direction:column;gap:5px;padding:0 2px; }
+ #kx-history-sidebar .study-history-row { flex-shrink:0;border-color:transparent;padding:3px; }
+ #kx-history-sidebar .study-history-row:hover { background:#ffffff04; }
+ #kx-history-sidebar .study-history-delete { padding:6px;font-size:10px;opacity:0; }
+ #kx-history-sidebar .study-history-row:is(:hover,:focus-within) .study-history-delete { opacity:1; }
+ #kx-history-sidebar .study-history-open strong { font-weight:500;font-size:12px; }
+ #kx-history-sidebar .study-history-open span { font-size:10px; }
+ #kx-history-sidebar .study-history-empty { padding:8px; }
+ #kx-sidebar-new { width:100%;margin:0 0 4px;min-height:42px;text-align:left;padding:10px 14px !important;color:#5ee7c5 !important;background:#5ee7c50b !important;border-color:#5ee7c52b !important; }
+ #kx-sidebar-status { flex-shrink:0;margin:12px 8px 0;color:#93a1b7;font-size:10px;line-height:1.5; }
+ body.kx-desktop-ai.kx-sidebar-collapsed #doubt .tutor { grid-template-columns:minmax(0,1fr); }
+ body.kx-desktop-ai.kx-sidebar-collapsed #kx-history-sidebar { display:none; }
+ #kx-history-sidebar button:focus-visible { outline:2px solid #5ee7c5;outline-offset:2px; }
+}
+@media(min-width:851px) and (max-width:1100px) {
+ body.kx-desktop-ai #doubt { padding:10px 12px 14px; }
+ body.kx-desktop-ai #doubt .tutor { grid-template-columns:220px minmax(0,1fr); }
+}
+@media(min-width:851px) and (prefers-reduced-motion:reduce) {
+ body.kx-desktop-ai #doubt #messages .message { animation:none;opacity:1;transform:none; }
+}
+</style>
+<script id="kx-desktop-script">
+(() => {
+ const desktop=matchMedia('(min-width:851px)'),body=document.body,section=document.getElementById('doubt');
+ const dialog=document.getElementById('study-history-dialog'),tutor=section.querySelector('.tutor');
+ const sidebar=document.createElement('aside');sidebar.id='kx-history-sidebar';sidebar.setAttribute('aria-label','Chat history');sidebar.setAttribute('data-lenis-prevent','');tutor.prepend(sidebar);
+ const newChat=document.createElement('button');newChat.id='kx-sidebar-new';newChat.type='button';newChat.textContent='+ New chat';newChat.onclick=()=>document.getElementById('study-chat-new').click();
+ const syncStatus=document.createElement('p');syncStatus.id='kx-sidebar-status';syncStatus.setAttribute('role','status');
+ const status=document.getElementById('study-chat-status');
+ const reflect=()=>syncStatus.textContent=status.textContent;
+ new MutationObserver(reflect).observe(status,{childList:true,characterData:true,subtree:true});reflect();
+ const children=Array.from(dialog.children);let requested=location.hash==='#doubt';
+ function update(){
+   const active=desktop.matches&&requested;
+   body.classList.toggle('kx-desktop-ai',active);
+   if(active){
+     if(dialog.open)dialog.close();children.forEach(el=>sidebar.append(el));
+     sidebar.querySelector('header').after(newChat);sidebar.append(syncStatus);
+     window.studyChats?.refreshList?.();
+   } else { children.forEach(el=>dialog.append(el));body.classList.remove('kx-sidebar-collapsed'); }
+ }
+ function show(){body.classList.remove('kx-sidebar-collapsed');document.getElementById('study-history-search').focus();}
+ window.studyDesktop={active:()=>desktop.matches&&requested,open:show,close:()=>{body.classList.add('kx-sidebar-collapsed');document.getElementById('study-history-open').focus();}};
+ document.addEventListener('click',event=>{
+   if(!desktop.matches||event.button>0||event.ctrlKey||event.metaKey||event.altKey||event.shiftKey)return;
+   const link=event.target.closest('a[href^="#"]');if(!link)return;
+   const target=link.getAttribute('href').slice(1);
+   if(['','dashboard','quiz-engine','pyq-vault-section','planner','doubt','progress'].includes(target)){
+     requested=target==='doubt';update();
+     if(requested){event.preventDefault();if(location.hash!=='#doubt')history.pushState(history.state,'','#doubt');}
+   }
+ },true);
+ window.addEventListener('study:screenchange',event=>{if(event.detail?.id)requested=event.detail.id==='doubt';else requested=document.body.dataset.studyScreen==='doubt';update();});
+ window.addEventListener('hashchange',()=>{requested=location.hash==='#doubt';update();});
+ window.addEventListener('popstate',()=>{requested=location.hash==='#doubt';update();});
+ desktop.addEventListener('change',()=>{requested=location.hash==='#doubt';update();});update();
+})();
+</script>
+
 </body>
 
 </html>
+
 
