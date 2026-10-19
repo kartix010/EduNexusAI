@@ -6993,7 +6993,7 @@
 
       const observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting && !window.studyNavigation?.isMobile()) {
+          if (entry.isIntersecting && !window.studyNavigation?.isMobile() && !document.body.classList.contains('kx-desktop-ai')) {
             // Saare links se dot hatao
             navLinks.forEach((link) => link.classList.remove("active-link"));
 
@@ -7946,6 +7946,7 @@
   function navigate(id,{historyMode='push',restore=false,focus=false}={}) {
     if(!ids.includes(id))return false;
     if(!mobile.matches) {
+      if(historyMode==='push' && location.hash!=='#'+id)history.pushState(history.state,'','#'+id);
       window.dispatchEvent(new CustomEvent('study:screenchange',{detail:{id}}));
       if(id==='doubt'&&window.studyDesktop?.active()){if(location.hash!=='#doubt')history.pushState(history.state,'','#doubt');return true;}
       document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'});
@@ -8962,26 +8963,28 @@ document.querySelector('.chat-input button[type="submit"]')?.addEventListener('c
 @media(min-width:851px) {
  body.kx-desktop-ai { overflow:hidden; }
  body.kx-desktop-ai #doubt {
-   position:fixed;inset:76px 0 0;z-index:1000;max-width:none;width:100%;height:auto;
+   position:fixed;inset:var(--kx-desktop-header,76px) 0 0;z-index:1000;max-width:none;width:100%;height:auto;
    margin:0;padding:16px 24px 20px;box-sizing:border-box;opacity:1;transform:none !important;
    background:#070a12;overflow:hidden;
  }
  body.kx-desktop-ai #doubt > .section-heading { display:none !important; }
- body.kx-desktop-ai #doubt .tutor {
-   display:grid !important;grid-template-columns:260px minmax(0,1fr);height:100% !important;
+ #doubt .tutor {
+   display:grid !important;grid-template-columns:260px minmax(0,1fr);height:calc(100dvh - var(--kx-desktop-header,76px) - 32px) !important;
    min-height:0 !important;max-width:1600px;margin:0 auto;padding:0;border-radius:22px !important;
    border:1px solid #8b7cff24;box-shadow:0 16px 64px #0004;overflow:hidden;transition:none;
  }
- body.kx-desktop-ai #doubt .chat { min-width:0;min-height:0;height:100%;background:#0b111d; }
- body.kx-desktop-ai #doubt .kx-workspace-head { background:#0b111d;min-height:68px;padding:12px 24px; }
- body.kx-desktop-ai #doubt .chat-message-window { min-height:0; }
- body.kx-desktop-ai #doubt #messages { box-sizing:border-box;padding:28px max(24px,calc((100% - 820px)/2)) 52px !important;gap:24px; }
- body.kx-desktop-ai #doubt #messages .message { width:100%;max-width:100%;flex-shrink:0;font-size:15px;line-height:1.75;color:#c5cfdf; }
- body.kx-desktop-ai #doubt #messages .message.ai > .answer-content { background:transparent;border:0;box-shadow:none;padding:4px 0 12px;line-height:1.8; }
- body.kx-desktop-ai #doubt #messages .message.user > .answer-content { width:fit-content;max-width:80%;padding:12px 18px;border-radius:20px 20px 6px 20px; }
- body.kx-desktop-ai #doubt .chat-input { box-sizing:border-box;flex:0 0 auto;width:min(100%,868px);margin:0 auto;padding:14px 24px 18px !important;border-top:0;background:transparent; }
- body.kx-desktop-ai #doubt #question { max-height:132px; }
- body.kx-desktop-ai #kx-history-sidebar { display:flex;flex-direction:column;width:auto;height:100%;max-height:none;margin:0;border-radius:0;box-shadow:none;border:0;min-height:0;min-width:0;overflow:hidden;background:#0e1421;border-right:1px solid #ffffff0b;padding:22px 14px 14px; }
+
+ body.kx-desktop-ai #doubt .tutor { height:100% !important; }
+ #doubt .chat { min-width:0;min-height:0;height:100%;background:#0b111d; }
+ #doubt .kx-workspace-head { background:#0b111d;min-height:68px;padding:12px 24px; }
+ #doubt .chat-message-window { min-height:0; }
+ #doubt #messages { box-sizing:border-box;padding:28px max(24px,calc((100% - 820px)/2)) 52px !important;gap:24px; }
+ #doubt #messages .message { width:100%;max-width:100%;flex-shrink:0;font-size:15px;line-height:1.75;color:#c5cfdf; }
+ #doubt #messages .message.ai > .answer-content { background:transparent;border:0;box-shadow:none;padding:4px 0 12px;line-height:1.8; }
+ #doubt #messages .message.user > .answer-content { width:fit-content;max-width:80%;padding:12px 18px;border-radius:20px 20px 6px 20px; }
+ #doubt .chat-input { box-sizing:border-box;flex:0 0 auto;width:min(100%,868px);margin:0 auto;padding:14px 24px 18px !important;border-top:0;background:transparent; }
+ #doubt #question { max-height:132px; }
+ #kx-history-sidebar { display:flex;flex-direction:column;width:auto;height:100%;max-height:none;margin:0;border-radius:0;box-shadow:none;border:0;min-height:0;min-width:0;overflow:hidden;background:#0e1421;border-right:1px solid #ffffff0b;padding:22px 14px 14px; }
  #kx-history-sidebar header { display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 8px; }
  #kx-history-sidebar h2 { font:600 18px 'Space Grotesk',sans-serif;margin:6px 0 16px; }
  #kx-history-sidebar .study-history-eyebrow { font-size:9px; }
@@ -8999,16 +9002,16 @@ document.querySelector('.chat-input button[type="submit"]')?.addEventListener('c
  #kx-history-sidebar .study-history-empty { padding:8px; }
  #kx-sidebar-new { width:100%;margin:0 0 4px;min-height:42px;text-align:left;padding:10px 14px !important;color:#5ee7c5 !important;background:#5ee7c50b !important;border-color:#5ee7c52b !important; }
  #kx-sidebar-status { flex-shrink:0;margin:12px 8px 0;color:#93a1b7;font-size:10px;line-height:1.5; }
- body.kx-desktop-ai.kx-sidebar-collapsed #doubt .tutor { grid-template-columns:minmax(0,1fr); }
- body.kx-desktop-ai.kx-sidebar-collapsed #kx-history-sidebar { display:none; }
+ body.kx-sidebar-collapsed #doubt .tutor { grid-template-columns:minmax(0,1fr); }
+ body.kx-sidebar-collapsed #kx-history-sidebar { display:none; }
  #kx-history-sidebar button:focus-visible { outline:2px solid #5ee7c5;outline-offset:2px; }
 }
 @media(min-width:851px) and (max-width:1100px) {
  body.kx-desktop-ai #doubt { padding:10px 12px 14px; }
- body.kx-desktop-ai #doubt .tutor { grid-template-columns:220px minmax(0,1fr); }
+ #doubt .tutor { grid-template-columns:220px minmax(0,1fr); }
 }
 @media(min-width:851px) and (prefers-reduced-motion:reduce) {
- body.kx-desktop-ai #doubt #messages .message { animation:none;opacity:1;transform:none; }
+ #doubt #messages .message { animation:none;opacity:1;transform:none; }
 }
 </style>
 <script id="kx-desktop-script">
@@ -9021,30 +9024,45 @@ document.querySelector('.chat-input button[type="submit"]')?.addEventListener('c
  const status=document.getElementById('study-chat-status');
  const reflect=()=>syncStatus.textContent=status.textContent;
  new MutationObserver(reflect).observe(status,{childList:true,characterData:true,subtree:true});reflect();
- const children=Array.from(dialog.children);let requested=location.hash==='#doubt';
+ const children=Array.from(dialog.children);
+ let lastScreen='';try{lastScreen=sessionStorage.getItem('kx-desktop-screen')||'';}catch{}
+ let requested=location.hash==='#doubt'||(!location.hash&&lastScreen==='doubt');
+ let mounted=false;
+ function remember(id){try{sessionStorage.setItem('kx-desktop-screen',id);}catch{}}
+ function measureHeader(){const h=document.querySelector('.topbar-wrapper')?.getBoundingClientRect().height||76;body.style.setProperty('--kx-desktop-header',h+'px');}
+ const header=document.querySelector('.topbar-wrapper');
+ if(header&&typeof ResizeObserver!=='undefined')new ResizeObserver(measureHeader).observe(header);
+ measureHeader();
  function update(){
    const active=desktop.matches&&requested;
    body.classList.toggle('kx-desktop-ai',active);
-   if(active){
+   if(desktop.matches&&!mounted){
      if(dialog.open)dialog.close();children.forEach(el=>sidebar.append(el));
      sidebar.querySelector('header').after(newChat);sidebar.append(syncStatus);
-     window.studyChats?.refreshList?.();
-   } else { children.forEach(el=>dialog.append(el));body.classList.remove('kx-sidebar-collapsed'); }
+     mounted=true;window.studyChats?.refreshList?.();
+   } else if(!desktop.matches&&mounted) { children.forEach(el=>dialog.append(el));body.classList.remove('kx-sidebar-collapsed');mounted=false; }
+   if(active){
+     remember('doubt');
+     if(location.hash!=='#doubt')history.replaceState(history.state,'','#doubt');
+     document.querySelectorAll('nav a[href^="#"]').forEach(link=>link.classList.toggle('active-link',link.getAttribute('href')==='#doubt'));
+   }
  }
  function show(){body.classList.remove('kx-sidebar-collapsed');document.getElementById('study-history-search').focus();}
- window.studyDesktop={active:()=>desktop.matches&&requested,open:show,close:()=>{body.classList.add('kx-sidebar-collapsed');document.getElementById('study-history-open').focus();}};
+ window.studyDesktop={active:()=>desktop.matches,open:show,close:()=>{body.classList.add('kx-sidebar-collapsed');document.getElementById('study-history-open').focus();}};
  document.addEventListener('click',event=>{
    if(!desktop.matches||event.button>0||event.ctrlKey||event.metaKey||event.altKey||event.shiftKey)return;
    const link=event.target.closest('a[href^="#"]');if(!link)return;
    const target=link.getAttribute('href').slice(1);
    if(['','dashboard','quiz-engine','pyq-vault-section','planner','doubt','progress'].includes(target)){
-     requested=target==='doubt';update();
+     requested=target==='doubt';remember(target||'dashboard');update();
      if(requested){event.preventDefault();if(location.hash!=='#doubt')history.pushState(history.state,'','#doubt');}
    }
  },true);
- window.addEventListener('study:screenchange',event=>{if(event.detail?.id)requested=event.detail.id==='doubt';else requested=document.body.dataset.studyScreen==='doubt';update();});
- window.addEventListener('hashchange',()=>{requested=location.hash==='#doubt';update();});
- window.addEventListener('popstate',()=>{requested=location.hash==='#doubt';update();});
+ window.addEventListener('study:screenchange',event=>{const id=event.detail?.id||document.body.dataset.studyScreen;requested=id==='doubt';if(id)remember(id);update();});
+ const fromLocation=()=>{requested=location.hash==='#doubt';remember(location.hash.slice(1)||'dashboard');update();};
+ window.addEventListener('hashchange',fromLocation);
+ window.addEventListener('popstate',fromLocation);
+ window.addEventListener('pageshow',()=>{measureHeader();update();});
  desktop.addEventListener('change',()=>{requested=location.hash==='#doubt';update();});update();
 })();
 </script>
