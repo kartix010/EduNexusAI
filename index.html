@@ -7571,128 +7571,7 @@
   <!-- EDUNEXUS MOBILE HOME — paste this entire block ONCE, immediately before 
 
 
-<style id="kx-camera-style">
-#doubt .chat { position:relative; }
-#kx-camera[hidden] { display:none !important; }
-#kx-camera { position:absolute;inset:0;z-index:30;display:flex;flex-direction:column;background:#0e1421;border-radius:inherit;overflow:hidden;color:#e9e5ff; }
-.kx-camera-head,.kx-camera-controls { display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;flex-shrink:0;background:#0e1421; }
-.kx-camera-head strong { font:600 16px 'Space Grotesk',sans-serif; }
-#kx-camera button { min-width:44px;min-height:44px;padding:10px 14px;border:1px solid #8b7cff40;border-radius:14px;background:#171f30;color:#d7d0ff;font:500 14px Inter,sans-serif;cursor:pointer; }
-#kx-camera button:focus-visible { outline:2px solid #5ee7c5;outline-offset:-3px; }
-#kx-camera button:disabled { opacity:.4;cursor:default; }
-.kx-camera-stage { position:relative;flex:1;min-height:0;background:#070a12;overflow:hidden; }
-.kx-camera-stage video,.kx-camera-stage img { width:100%;height:100%;object-fit:contain;display:block; }
-#kx-camera video[data-front="true"] { transform:scaleX(-1); }
-#kx-camera-status { position:absolute;bottom:12px;left:12px;right:12px;margin:0;padding:10px 12px;border-radius:12px;background:#0e1421e8;color:#b9c9d8;font-size:13px;text-align:center;pointer-events:none; }
-#kx-camera-capture { border:4px solid #d7fff4 !important;background:#5ee7c5 !important;width:60px;min-height:60px !important;border-radius:50% !important;box-shadow:inset 0 0 0 4px #0e1421; }
-#kx-camera-use { background:#5ee7c5 !important;color:#071710 !important; }
-.kx-camera-controls [hidden],.kx-camera-stage [hidden] { display:none !important; }
-body.kx-camera-open .mobile-nav-bar { translate:0 calc(100% + 50px + env(safe-area-inset-bottom,0px)) !important;opacity:0;pointer-events:none; }
-#attachment-preview.kx-camera-attached { animation:kx-photo-in .2s ease-out; }
-@keyframes kx-photo-in { from { opacity:0;transform:translateY(6px); } to { opacity:1;transform:none; } }
-@media(prefers-reduced-motion:reduce) { #attachment-preview.kx-camera-attached { animation:none; } }
-</style>
-<script id="kx-camera-script">
-(() => {
- const chat=document.querySelector('#doubt .chat');
- const trigger=document.querySelector('[aria-label="Camera or image"]');
- if(!chat||!trigger)return;
- trigger.removeAttribute('onclick');trigger.setAttribute('aria-label','Open camera');
- trigger.querySelector('span').textContent='Camera or photo';
- const panel=document.createElement('section');panel.id='kx-camera';panel.hidden=true;
- panel.setAttribute('role','dialog');panel.setAttribute('aria-modal','true');panel.setAttribute('aria-labelledby','kx-camera-title');
- panel.innerHTML=`<div class="kx-camera-head"><strong id="kx-camera-title">Capture a question</strong><button type="button" id="kx-camera-close" aria-label="Close camera">✕</button></div>
- <div class="kx-camera-stage"><video autoplay muted playsinline></video><img hidden alt="Captured photo"><p id="kx-camera-status" role="status" aria-live="polite">Opening camera…</p></div>
- <div class="kx-camera-controls"><button type="button" id="kx-camera-gallery">Photos</button><button type="button" id="kx-camera-capture" aria-label="Take photo" disabled></button><button type="button" id="kx-camera-switch" aria-label="Switch front or back camera">Flip</button><button type="button" id="kx-camera-retake" hidden>Retake</button><button type="button" id="kx-camera-use" hidden>Use photo</button></div>`;
- chat.append(panel);
- const get=id=>panel.querySelector('#kx-camera-'+id),video=panel.querySelector('video'),preview=panel.querySelector('img'),status=document.getElementById('kx-camera-status');
- const picker=document.createElement('input');picker.type='file';picker.accept='image/*';picker.hidden=true;panel.append(picker);
- let stream=null,epoch=0,facing='environment',photo=null,photoName='',chatToken=null,background=[],pageTop=0;
- const stop=()=>{stream?.getTracks().forEach(t=>t.stop());stream=null;video.srcObject=null;};
- function review(data,name='question-'+Date.now()+'.jpg') {
-   photo=data;photoName=name;stop();video.hidden=true;preview.src=data;preview.hidden=false;
-   get('capture').hidden=get('switch').hidden=true;get('retake').hidden=get('use').hidden=false;
-   status.textContent='Ready to attach. You can add a message before sending.';
- }
- function close(restore=true) {
-   ++epoch;stop();photo=null;preview.removeAttribute('src');panel.hidden=true;
-   document.body.classList.remove('kx-camera-open');
-   background.forEach(([el,inert])=>el.inert=inert);background=[];
-   if(restore){window.scrollTo({top:pageTop,behavior:'instant'});document.querySelector('#kx-attachments summary')?.focus({preventScroll:true});}
- }
- async function start() {
-   const ticket=++epoch;stop();photo=null;preview.hidden=true;preview.removeAttribute('src');video.hidden=false;
-   get('capture').hidden=get('switch').hidden=false;get('retake').hidden=get('use').hidden=true;get('capture').disabled=true;
-   status.textContent='Opening camera…';
-   try {
-     if(!navigator.mediaDevices?.getUserMedia)throw new Error('unavailable');
-     const next=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:facing},width:{ideal:1600},height:{ideal:1200}}});
-     if(ticket!==epoch||panel.hidden){next.getTracks().forEach(t=>t.stop());return;}
-     stream=next;video.srcObject=next;video.dataset.front=String(facing==='user');await video.play();
-     if(ticket!==epoch||panel.hidden)return;
-     get('capture').disabled=false;status.textContent='Keep the question clear and inside the frame.';
-   } catch(error) {
-     if(ticket!==epoch||panel.hidden)return;
-     stop();status.textContent=error.name==='NotAllowedError'?'Camera permission is off. Allow it in browser settings, or choose Photos.':'Camera could not open. Choose Photos or try Flip again.';
-   }
- }
- trigger.addEventListener('click',()=>{
-   document.getElementById('kx-attachments').open=false;
-   document.activeElement?.blur();pageTop=window.scrollY;chatToken=window.studyChats?.token();panel.hidden=false;
-   document.body.classList.add('kx-camera-open');
-   background=Array.from(chat.children).filter(el=>el!==panel).map(el=>[el,el.inert]);background.forEach(([el])=>el.inert=true);
-   get('close').focus({preventScroll:true});
-   if(matchMedia('(max-width:850px)').matches){
-     const header=document.querySelector('.topbar-wrapper')?.offsetHeight||76;
-     const top=Math.max(0,window.scrollY+chat.getBoundingClientRect().top-header-8);
-     if(typeof lenis!=='undefined')lenis.scrollTo(top,{immediate:true,force:true});
-     else window.scrollTo({top,behavior:'instant'});
-   }
-   start();
- });
- get('close').onclick=()=>close();get('retake').onclick=start;
- get('switch').onclick=()=>{facing=facing==='environment'?'user':'environment';start();};
- get('capture').onclick=()=>{
-   if(!video.videoWidth||!video.videoHeight)return;
-   try {const scale=Math.min(1,1600/Math.max(video.videoWidth,video.videoHeight)),canvas=document.createElement('canvas');
-     canvas.width=Math.round(video.videoWidth*scale);canvas.height=Math.round(video.videoHeight*scale);
-     canvas.getContext('2d').drawImage(video,0,0,canvas.width,canvas.height);review(canvas.toDataURL('image/jpeg',.88));
-   } catch {status.textContent='Photo could not be captured. Please try again.';}
- };
- get('gallery').onclick=()=>picker.click();
- picker.onchange=async()=>{
-   const file=picker.files[0];picker.value='';if(!file)return;
-   if(!file.type.startsWith('image/')||file.size>20*1024*1024){status.textContent='Choose an image smaller than 20 MB.';return;}
-   const ticket=++epoch;stop();get('capture').disabled=true;status.textContent='Loading photo…';
-   const reader=new FileReader();reader.onload=()=>{if(ticket===epoch&&!panel.hidden)review(reader.result,file.name);};
-   reader.onerror=()=>{if(ticket===epoch&&!panel.hidden)status.textContent='Could not read this photo. Choose another image.';};reader.readAsDataURL(file);
- };
- get('use').onclick=()=>{
-   if(!photo)return;
-   if(window.studyChats&&!window.studyChats.matches(chatToken)){close();return;}
-   currentAttachmentBase64=photo;currentAttachmentName=photoName;
-   const image=document.getElementById('preview-img');image.src=photo;image.style.display='block';document.getElementById('preview-doc').style.display='none';
-   document.getElementById('preview-name').textContent=currentAttachmentName;
-   document.getElementById('preview-size').textContent='Photo ready to send';
-   const attachment=document.getElementById('attachment-preview');attachment.style.display='flex';attachment.classList.remove('kx-camera-attached');void attachment.offsetWidth;attachment.classList.add('kx-camera-attached');
-   close(false);document.getElementById('question').focus({preventScroll:true});
- };
- panel.addEventListener('keydown',event=>{
-   if(event.key==='Escape'){event.preventDefault();close();}
-   if(event.key==='Tab'){const buttons=Array.from(panel.querySelectorAll('button')).filter(b=>!b.hidden&&!b.disabled);const first=buttons[0],last=buttons.at(-1);
-     if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
-     else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}
- });
- window.addEventListener('study:screenchange',()=>{if(!panel.hidden)close(false);});
- window.addEventListener('pagehide',()=>close(false));
- document.addEventListener('visibilitychange',()=>{
-   if(document.hidden&&!panel.hidden&&!photo){
-     ++epoch;stop();get('capture').disabled=true;get('retake').hidden=false;
-     status.textContent='Camera paused. Tap Retake to reopen, or choose Photos.';
-   }
- });
-})();
-</script>
+
 
 </body>. -->
 <style id="enh-mobile-home-style">
@@ -9214,6 +9093,128 @@ document.querySelector('.chat-input button[type="submit"]')?.addEventListener('c
 })();
 </script>
 
+<style id="kx-camera-style">
+#doubt .chat { position:relative; }
+#kx-camera[hidden] { display:none !important; }
+#kx-camera { position:absolute;inset:0;z-index:30;display:flex;flex-direction:column;background:#0e1421;border-radius:inherit;overflow:hidden;color:#e9e5ff; }
+.kx-camera-head,.kx-camera-controls { display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;flex-shrink:0;background:#0e1421; }
+.kx-camera-head strong { font:600 16px 'Space Grotesk',sans-serif; }
+#kx-camera button { min-width:44px;min-height:44px;padding:10px 14px;border:1px solid #8b7cff40;border-radius:14px;background:#171f30;color:#d7d0ff;font:500 14px Inter,sans-serif;cursor:pointer; }
+#kx-camera button:focus-visible { outline:2px solid #5ee7c5;outline-offset:-3px; }
+#kx-camera button:disabled { opacity:.4;cursor:default; }
+.kx-camera-stage { position:relative;flex:1;min-height:0;background:#070a12;overflow:hidden; }
+.kx-camera-stage video,.kx-camera-stage img { width:100%;height:100%;object-fit:contain;display:block; }
+#kx-camera video[data-front="true"] { transform:scaleX(-1); }
+#kx-camera-status { position:absolute;bottom:12px;left:12px;right:12px;margin:0;padding:10px 12px;border-radius:12px;background:#0e1421e8;color:#b9c9d8;font-size:13px;text-align:center;pointer-events:none; }
+#kx-camera-capture { border:4px solid #d7fff4 !important;background:#5ee7c5 !important;width:60px;min-height:60px !important;border-radius:50% !important;box-shadow:inset 0 0 0 4px #0e1421; }
+#kx-camera-use { background:#5ee7c5 !important;color:#071710 !important; }
+.kx-camera-controls [hidden],.kx-camera-stage [hidden] { display:none !important; }
+body.kx-camera-open .mobile-nav-bar { translate:0 calc(100% + 50px + env(safe-area-inset-bottom,0px)) !important;opacity:0;pointer-events:none; }
+#attachment-preview.kx-camera-attached { animation:kx-photo-in .2s ease-out; }
+@keyframes kx-photo-in { from { opacity:0;transform:translateY(6px); } to { opacity:1;transform:none; } }
+@media(prefers-reduced-motion:reduce) { #attachment-preview.kx-camera-attached { animation:none; } }
+</style>
+<script id="kx-camera-script">
+(() => {
+ const chat=document.querySelector('#doubt .chat');
+ const trigger=document.querySelector('[aria-label="Camera or image"]');
+ if(!chat||!trigger)return;
+ trigger.removeAttribute('onclick');trigger.setAttribute('aria-label','Open camera');
+ trigger.querySelector('span').textContent='Camera or photo';
+ const panel=document.createElement('section');panel.id='kx-camera';panel.hidden=true;
+ panel.setAttribute('role','dialog');panel.setAttribute('aria-modal','true');panel.setAttribute('aria-labelledby','kx-camera-title');
+ panel.innerHTML=`<div class="kx-camera-head"><strong id="kx-camera-title">Capture a question</strong><button type="button" id="kx-camera-close" aria-label="Close camera">✕</button></div>
+ <div class="kx-camera-stage"><video autoplay muted playsinline></video><img hidden alt="Captured photo"><p id="kx-camera-status" role="status" aria-live="polite">Opening camera…</p></div>
+ <div class="kx-camera-controls"><button type="button" id="kx-camera-gallery">Photos</button><button type="button" id="kx-camera-capture" aria-label="Take photo" disabled></button><button type="button" id="kx-camera-switch" aria-label="Switch front or back camera">Flip</button><button type="button" id="kx-camera-retake" hidden>Retake</button><button type="button" id="kx-camera-use" hidden>Use photo</button></div>`;
+ chat.append(panel);
+ const get=id=>panel.querySelector('#kx-camera-'+id),video=panel.querySelector('video'),preview=panel.querySelector('img'),status=document.getElementById('kx-camera-status');
+ const picker=document.createElement('input');picker.type='file';picker.accept='image/*';picker.hidden=true;panel.append(picker);
+ let stream=null,epoch=0,facing='environment',photo=null,photoName='',chatToken=null,background=[],pageTop=0;
+ const stop=()=>{stream?.getTracks().forEach(t=>t.stop());stream=null;video.srcObject=null;};
+ function review(data,name='question-'+Date.now()+'.jpg') {
+   photo=data;photoName=name;stop();video.hidden=true;preview.src=data;preview.hidden=false;
+   get('capture').hidden=get('switch').hidden=true;get('retake').hidden=get('use').hidden=false;
+   status.textContent='Ready to attach. You can add a message before sending.';
+ }
+ function close(restore=true) {
+   ++epoch;stop();photo=null;preview.removeAttribute('src');panel.hidden=true;
+   document.body.classList.remove('kx-camera-open');
+   background.forEach(([el,inert])=>el.inert=inert);background=[];
+   if(restore){window.scrollTo({top:pageTop,behavior:'instant'});document.querySelector('#kx-attachments summary')?.focus({preventScroll:true});}
+ }
+ async function start() {
+   const ticket=++epoch;stop();photo=null;preview.hidden=true;preview.removeAttribute('src');video.hidden=false;
+   get('capture').hidden=get('switch').hidden=false;get('retake').hidden=get('use').hidden=true;get('capture').disabled=true;
+   status.textContent='Opening camera…';
+   try {
+     if(!navigator.mediaDevices?.getUserMedia)throw new Error('unavailable');
+     const next=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:facing},width:{ideal:1600},height:{ideal:1200}}});
+     if(ticket!==epoch||panel.hidden){next.getTracks().forEach(t=>t.stop());return;}
+     stream=next;video.srcObject=next;video.dataset.front=String(facing==='user');await video.play();
+     if(ticket!==epoch||panel.hidden)return;
+     get('capture').disabled=false;status.textContent='Keep the question clear and inside the frame.';
+   } catch(error) {
+     if(ticket!==epoch||panel.hidden)return;
+     stop();status.textContent=error.name==='NotAllowedError'?'Camera permission is off. Allow it in browser settings, or choose Photos.':'Camera could not open. Choose Photos or try Flip again.';
+   }
+ }
+ trigger.addEventListener('click',()=>{
+   document.getElementById('kx-attachments').open=false;
+   document.activeElement?.blur();pageTop=window.scrollY;chatToken=window.studyChats?.token();panel.hidden=false;
+   document.body.classList.add('kx-camera-open');
+   background=Array.from(chat.children).filter(el=>el!==panel).map(el=>[el,el.inert]);background.forEach(([el])=>el.inert=true);
+   get('close').focus({preventScroll:true});
+   if(matchMedia('(max-width:850px)').matches){
+     const header=document.querySelector('.topbar-wrapper')?.offsetHeight||76;
+     const top=Math.max(0,window.scrollY+chat.getBoundingClientRect().top-header-8);
+     if(typeof lenis!=='undefined')lenis.scrollTo(top,{immediate:true,force:true});
+     else window.scrollTo({top,behavior:'instant'});
+   }
+   start();
+ });
+ get('close').onclick=()=>close();get('retake').onclick=start;
+ get('switch').onclick=()=>{facing=facing==='environment'?'user':'environment';start();};
+ get('capture').onclick=()=>{
+   if(!video.videoWidth||!video.videoHeight)return;
+   try {const scale=Math.min(1,1600/Math.max(video.videoWidth,video.videoHeight)),canvas=document.createElement('canvas');
+     canvas.width=Math.round(video.videoWidth*scale);canvas.height=Math.round(video.videoHeight*scale);
+     canvas.getContext('2d').drawImage(video,0,0,canvas.width,canvas.height);review(canvas.toDataURL('image/jpeg',.88));
+   } catch {status.textContent='Photo could not be captured. Please try again.';}
+ };
+ get('gallery').onclick=()=>picker.click();
+ picker.onchange=async()=>{
+   const file=picker.files[0];picker.value='';if(!file)return;
+   if(!file.type.startsWith('image/')||file.size>20*1024*1024){status.textContent='Choose an image smaller than 20 MB.';return;}
+   const ticket=++epoch;stop();get('capture').disabled=true;status.textContent='Loading photo…';
+   const reader=new FileReader();reader.onload=()=>{if(ticket===epoch&&!panel.hidden)review(reader.result,file.name);};
+   reader.onerror=()=>{if(ticket===epoch&&!panel.hidden)status.textContent='Could not read this photo. Choose another image.';};reader.readAsDataURL(file);
+ };
+ get('use').onclick=()=>{
+   if(!photo)return;
+   if(window.studyChats&&!window.studyChats.matches(chatToken)){close();return;}
+   currentAttachmentBase64=photo;currentAttachmentName=photoName;
+   const image=document.getElementById('preview-img');image.src=photo;image.style.display='block';document.getElementById('preview-doc').style.display='none';
+   document.getElementById('preview-name').textContent=currentAttachmentName;
+   document.getElementById('preview-size').textContent='Photo ready to send';
+   const attachment=document.getElementById('attachment-preview');attachment.style.display='flex';attachment.classList.remove('kx-camera-attached');void attachment.offsetWidth;attachment.classList.add('kx-camera-attached');
+   close(false);document.getElementById('question').focus({preventScroll:true});
+ };
+ panel.addEventListener('keydown',event=>{
+   if(event.key==='Escape'){event.preventDefault();close();}
+   if(event.key==='Tab'){const buttons=Array.from(panel.querySelectorAll('button')).filter(b=>!b.hidden&&!b.disabled);const first=buttons[0],last=buttons.at(-1);
+     if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
+     else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}
+ });
+ window.addEventListener('study:screenchange',()=>{if(!panel.hidden)close(false);});
+ window.addEventListener('pagehide',()=>close(false));
+ document.addEventListener('visibilitychange',()=>{
+   if(document.hidden&&!panel.hidden&&!photo){
+     ++epoch;stop();get('capture').disabled=true;get('retake').hidden=false;
+     status.textContent='Camera paused. Tap Retake to reopen, or choose Photos.';
+   }
+ });
+})();
+</script>
 </body>
 
 </html>
