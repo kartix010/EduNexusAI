@@ -7986,6 +7986,15 @@
       document.body.style.removeProperty('--study-viewport-height');
       return;
     }
+    // Layout dimensions exclude the hide/show translation and button animation.
+    // Keep Tutor sizing separate: only the page-end reserve changes.
+    if(bar.offsetHeight) {
+      const ai=bar.querySelector('.mobile-nav-ai');
+      const raised=ai ? Math.max(0,-ai.offsetTop) : 0;
+      const bottom=parseFloat(getComputedStyle(bar).bottom)||0;
+      document.body.style.setProperty('--study-page-clearance',
+        (bar.offsetHeight+bottom+raised+12)+'px');
+    }
     headerHeight=document.querySelector('.topbar-wrapper')?.getBoundingClientRect().height||76;
     document.body.style.setProperty('--study-header-height',headerHeight+'px');
     document.body.style.setProperty('--study-viewport-height',(window.visualViewport?.height||window.innerHeight)+'px');
@@ -8030,6 +8039,12 @@
   },true);
   document.addEventListener('focusin',syncFocus);
   document.addEventListener('focusout',()=>queueMicrotask(syncFocus));
+  if(typeof ResizeObserver!=='undefined') {
+    const navSizeObserver=new ResizeObserver(syncViewport);
+    navSizeObserver.observe(bar);
+    const ai=bar.querySelector('.mobile-nav-ai');
+    if(ai)navSizeObserver.observe(ai);
+  }
   window.addEventListener('resize',syncViewport,{passive:true});
   window.visualViewport?.addEventListener('resize',syncViewport,{passive:true});
   window.addEventListener('popstate',()=>{if(mobile.matches)fromLocation(true);});
@@ -8866,8 +8881,17 @@ document.querySelector('.chat-input button[type="submit"]')?.addEventListener('c
   body.study-screens #main-content > main {
     box-sizing:border-box;min-height:var(--study-viewport-height,100dvh);
     padding-top:var(--study-header-height,76px);
-    padding-bottom:var(--study-nav-clearance,100px) !important;
+    padding-bottom:var(--study-page-clearance,calc(100px + env(safe-area-inset-bottom,0px))) !important;
   }
+  /* Reserve navigation space once, outside the final content card. */
+  body.study-screens #planner,
+  body.study-screens #progress,
+  body.study-screens #doubt,
+  body.study-screens .pitch,
+  body.study-screens:not([data-study-screen="dashboard"]) #dashboard {
+    padding-bottom:0 !important;margin-bottom:0 !important;
+  }
+  body.study-screens.typing-mode #main-content > main { padding-bottom:12px !important; }
   body.study-screens #planner, body.study-screens #progress { padding-top:24px; }
   body.study-screens #dashboard { grid-template-columns:minmax(0,1fr); }
   body.study-screens:not([data-study-screen="dashboard"]) #dashboard { display:block; }
@@ -8880,7 +8904,7 @@ document.querySelector('.chat-input button[type="submit"]')?.addEventListener('c
   body.study-screens[data-study-screen="doubt"] #doubt > .section-heading { display:flex !important; }
   body.study-screens[data-study-screen="doubt"] #doubt .chat { min-height:0 !important; }
   body.study-screens[data-study-screen="doubt"] #doubt .chat-input { flex:0 0 auto; }
-  body.study-screens #doubt #messages { overscroll-behavior-y:contain !important; }
+  body.study-screens #doubt #messages { overscroll-behavior-y:auto !important; }
   .mobile-nav-ai[aria-current="page"] { box-shadow:0 0 0 2px #5ee7c5,0 0 18px #5ee7c540; }
 }
 </style>
