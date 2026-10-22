@@ -9095,7 +9095,7 @@ document.querySelector('.chat-input button[type="submit"]')?.addEventListener('c
 
 <style id="kx-camera-style">
 #doubt .chat { position:relative; }
-#kx-camera[hidden] { display:none !important; }
+#kx-camera[hidden], #kx-camera input[type="file"], #kx-camera-status:empty { display:none !important; }
 #kx-camera { position:absolute;inset:0;z-index:30;display:flex;flex-direction:column;background:#0e1421;border-radius:inherit;overflow:hidden;color:#e9e5ff; }
 .kx-camera-head,.kx-camera-controls { display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;flex-shrink:0;background:#0e1421; }
 .kx-camera-head strong { font:600 16px 'Space Grotesk',sans-serif; }
@@ -9152,7 +9152,7 @@ body.kx-camera-open .mobile-nav-bar { translate:0 calc(100% + 50px + env(safe-ar
      if(ticket!==epoch||panel.hidden){next.getTracks().forEach(t=>t.stop());return;}
      stream=next;video.srcObject=next;video.dataset.front=String(facing==='user');await video.play();
      if(ticket!==epoch||panel.hidden)return;
-     get('capture').disabled=false;status.textContent='Keep the question clear and inside the frame.';
+     get('capture').disabled=false;status.textContent='';
    } catch(error) {
      if(ticket!==epoch||panel.hidden)return;
      stop();status.textContent=error.name==='NotAllowedError'?'Camera permission is off. Allow it in browser settings, or choose Photos.':'Camera could not open. Choose Photos or try Flip again.';
