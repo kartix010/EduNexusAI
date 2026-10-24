@@ -4046,7 +4046,7 @@
               as you improve.</p>
             <div class="hero-actions">
               <a class="btn primary" href="#planner">Build my AI plan <span>→</span></a>
-              <a class="btn ghost" href="#doubt">Try AI Tutor</a>
+              <a class="btn ghost" id="home-scan" href="#doubt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M8 5l2-2h4l2 2h4v15H4V5z"/><circle cx="12" cy="12" r="4"/></svg>Scan &amp; Solve</a>
             </div>
             <div class="trust-row">
               <span>✓ Personalized</span>
@@ -5991,6 +5991,7 @@
           $('preview-img').style.display = 'none';
           $('preview-doc').style.display = 'grid';
         }
+        window.kxDrafts?.save();
       };
       reader.readAsDataURL(file);
     }
@@ -6001,6 +6002,7 @@
       $('image-upload').value = "";
       $('file-upload').value = "";
       $('attachment-preview').style.display = 'none';
+      window.kxDrafts?.save();
     }
 
     function askDemo(text) {
@@ -6306,13 +6308,13 @@
       });
     }
 
-    async function sendQuestion(e, generated = null) {
+    async function sendQuestion(e, generated = null, displayOverride = null) {
       e.preventDefault();
       if (tutorRequestPending) return;
       if (window.studyChats && !window.studyChats.ready()) { showToast('Sign in to start a saved chat.'); return; }
       const input = document.getElementById("question");
       const q = generated ? generated.prompt : input.value.trim();
-      const displayText = generated ? generated.displayText : q;
+      const displayText = generated ? generated.displayText : (displayOverride || q);
       if (!q && (generated || !currentAttachmentBase64)) return;
       if (quizRequestPending) {
         showToast('Your quiz is being prepared. Please wait.');
@@ -8508,6 +8510,7 @@ window.studyChats = (() => {
     current.memory = chatMemory.slice(-12).map(m=>({role:m.role,content:{text:m.content.text}}));
   }
   function render(focusMessageId = null) {
+    window.kxDrafts?.suspend();
     window.kxMessageEdit?.reset(true);
     window.speechSynthesis?.cancel();
     wrap().replaceChildren();
@@ -8555,6 +8558,7 @@ window.studyChats = (() => {
     if(hit) getChatScroll(wrap()).seek(hit);
     else getChatScroll(wrap()).follow();
     announce(current.messages.length ? 'Saved on this device · files are not retained' : 'New chat · saved on this device');
+    window.kxDrafts?.bind(token());
   }
   function canLeave(allowUnsaved = false) {
     if(tutorRequestPending||quizRequestPending||activeQuizReview) {
@@ -8657,9 +8661,10 @@ window.studyChats = (() => {
     if(next===owner)return;
     if(typeof cancelTutorReply==='function')cancelTutorReply(true);
     window.kxMessageEdit?.reset(true);
+    window.kxDrafts?.suspend();
     cloud.stop();owner=next;epoch++;failedSave=false;chatMemory=[];
     if(dialog.open)dialog.close();
-    if(!owner){current=null;list.replaceChildren();wrap().replaceChildren();clearAttachment();announce('Sign in to save chats');return;}
+    if(!owner){current=null;list.replaceChildren();wrap().replaceChildren();clearAttachment();window.kxDrafts?.bind(null);announce('Sign in to save chats');return;}
     let active;
     try { active=sessionStorage.getItem(prefix()+'active'); } catch {}
     const saved=records();
@@ -8694,7 +8699,7 @@ window.studyChats = (() => {
   });
   firebase.auth().onAuthStateChanged(account);
   return {
-    token,matches,refreshList:drawList,
+    token,matches,refreshList:drawList,ensureDraft:persist,
     ready:owned,
     add,
     complete(t,messageId,text){
@@ -9158,7 +9163,8 @@ body.kx-camera-open .mobile-nav-bar { translate:0 calc(100% + 50px + env(safe-ar
      stop();status.textContent=error.name==='NotAllowedError'?'Camera permission is off. Allow it in browser settings, or choose Photos.':'Camera could not open. Choose Photos or try Flip again.';
    }
  }
- trigger.addEventListener('click',()=>{
+ function openCamera(){
+   if(!panel.hidden)return;
    document.getElementById('kx-attachments').open=false;
    document.activeElement?.blur();pageTop=window.scrollY;chatToken=window.studyChats?.token();panel.hidden=false;
    document.body.classList.add('kx-camera-open');
@@ -9171,7 +9177,9 @@ body.kx-camera-open .mobile-nav-bar { translate:0 calc(100% + 50px + env(safe-ar
      else window.scrollTo({top,behavior:'instant'});
    }
    start();
- });
+ }
+ trigger.addEventListener('click',openCamera);
+ window.kxCamera={open:openCamera};
  get('close').onclick=()=>close();get('retake').onclick=start;
  get('switch').onclick=()=>{facing=facing==='environment'?'user':'environment';start();};
  get('capture').onclick=()=>{
@@ -9197,6 +9205,7 @@ body.kx-camera-open .mobile-nav-bar { translate:0 calc(100% + 50px + env(safe-ar
    document.getElementById('preview-name').textContent=currentAttachmentName;
    document.getElementById('preview-size').textContent='Photo ready to send';
    const attachment=document.getElementById('attachment-preview');attachment.style.display='flex';attachment.classList.remove('kx-camera-attached');void attachment.offsetWidth;attachment.classList.add('kx-camera-attached');
+   window.kxDrafts?.save();
    close(false);document.getElementById('question').focus({preventScroll:true});
  };
  panel.addEventListener('keydown',event=>{
@@ -9215,6 +9224,80 @@ body.kx-camera-open .mobile-nav-bar { translate:0 calc(100% + 50px + env(safe-ar
  });
 })();
 </script>
+<style id="kx-scan-style">
+#home-scan { color:#baffeb;border-color:#5ee7c580;background:linear-gradient(135deg,#5ee7c518,#8b7cff14);gap:8px; }
+#home-scan svg { width:18px;height:18px;flex-shrink:0; }
+#home-scan:active { transform:scale(.98); }
+#scan-solve { flex-shrink:0;padding:8px 12px;border:1px solid #5ee7c54d;border-radius:12px;background:#5ee7c51a;color:#7bf0d3;font:600 12px Inter,sans-serif;min-height:40px; }
+#scan-solve[hidden] { display:none !important; }
+@media(max-width:380px) { #scan-solve { padding:8px;font-size:11px; } }
+</style>
+<script id="kx-scan-drafts">
+(() => {
+ const input=document.getElementById('question'),preview=document.getElementById('attachment-preview');
+ const solve=document.createElement('button');solve.id='scan-solve';solve.type='button';solve.textContent='Solve this';solve.hidden=true;
+ preview.insertBefore(solve,preview.querySelector('.preview-close'));
+ function reflect(){solve.hidden=!currentAttachmentBase64?.startsWith('data:image/');}
+ solve.onclick=()=>{
+   if(!currentAttachmentBase64||tutorRequestPending||quizRequestPending||activeQuizReview)return;
+   const automatic=!input.value.trim();
+   if(automatic)input.value='Solve the question in this image. Give the answer first, then explain the steps. If anything is unclear, ask me instead of guessing.';
+   sendQuestion(new Event('submit',{cancelable:true}),null,automatic?'Solve this photo':null);
+ };
+ document.getElementById('home-scan').addEventListener('click',event=>{
+   event.preventDefault();
+   if(!window.studyChats?.ready()){showToast('Sign in to scan a question.');return;}
+   if(currentAttachmentBase64){openStudySection('doubt');showToast('Send or remove your current attachment before scanning another.');return;}
+   openStudySection('doubt');window.kxCamera.open();
+ });
+ let context=null,paused=true,revision=0,generation=0,dbPromise=null,warned=false;
+ const remembered=new Set();
+ function warn(){if(!warned){warned=true;showToast('Draft recovery is unavailable in this browser. Keep this tab open until you send.');}}
+ function db(){return dbPromise||(dbPromise=new Promise((resolve,reject)=>{
+   const req=indexedDB.open('edunexus-pending-drafts',1);
+   req.onupgradeneeded=()=>req.result.createObjectStore('drafts');
+   req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);req.onblocked=()=>reject(new Error('blocked'));
+ }));}
+ async function transact(key,value,read=false){const conn=await db();return new Promise((resolve,reject)=>{
+   const tx=conn.transaction('drafts',read?'readonly':'readwrite'),store=tx.objectStore('drafts');
+   const req=read?store.get(key):value?store.put(value,key):store.delete(key);
+   tx.oncomplete=()=>resolve(req.result);tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error);
+ });}
+ const current=()=>window.studyChats?.token();
+ const same=t=>t&&current()?.owner===t.owner&&current()?.id===t.id&&current()?.epoch===t.epoch;
+ const key=t=>JSON.stringify([t.owner,t.id]);
+ function save(){
+   reflect();if(paused||!context||!same(context))return;
+   revision++;
+   const value={text:input.value,image:currentAttachmentBase64,name:currentAttachmentName};
+   const has=!!(value.text||value.image);
+   if(has&&!remembered.has(key(context))){window.studyChats.ensureDraft();remembered.add(key(context));}
+   return transact(key(context),has?value:null).catch(warn);
+ }
+ async function bind(t){
+   const own=++generation;context=t?.owner&&t.id?t:null;paused=false;const rev=++revision;
+   reflect();if(!context)return;const target={...context};
+   try {const value=await transact(key(target),null,true);
+     if(own!==generation||rev!==revision||!same(target)||!value||input.value||currentAttachmentBase64)return;
+     paused=true;
+     input.value=typeof value.text==='string'?value.text:'';
+     if(typeof value.image==='string'&&value.image.startsWith('data:')){
+       currentAttachmentBase64=value.image;currentAttachmentName=typeof value.name==='string'?value.name:'photo.jpg';
+       const isImage=value.image.startsWith('data:image/');const img=document.getElementById('preview-img');
+       img.src=isImage?value.image:'';img.style.display=isImage?'block':'none';document.getElementById('preview-doc').style.display=isImage?'none':'grid';
+       document.getElementById('preview-name').textContent=currentAttachmentName;document.getElementById('preview-size').textContent='Restored draft';preview.style.display='flex';
+     }
+     input.dispatchEvent(new Event('input',{bubbles:true}));paused=false;reflect();
+   }catch{warn();}
+ }
+ window.kxDrafts={save,suspend(){paused=true;++generation;},bind};
+ input.addEventListener('input',save);
+ window.addEventListener('pagehide',save);
+ document.addEventListener('visibilitychange',()=>{if(document.hidden)save();});
+ bind(current());
+})();
+</script>
+
 </body>
 
 </html>
