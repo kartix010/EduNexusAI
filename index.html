@@ -9119,6 +9119,52 @@ body.kx-camera-open .mobile-nav-bar { translate:0 calc(100% + 50px + env(safe-ar
 @keyframes kx-photo-in { from { opacity:0;transform:translateY(6px); } to { opacity:1;transform:none; } }
 @media(prefers-reduced-motion:reduce) { #attachment-preview.kx-camera-attached { animation:none; } }
 </style>
+<style id="kx-crop-style">
+#kx-camera .kx-crop-layer { position:absolute;pointer-events:none;overflow:hidden; }
+#kx-camera .kx-crop-layer[hidden] { display:none !important; }
+#kx-camera .kx-crop-frame { position:absolute;box-sizing:border-box;border:2px solid #5ee7c5;box-shadow:0 0 0 2000px #070a1299;pointer-events:auto;touch-action:none;cursor:move; }
+#kx-camera .kx-crop-handle { position:absolute;width:36px;height:36px;min-width:36px;min-height:36px;padding:0;border:0;background:transparent;transform:translate(-50%,-50%);border-radius:0;touch-action:none; }
+#kx-camera .kx-crop-handle::after { content:'';position:absolute;inset:12px;background:#e7fff8;border:2px solid #5ee7c5;border-radius:4px; }
+#kx-camera .kx-crop-handle[data-corner="nw"] { left:0;top:0;cursor:nwse-resize; }
+#kx-camera .kx-crop-handle[data-corner="ne"] { left:100%;top:0;cursor:nesw-resize; }
+#kx-camera .kx-crop-handle[data-corner="sw"] { left:0;top:100%;cursor:nesw-resize; }
+#kx-camera .kx-crop-handle[data-corner="se"] { left:100%;top:100%;cursor:nwse-resize; }
+#kx-camera-solve { background:#5ee7c5 !important;color:#071710 !important; }
+#kx-camera.crop-review #kx-camera-gallery { display:none; }
+#kx-camera .kx-camera-controls { flex-wrap:wrap; }
+</style>
+<script id="kx-crop-script">
+window.createPhotoCrop=(stage,img,onReady)=>{
+ const layer=document.createElement('div');layer.className='kx-crop-layer';layer.hidden=true;
+ const frame=document.createElement('div');frame.className='kx-crop-frame';frame.setAttribute('aria-label','Selected photo area');
+ for(const corner of ['nw','ne','sw','se']){const b=document.createElement('button');b.type='button';b.className='kx-crop-handle';b.dataset.corner=corner;b.setAttribute('aria-label',({nw:'Top left',ne:'Top right',sw:'Bottom left',se:'Bottom right'})[corner]+' crop corner; use arrow keys to resize');frame.append(b);}
+ layer.append(frame);stage.append(layer);
+ let box={x:0,y:0,w:1,h:1},drag=null,ready=false;
+ const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+ function draw(){frame.style.left=box.x*100+'%';frame.style.top=box.y*100+'%';frame.style.width=box.w*100+'%';frame.style.height=box.h*100+'%';}
+ function layout(){if(!ready)return;const scale=Math.min(stage.clientWidth/img.naturalWidth,stage.clientHeight/img.naturalHeight),w=img.naturalWidth*scale,h=img.naturalHeight*scale;
+   Object.assign(layer.style,{left:(stage.clientWidth-w)/2+'px',top:(stage.clientHeight-h)/2+'px',width:w+'px',height:h+'px'});draw();}
+ function reset(){ready=false;drag=null;layer.hidden=true;box={x:0,y:0,w:1,h:1};onReady(false);}
+ img.addEventListener('load',()=>{if(img.hidden||!img.naturalWidth)return;ready=true;layer.hidden=false;layout();onReady(true);});
+ img.addEventListener('error',reset);
+ new ResizeObserver(layout).observe(stage);
+ function adjust(start,corner,dx,dy){
+   const minW=Math.min(.5,28/Math.max(1,layer.clientWidth)),minH=Math.min(.5,28/Math.max(1,layer.clientHeight));
+   let l=start.x,t=start.y,r=l+start.w,b=t+start.h;
+   if(!corner){box={...start,x:clamp(l+dx,0,1-start.w),y:clamp(t+dy,0,1-start.h)};draw();return;}
+   if(corner.includes('w'))l=clamp(l+dx,0,r-minW);else r=clamp(r+dx,l+minW,1);
+   if(corner.includes('n'))t=clamp(t+dy,0,b-minH);else b=clamp(b+dy,t+minH,1);
+   box={x:l,y:t,w:r-l,h:b-t};draw();
+ }
+ frame.addEventListener('pointerdown',e=>{if(!ready||drag||(e.pointerType==='mouse'&&e.button!==0))return;e.preventDefault();const rect=layer.getBoundingClientRect();drag={id:e.pointerId,x:e.clientX,y:e.clientY,w:rect.width,h:rect.height,box:{...box},corner:e.target.closest('[data-corner]')?.dataset.corner};frame.setPointerCapture(e.pointerId);});
+ frame.addEventListener('pointermove',e=>{if(drag?.id!==e.pointerId)return;e.preventDefault();adjust(drag.box,drag.corner,(e.clientX-drag.x)/drag.w,(e.clientY-drag.y)/drag.h);});
+ for(const type of ['pointerup','pointercancel','lostpointercapture'])frame.addEventListener(type,e=>{if(drag?.id===e.pointerId)drag=null;});
+ frame.addEventListener('keydown',e=>{const c=e.target.dataset.corner;if(!c||!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key))return;e.preventDefault();const step=e.shiftKey?10:2;adjust({...box},c,(e.key==='ArrowRight'?step:e.key==='ArrowLeft'?-step:0)/layer.clientWidth,(e.key==='ArrowDown'?step:e.key==='ArrowUp'?-step:0)/layer.clientHeight);});
+ return {reset,export(){if(!ready)throw Error('Photo not ready');const nw=img.naturalWidth,nh=img.naturalHeight,x=Math.round(box.x*nw),y=Math.round(box.y*nh),w=Math.max(1,Math.min(nw-x,Math.round(box.w*nw))),h=Math.max(1,Math.min(nh-y,Math.round(box.h*nh))),scale=Math.min(1,1600/Math.max(w,h));
+   const canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(w*scale));canvas.height=Math.max(1,Math.round(h*scale));const ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(img,x,y,w,h,0,0,canvas.width,canvas.height);return canvas.toDataURL('image/jpeg',.9);}};
+};
+</script>
+
 <script id="kx-camera-script">
 (() => {
  const chat=document.querySelector('#doubt .chat');
@@ -9130,24 +9176,27 @@ body.kx-camera-open .mobile-nav-bar { translate:0 calc(100% + 50px + env(safe-ar
  panel.setAttribute('role','dialog');panel.setAttribute('aria-modal','true');panel.setAttribute('aria-labelledby','kx-camera-title');
  panel.innerHTML=`<div class="kx-camera-head"><strong id="kx-camera-title">Capture a question</strong><button type="button" id="kx-camera-close" aria-label="Close camera">✕</button></div>
  <div class="kx-camera-stage"><video autoplay muted playsinline></video><img hidden alt="Captured photo"><p id="kx-camera-status" role="status" aria-live="polite">Opening camera…</p></div>
- <div class="kx-camera-controls"><button type="button" id="kx-camera-gallery">Photos</button><button type="button" id="kx-camera-capture" aria-label="Take photo" disabled></button><button type="button" id="kx-camera-switch" aria-label="Switch front or back camera">Flip</button><button type="button" id="kx-camera-retake" hidden>Retake</button><button type="button" id="kx-camera-use" hidden>Use photo</button></div>`;
+ <div class="kx-camera-controls"><button type="button" id="kx-camera-gallery">Photos</button><button type="button" id="kx-camera-capture" aria-label="Take photo" disabled></button><button type="button" id="kx-camera-switch" aria-label="Switch front or back camera">Flip</button><button type="button" id="kx-camera-retake" hidden>Retake</button><button type="button" id="kx-camera-use" hidden>Use photo</button><button type="button" id="kx-camera-solve" hidden>Solve this</button></div>`;
  chat.append(panel);
  const get=id=>panel.querySelector('#kx-camera-'+id),video=panel.querySelector('video'),preview=panel.querySelector('img'),status=document.getElementById('kx-camera-status');
+ const crop=window.createPhotoCrop(panel.querySelector('.kx-camera-stage'),preview,ready=>{get('use').disabled=get('solve').disabled=!ready;});
  const picker=document.createElement('input');picker.type='file';picker.accept='image/*';picker.hidden=true;panel.append(picker);
  let stream=null,epoch=0,facing='environment',photo=null,photoName='',chatToken=null,background=[],pageTop=0;
  const stop=()=>{stream?.getTracks().forEach(t=>t.stop());stream=null;video.srcObject=null;};
  function review(data,name='question-'+Date.now()+'.jpg') {
-   photo=data;photoName=name;stop();video.hidden=true;preview.src=data;preview.hidden=false;
+   crop.reset();panel.classList.add('crop-review');get('solve').hidden=false;
+   photo=data;photoName=name;stop();video.hidden=true;preview.hidden=false;preview.src=data;
    get('capture').hidden=get('switch').hidden=true;get('retake').hidden=get('use').hidden=false;
-   status.textContent='Ready to attach. You can add a message before sending.';
+   status.textContent='';get('title').textContent='Select your question';
  }
  function close(restore=true) {
-   ++epoch;stop();photo=null;preview.removeAttribute('src');panel.hidden=true;
+   ++epoch;crop.reset();panel.classList.remove('crop-review');get('solve').hidden=true;stop();photo=null;preview.removeAttribute('src');panel.hidden=true;
    document.body.classList.remove('kx-camera-open');
    background.forEach(([el,inert])=>el.inert=inert);background=[];
    if(restore){window.scrollTo({top:pageTop,behavior:'instant'});document.querySelector('#kx-attachments summary')?.focus({preventScroll:true});}
  }
  async function start() {
+   crop.reset();panel.classList.remove('crop-review');get('solve').hidden=true;get('title').textContent='Capture a question';
    const ticket=++epoch;stop();photo=null;preview.hidden=true;preview.removeAttribute('src');video.hidden=false;
    get('capture').hidden=get('switch').hidden=false;get('retake').hidden=get('use').hidden=true;get('capture').disabled=true;
    status.textContent='Opening camera…';
@@ -9200,17 +9249,19 @@ body.kx-camera-open .mobile-nav-bar { translate:0 calc(100% + 50px + env(safe-ar
  get('use').onclick=()=>{
    if(!photo)return;
    if(window.studyChats&&!window.studyChats.matches(chatToken)){close();return;}
+   try {photo=crop.export();photoName='question-'+Date.now()+'.jpg';} catch {status.textContent='Photo could not be cropped. Please retake it.';return;}
    currentAttachmentBase64=photo;currentAttachmentName=photoName;
    const image=document.getElementById('preview-img');image.src=photo;image.style.display='block';document.getElementById('preview-doc').style.display='none';
    document.getElementById('preview-name').textContent=currentAttachmentName;
    document.getElementById('preview-size').textContent='Photo ready to send';
    const attachment=document.getElementById('attachment-preview');attachment.style.display='flex';attachment.classList.remove('kx-camera-attached');void attachment.offsetWidth;attachment.classList.add('kx-camera-attached');
    window.kxDrafts?.save();
-   close(false);document.getElementById('question').focus({preventScroll:true});
+   close(false);document.getElementById('question').focus({preventScroll:true});return true;
  };
+ get('solve').onclick=()=>{if(tutorRequestPending||quizRequestPending||activeQuizReview){showToast('Finish the current reply or quiz before solving another question.');return;}if(get('use').onclick()===true)document.getElementById('scan-solve').click();};
  panel.addEventListener('keydown',event=>{
    if(event.key==='Escape'){event.preventDefault();close();}
-   if(event.key==='Tab'){const buttons=Array.from(panel.querySelectorAll('button')).filter(b=>!b.hidden&&!b.disabled);const first=buttons[0],last=buttons.at(-1);
+   if(event.key==='Tab'){const buttons=Array.from(panel.querySelectorAll('button')).filter(b=>!b.disabled&&b.getClientRects().length>0);const first=buttons[0],last=buttons.at(-1);
      if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
      else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}
  });
