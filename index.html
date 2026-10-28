@@ -3694,6 +3694,9 @@
 #messages .quiz-choice:disabled { opacity:.55; cursor:default; }
 #messages .quiz-review-item { padding:12px 0; border-top:1px solid #8b7cff30; }
 </style>
+<!-- Pinned equation renderer; failed loading leaves readable source text. -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.19.1/dist/katex.min.css" integrity="sha384-WwGtaC6ywCHxA5cstpj/3+xIZvTez8dq2IcBQaXRkenHZ7FVVq1ZROtURwfbtTlG" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.19.1/dist/katex.min.js" integrity="sha384-a1WQdjRj162i159OYq041X6I4K8NenkrI09LlPmiHg0YOb7CR+wJOraXwK9abpnE" crossorigin="anonymous" onload="window.renderTutorMath?.(document.getElementById('messages'))"></script>
 </head>
 
 <body>
@@ -7148,7 +7151,7 @@
     });
     // Input is already escaped at the response boundary. Format prose, never code.
     function formatTutorAnswer(escapedText) {
-      const prose = text => text
+      const markdown = text => text
         .replace(/\*\*([^\n]+?)\*\*/g, '<b>$1</b>')
         .replace(/^ {0,3}(#{1,6})[ \t]+(.+?)(?:[ \t]+#+)?[ \t]*$/gm, (_, hashes, title) => {
           const level = Math.min(6, Math.max(3, hashes.length + 1));
@@ -7157,6 +7160,23 @@
         .replace(/^ {0,3}(?:(?:-[ \t]*){3,}|(?:\*[ \t]*){3,}|(?:_[ \t]*){3,})$/gm, '<hr class="answer-divider">')
         .replace(/\n{0,2}(<h[3-6] class="answer-heading">.*?<\/h[3-6]>)\n{0,2}/g, '$1')
         .replace(/\n{0,2}(<hr class="answer-divider">)\n{0,2}/g, '$1');
+
+      // Separate math/inline code before Markdown can interpret TeX underscores or stars.
+      const prose = text => {
+        const token = /(`+)([^\n]*?)\1|\\\[([\s\S]*?)\\\]|\$\$([\s\S]*?)\$\$|\\\(([^\n]*?)\\\)/g;
+        let result = '', cursor = 0, match;
+        while ((match = token.exec(text))) {
+          result += markdown(text.slice(cursor, match.index));
+          if (match[1]) result += `<code class="tutor-inline-code">${match[2]}</code>`;
+          else {
+            const display = match[3] !== undefined || match[4] !== undefined;
+            result += `<span class="tutor-math${display ? ' tutor-math-display' : ''}" data-display="${display}">${match[0]}</span>`;
+          }
+          cursor = token.lastIndex;
+        }
+        return (result + markdown(text.slice(cursor)))
+          .replace(/\n{0,2}(<span class="tutor-math tutor-math-display"[^>]*>[\s\S]*?<\/span>)\n{0,2}/g, '$1');
+      };
       const fence = /(`{3,}|(?:&#039;){3}|(?:&quot;){3})([^\n]*)\n([\s\S]*?)\1/g;
       let result = '';
       let cursor = 0;
@@ -7178,6 +7198,25 @@
       }
       return result + prose(escapedText.slice(cursor));
     }
+
+    function renderTutorMath(root) {
+      if (!root || !window.katex) return;
+      root.querySelectorAll('.tutor-math:not([data-rendered])').forEach(node => {
+        if (node.hidden) return;
+        const source = node.textContent;
+        try {
+          window.katex.render(source.slice(2, -2).trim(), node, {
+            displayMode: node.dataset.display === 'true', throwOnError: true,
+            trust: false, strict: 'warn', maxSize: 10, maxExpand: 500
+          });
+          node.dataset.rendered = 'true';
+        } catch {
+          // Keep the original equation readable if a model emits invalid TeX.
+          node.textContent = source;
+        }
+      });
+    }
+
     async function copyTutorCode(button) {
       const code = button.parentElement.nextElementSibling.textContent;
       try {
@@ -7268,6 +7307,8 @@
       const wrap = element.closest('.messages');
       const scroll = wrap ? getChatScroll(wrap) : null;
       element.innerHTML = html;
+      const equations = Array.from(element.querySelectorAll('.tutor-math'));
+      equations.forEach(node => { node.hidden = true; });
       const diagrams = Array.from(element.querySelectorAll('.mermaid'));
       const diagramVisibility = diagrams.map(node => node.hidden);
       diagrams.forEach(node => { node.hidden = true; });
@@ -7278,7 +7319,7 @@
       let node;
       let total = 0;
       while ((node = walker.nextNode())) {
-        if (node.parentElement.closest('.mermaid, button, script, style')) continue;
+        if (node.parentElement.closest('.mermaid, .tutor-math, button, script, style')) continue;
         const text = node.data;
         if (!text.trim()) continue;
         const chars = segmenter
@@ -7312,6 +7353,8 @@
         parts.forEach(part => { part.node.data = part.text; });
         diagrams.forEach((diagram, i) => { diagram.hidden = diagramVisibility[i]; });
         if (!element.isConnected) return;
+        equations.forEach(node => { node.hidden = false; });
+        renderTutorMath(element);
         scroll?.pin();
         if (renderDiagrams && diagrams.length && window.mermaid) {
           // Render only this completed answer, not other answers still revealing.
@@ -7343,6 +7386,7 @@
       const handle={done,cancel(){
         if(stopped)return element.innerText || element.textContent || '';
         stopped=true;cleanup();
+        equations.forEach(equation=>{if(equation.hidden)equation.remove();});
         diagrams.forEach(diagram=>{if(diagram.hidden)diagram.remove();});
         element.querySelectorAll('.tutor-code-block > div:first-child').forEach(header=>header.remove());
         element.querySelectorAll('button').forEach(button=>button.remove());
@@ -7571,6 +7615,9 @@
     })();
   </script>
   <!-- EDUNEXUS MOBILE HOME — paste this entire block ONCE, immediately before 
+
+
+
 
 
 
@@ -8543,6 +8590,7 @@ window.studyChats = (() => {
         note.textContent='Reply not saved. Send this question again; reattach any file.';content.append(note);
       }
       row.append(content);wrap().append(row);
+      if (m.role==='ai') renderTutorMath(content);
       if(m.role==='user' && m.editable===true) window.kxMessageEdit?.attach(row,m.text);
       if(m.role==='user' || (m.role==='ai' && m.state!=='pending' && m.state!=='failed')) window.attachAnswerCopy?.(content,m.text);
     }
@@ -9349,8 +9397,34 @@ window.createPhotoCrop=(stage,img,onReady)=>{
 })();
 </script>
 
+<style id="kx-open-answers">
+/* Keep the user bubble and code cards; only assistant prose loses its outer card. */
+#doubt #messages .message.ai { width:100%;max-width:100% !important;min-width:0;box-sizing:border-box; }
+#doubt #messages .message.ai > .answer-content,
+#doubt #messages .message.ai > div:not([class]) {
+  flex:1;min-width:0;max-width:100%;padding:4px 0 12px !important;
+  background:transparent !important;border:0 !important;border-radius:0 !important;box-shadow:none !important;
+  line-height:1.8;
+}
+#doubt #messages .message.ai .tutor-math { white-space:normal;overflow-wrap:normal;word-break:normal; }
+#doubt #messages .message.ai .tutor-math-display { display:block;max-width:100%;overflow-x:auto;padding:6px 0;margin:10px 0; }
+#doubt #messages .message.ai .tutor-math[hidden] { display:none; }
+#doubt #messages .katex-display { margin:0;text-align:left; }
+#doubt #messages .katex-display > .katex { text-align:left; }
+#doubt #messages .tutor-inline-code { background:#8b7cff12;padding:1px 4px;border-radius:4px; }
+@media(max-width:850px) {
+  #doubt #messages .message.ai { font-size:14px; }
+  #doubt #messages .message.ai.kx-has-actions { grid-template-columns:minmax(0,1fr);row-gap:6px; }
+  #doubt #messages .message.ai.kx-has-actions > .msg-avatar { grid-column:1;grid-row:1;justify-self:start;width:25px;height:25px; }
+  #doubt #messages .message.ai.kx-has-actions > .answer-content { grid-column:1;grid-row:2; }
+  #doubt #messages .message.ai.kx-has-actions > .kx-message-actions { grid-column:1;grid-row:3; }
+  #doubt #messages .message.ai:not(.kx-has-actions):has(> .answer-content) { flex-wrap:wrap; }
+  #doubt #messages .message.ai:not(.kx-has-actions) > .answer-content { flex-basis:100%; }
+}
+</style>
 </body>
 
 </html>
+
 
 
