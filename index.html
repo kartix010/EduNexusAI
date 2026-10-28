@@ -5966,6 +5966,78 @@
 
     const sessionId = Date.now().toString();
 
+
+    // Attachment bytes stay on this device, outside the text-only cloud chat document.
+    const chatAttachments = (() => {
+      let connection = null, warned = false;
+      const recent = new Map();
+      const key = (owner, ref) => JSON.stringify([owner, ref.id]);
+      const valid = ref => ref && typeof ref.id === 'string' && typeof ref.name === 'string';
+      function remember(k, data) {
+        recent.delete(k); recent.set(k, data);
+        while (recent.size > 4) recent.delete(recent.keys().next().value);
+      }
+      function db() {
+        if (!connection) connection = new Promise((resolve, reject) => {
+          const req = indexedDB.open('edunexus-chat-attachments', 1);
+          req.onupgradeneeded = () => req.result.createObjectStore('files');
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+          req.onblocked = () => reject(new Error('Attachment storage blocked'));
+        }).catch(error => { connection = null; throw error; });
+        return connection;
+      }
+      async function access(k, mode, value) {
+        const conn = await db();
+        return new Promise((resolve, reject) => {
+          const tx = conn.transaction('files', mode === 'get' ? 'readonly' : 'readwrite');
+          const store = tx.objectStore('files');
+          const req = mode === 'get' ? store.get(k) : mode === 'put' ? store.put(value, k) : store.delete(k);
+          tx.oncomplete = () => resolve(req.result);
+          tx.onerror = tx.onabort = () => reject(tx.error);
+        });
+      }
+      async function put(owner, ref, data) {
+        if (!owner || !valid(ref)) return;
+        const k = key(owner, ref); remember(k, data);
+        try { await access(k, 'put', data); }
+        catch {
+          if (!warned) { warned = true; showToast('Attachment kept for this session. Browser storage could not save it for reload.'); }
+        }
+      }
+      async function get(owner, ref) {
+        if (!owner || !valid(ref)) return null;
+        const k = key(owner, ref);
+        if (recent.has(k)) return recent.get(k);
+        try {
+          const data = await access(k, 'get');
+          if (typeof data !== 'string' || !data.startsWith('data:')) return null;
+          remember(k, data); return data;
+        } catch { return null; }
+      }
+      function removeChat(chat) {
+        for (const message of chat?.messages || []) {
+          if (!chat.owner || !valid(message.attachment)) continue;
+          const k = key(chat.owner, message.attachment);
+          recent.delete(k); void access(k, 'delete').catch(() => {});
+        }
+      }
+      async function prepare(payload, owner, ref) {
+        if (!valid(ref)) return payload;
+        if (payload.image_data) {
+          await put(owner, ref, payload.image_data);
+          return payload;
+        }
+        const data = await get(owner, ref);
+        const context = data
+          ? 'The file included with this request is the most recent attachment ALREADY sent in this conversation. Use it for follow-up questions referring to the photo, document, above compound, or this question. It is not a new upload. If the new question is unrelated, answer normally.\n'
+          : 'An earlier attachment exists in this conversation but its original bytes are unavailable on this device. Use the text history where sufficient. If visual details are necessary, explain that the earlier file must be reattached; do not say the user never attached it or invent its contents.\n';
+        return {...payload, ...(data ? {image_data:data, file_name:ref.name} : {}),
+          message:context + 'Earlier attachment: ' + JSON.stringify({name:ref.name, originalQuestion:ref.question || ''}) + '\n\n' + payload.message};
+      }
+      return {prepare, removeChat, clearMemory(){recent.clear();}};
+    })();
+
     let chatMemory = [];
 
     let currentAttachmentBase64 = null;
@@ -6337,9 +6409,13 @@
         return;
       }
       const historyToken = window.studyChats?.token();
+      const newAttachment = !generated && currentAttachmentBase64 ? {
+        id: crypto.randomUUID(), name: currentAttachmentName || 'Attachment', question: q.slice(0, 2000)
+      } : null;
+      const attachmentRef = generated ? null : (newAttachment || window.studyChats?.latestAttachment());
       const historyMessageId = window.studyChats?.add('user',
         (!generated && currentAttachmentName ? 'Attached: ' + currentAttachmentName + '\n' : '') + displayText,
-        'plain', 'pending', !generated && !currentAttachmentBase64);
+        'plain', 'pending', !generated && !currentAttachmentBase64, newAttachment);
       document.querySelector('#messages .study-chat-empty')?.remove();
       // Track AI Usage
 
@@ -6445,10 +6521,12 @@
         activeTutorOperation=operation;
         setTutorRequestPending(true);
       try {
+        const requestPayload = await chatAttachments.prepare(payload, historyToken?.owner, attachmentRef);
+        if (operation.cancelled || (window.studyChats && !window.studyChats.matches(historyToken))) return;
         const res = await fetch("https://edunexusai.onrender.com/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json", "Accept": "application/json" },
-          body: JSON.stringify(payload), signal: controller.signal
+          body: JSON.stringify(requestPayload), signal: controller.signal
         });
 
         if(operation.cancelled)return;
@@ -8367,7 +8445,7 @@ window.createStudyChatSync = function createStudyChatSync(hooks) {
   const live=(uid,gen)=>owner===uid&&generation===gen&&firebase.auth().currentUser?.uid===uid;
   const notify=text=>hooks.status(text);
   const cache=chat=>{try{hooks.write(chat);return true;}catch{cacheFailed=true;notify('Cloud chat could not be cached · browser storage is full');return false;}};
-  const settled=()=>notify(cacheFailed?'Some cloud chats could not be cached · browser storage is full':blocked.size?'Some chats are too large to sync · saved on this device':'Chats synced · files are not retained');
+  const settled=()=>notify(cacheFailed?'Some cloud chats could not be cached · browser storage is full':blocked.size?'Some chats are too large to sync · saved on this device':'Chats synced · attachments stay on this device');
   function stop(){generation++;owner=null;unsubscribe?.();unsubscribe=null;clearTimeout(timer);queue.clear();blocked.clear();cursor=null;hasMore=false;running=false;cacheFailed=false;}
   function schedule(){clearTimeout(timer);timer=setTimeout(flush,700);}
   function save(chat){
@@ -8388,7 +8466,7 @@ window.createStudyChatSync = function createStudyChatSync(hooks) {
   function receive(doc){
     const remote=unpack(doc);if(!remote)return;
     const local=hooks.read(remote.id);
-    if(remote.deleted){queue.delete(remote.id);blocked.delete(remote.id);cache(remote);hooks.deleted(remote.id);hooks.changed();return;}
+    if(remote.deleted){chatAttachments.removeChat(local);queue.delete(remote.id);blocked.delete(remote.id);cache(remote);hooks.deleted(remote.id);hooks.changed();return;}
     if(local?.deleted){save(local);return;}
     if(local&&local.version!==local.cloudVersion&&local.version!==remote.version)return;
     if(!cache(remote))return;
@@ -8545,9 +8623,10 @@ window.studyChats = (() => {
   }
   function token() { return { owner, id: current?.id, epoch }; }
   function matches(t) { return owned() && t && t.owner===owner && t.epoch===epoch; }
-  function add(role,text,format='plain',state='complete',editable=false) {
+  function add(role,text,format='plain',state='complete',editable=false,attachment=null) {
     if (!owned() || !current) return null;
     const message={id:id(),role,text,format,state,editable};
+    if(role==='user' && attachment) message.attachment=attachment;
     current.messages.push(message);
     if (role==='user' && current.title==='New chat') current.title=text.replace(/\s+/g,' ').slice(0,70)||'Attachment chat';
     persist();
@@ -8605,7 +8684,7 @@ window.studyChats = (() => {
     const hit=Array.from(wrap().children).find(row=>focusMessageId && row.dataset.savedMessageId===focusMessageId);
     if(hit) getChatScroll(wrap()).seek(hit);
     else getChatScroll(wrap()).follow();
-    announce(current.messages.length ? 'Saved on this device · files are not retained' : 'New chat · saved on this device');
+    announce(current.messages.length ? 'Saved chat · attachments stay on the device that sent them' : 'New chat · saved on this device');
     window.kxDrafts?.bind(token());
   }
   function canLeave(allowUnsaved = false) {
@@ -8675,6 +8754,7 @@ window.studyChats = (() => {
         confirm.onclick=()=>{
           try { const removed={...chat,deleted:true,messages:[],memory:[],updated:Date.now(),version:id()};localStorage.setItem(key(chat.id),JSON.stringify(removed));cloud.save(removed); }
           catch { announce('Could not delete this chat.');return; }
+          chatAttachments.removeChat(chat);
           if(current?.id===chat.id){epoch++;failedSave=false;fresh();chatMemory=[];render();}
           else if(failedSave) persist();
           drawList();search.focus();
@@ -8710,6 +8790,7 @@ window.studyChats = (() => {
     if(typeof cancelTutorReply==='function')cancelTutorReply(true);
     window.kxMessageEdit?.reset(true);
     window.kxDrafts?.suspend();
+    chatAttachments.clearMemory();
     cloud.stop();owner=next;epoch++;failedSave=false;chatMemory=[];
     if(dialog.open)dialog.close();
     if(!owner){current=null;list.replaceChildren();wrap().replaceChildren();clearAttachment();window.kxDrafts?.bind(null);announce('Sign in to save chats');return;}
@@ -8748,6 +8829,14 @@ window.studyChats = (() => {
   firebase.auth().onAuthStateChanged(account);
   return {
     token,matches,refreshList:drawList,ensureDraft:persist,
+    latestAttachment(){
+      if(!owned() || !current) return null;
+      for(let i=current.messages.length-1;i>=0;i--) {
+        const m=current.messages[i];
+        if(m.role==='user' && m.attachment) return m.attachment;
+      }
+      return null;
+    },
     ready:owned,
     add,
     complete(t,messageId,text){
@@ -9425,6 +9514,7 @@ window.createPhotoCrop=(stage,img,onReady)=>{
 </body>
 
 </html>
+
 
 
 
