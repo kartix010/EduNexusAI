@@ -8127,17 +8127,26 @@
     }
     headerHeight=document.body.dataset.studyScreen==='dashboard' ? (document.querySelector('.topbar-wrapper')?.offsetHeight||76) : 0;
     document.body.style.setProperty('--study-header-height',headerHeight+'px');
-    document.body.style.setProperty('--study-viewport-height',(window.visualViewport?.height||window.innerHeight)+'px');
+    const visibleHeight=window.visualViewport?.height||window.innerHeight;
+    document.body.style.setProperty('--study-viewport-height',visibleHeight+'px');
+    document.body.style.setProperty('--study-keyboard-inset',Math.max(0,window.innerHeight-visibleHeight)+'px');
+    alignFocusedComposer();
+  }
+  let composerFrame=0;
+  function alignFocusedComposer() {
+    if(!mobile.matches || !document.body.classList.contains('typing-mode') || !window.requestAnimationFrame)return;
     const composer=document.activeElement?.closest('.chat-input');
-    if(composer && document.body.classList.contains('typing-mode') && window.requestAnimationFrame) {
-      requestAnimationFrame(()=>{
-        if(!composer.contains(document.activeElement))return;
-        const bounds=composer.getBoundingClientRect();
-        const viewport=window.visualViewport;
-        const top=viewport?.offsetTop||0, bottom=top+(viewport?.height||window.innerHeight);
-        if(bounds.bottom>bottom || bounds.top<top)scrollPage(window.scrollY+bounds.bottom-bottom+8);
-      });
-    }
+    if(!composer || composerFrame)return;
+    composerFrame=requestAnimationFrame(()=>{
+      composerFrame=0;
+      if(!mobile.matches || !composer.contains(document.activeElement))return;
+      const viewport=window.visualViewport;
+      // Bounds are relative to the layout viewport; offsetTop accounts for keyboard panning.
+      const bottom=(viewport?.offsetTop||0)+(viewport?.height||window.innerHeight);
+      const delta=composer.getBoundingClientRect().bottom-bottom;
+      // Correct both overlap AND empty space after the browser's keyboard scroll.
+      if(Math.abs(delta)>1)scrollPage(Math.max(0,window.scrollY+delta));
+    });
   }
   function syncFocus() {
     const el=document.activeElement;
@@ -8187,6 +8196,8 @@
   }
   window.addEventListener('resize',syncViewport,{passive:true});
   window.visualViewport?.addEventListener('resize',syncViewport,{passive:true});
+  window.visualViewport?.addEventListener('scroll',alignFocusedComposer,{passive:true});
+  window.addEventListener('scroll',alignFocusedComposer,{passive:true});
   window.addEventListener('popstate',()=>{if(mobile.matches)fromLocation(true);});
   window.addEventListener('hashchange',()=>{if(mobile.matches && location.hash!=='#'+active)fromLocation(true);});
   window.addEventListener('pageshow',()=>{syncMode();if(mobile.matches)fromLocation(true);});
@@ -9584,6 +9595,21 @@ window.createPhotoCrop=(stage,img,onReady)=>{
   }
 }
 
+</style>
+<style id="kx-keyboard-status-polish">
+@media(max-width:850px) {
+  /* Preserve enough layout scroll range when only the visual viewport shrinks. */
+  body.study-screens.typing-mode #main-content > main { padding-bottom:calc(var(--study-keyboard-inset,0px) + 12px) !important; }
+  /* Once typing, scroll the conversation without handing its edge to the page. */
+  body.study-screens.typing-mode #doubt #messages { overscroll-behavior-y:contain !important; }
+}
+.kx-ready-dot { flex-shrink:0; animation:kx-ready-pulse 2.4s ease-in-out infinite; }
+@keyframes kx-ready-pulse {
+  0%,100% { opacity:1;box-shadow:0 0 0 0 #5ee7c530; }
+  55% { opacity:.65;box-shadow:0 0 0 3px #5ee7c500; }
+}
+.study-tab-hidden .kx-ready-dot { animation-play-state:paused; }
+@media(prefers-reduced-motion:reduce) { .kx-ready-dot { animation:none; } }
 </style>
 </body>
 
