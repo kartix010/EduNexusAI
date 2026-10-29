@@ -7098,7 +7098,7 @@
   <div class="mobile-nav-bar" role="navigation" aria-label="Study navigation">
     <a href="#dashboard" class="mobile-nav-item active" onclick="updateMobileNav(this)">
       <!-- Professional Home Icon -->
-      <svg viewBox="0 0 24 24">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
         <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
       </svg>
       <span>Home</span>
@@ -7106,25 +7106,26 @@
 
     <a href="#pyq-vault-section" class="mobile-nav-item" onclick="updateMobileNav(this)">
       <!-- Professional Vault/Library Icon -->
-      <svg viewBox="0 0 24 24">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
         <path
           d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9H9V9h10v2zm-4 4H9v-2h6v2zm4-8H9V5h10v2z" />
       </svg>
-      <span>Vault</span>
+      <span>PYQ</span>
     </a>
 
     <!-- 🤖 THE GOD-TIER AI CENTER BUTTON 🤖 -->
     <a href="#doubt" class="mobile-nav-ai" aria-label="AI Tutor" onclick="updateMobileNav(this)">
       <!-- Sparkling AI Core Icon -->
-      <svg viewBox="0 0 24 24">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
         <path
           d="M19 9l1.25-2.75L23 5l-2.75-1.25L19 1l-1.25 2.75L15 5l2.75 1.25L19 9zm-7.5.5L9 4 7.5 9.5 2 11l5.5 1.5L9 18l1.5-5.5L16 11l-4.5-1.5z" />
       </svg>
+      <span aria-hidden="true">AI</span>
     </a>
 
     <a href="#planner" class="mobile-nav-item" onclick="updateMobileNav(this)">
       <!-- Professional Planner Icon -->
-      <svg viewBox="0 0 24 24">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
         <path
           d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z" />
       </svg>
@@ -7133,11 +7134,11 @@
 
     <a href="#progress" class="mobile-nav-item" onclick="updateMobileNav(this)">
       <!-- Professional Progress/Stats Icon -->
-      <svg viewBox="0 0 24 24">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
         <path
           d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" />
       </svg>
-      <span>Stats</span>
+      <span>Progress</span>
     </a>
   </div>
   <script>
@@ -8124,9 +8125,19 @@
       document.body.style.setProperty('--study-page-clearance',
         (bar.offsetHeight+bottom+raised+12)+'px');
     }
-    headerHeight=document.querySelector('.topbar-wrapper')?.getBoundingClientRect().height||76;
+    headerHeight=document.body.dataset.studyScreen==='dashboard' ? (document.querySelector('.topbar-wrapper')?.offsetHeight||76) : 0;
     document.body.style.setProperty('--study-header-height',headerHeight+'px');
     document.body.style.setProperty('--study-viewport-height',(window.visualViewport?.height||window.innerHeight)+'px');
+    const composer=document.activeElement?.closest('.chat-input');
+    if(composer && document.body.classList.contains('typing-mode') && window.requestAnimationFrame) {
+      requestAnimationFrame(()=>{
+        if(!composer.contains(document.activeElement))return;
+        const bounds=composer.getBoundingClientRect();
+        const viewport=window.visualViewport;
+        const top=viewport?.offsetTop||0, bottom=top+(viewport?.height||window.innerHeight);
+        if(bounds.bottom>bottom || bounds.top<top)scrollPage(window.scrollY+bounds.bottom-bottom+8);
+      });
+    }
   }
   function syncFocus() {
     const el=document.activeElement;
@@ -9357,7 +9368,7 @@ window.createPhotoCrop=(stage,img,onReady)=>{
    background=Array.from(chat.children).filter(el=>el!==panel).map(el=>[el,el.inert]);background.forEach(([el])=>el.inert=true);
    get('close').focus({preventScroll:true});
    if(matchMedia('(max-width:850px)').matches){
-     const header=document.querySelector('.topbar-wrapper')?.offsetHeight||76;
+     const header=document.querySelector('.topbar-wrapper')?.offsetHeight ?? 0;
      const top=Math.max(0,window.scrollY+chat.getBoundingClientRect().top-header-8);
      if(typeof lenis!=='undefined')lenis.scrollTo(top,{immediate:true,force:true});
      else window.scrollTo({top,behavior:'instant'});
@@ -9511,9 +9522,73 @@ window.createPhotoCrop=(stage,img,onReady)=>{
   #doubt #messages .message.ai:not(.kx-has-actions) > .answer-content { flex-basis:100%; }
 }
 </style>
+<style id="kx-mobile-nav-polish">
+/* Keyboard resizing must settle before keeping the focused composer in view. */
+@media (max-width:850px) {
+  body.study-screens #doubt .tutor { transition-property:border-color,box-shadow !important; transform:none !important; }
+}
+@media (max-width:850px) {
+  body.study-screens:not([data-study-screen="dashboard"]) .topbar-wrapper { display:none; }
+  body.study-screens:not([data-study-screen="dashboard"]) { --study-header-height:0px; }
+  body.study-screens:not([data-study-screen="dashboard"]) #main-content > main { padding-top:env(safe-area-inset-top,0px); }
+
+  .mobile-nav-bar {
+    box-sizing:border-box;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));
+    width:calc(100% - 24px);max-width:420px;height:64px;padding:6px 8px;
+    bottom:calc(8px + env(safe-area-inset-bottom,0px));border-radius:28px;
+    background:rgba(14,20,33,.94);border:1px solid rgba(139,124,255,.19);
+    box-shadow:0 8px 28px #0005,inset 0 1px 0 #ffffff0a;
+    backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+    isolation:isolate;--nav-index:0;
+  }
+  .mobile-nav-bar::before { opacity:.22;padding:1px;border-radius:inherit;pointer-events:none; }
+  .mobile-nav-bar::after {
+    content:"";position:absolute;left:8px;top:6px;height:50px;width:calc((100% - 16px)/5);
+    border-radius:21px;background:linear-gradient(140deg,#8b7cff19,#5ee7c510);
+    box-shadow:inset 0 1px 0 #ffffff08;pointer-events:none;z-index:-1;
+    transform:translateX(calc(var(--nav-index)*100%));transition:transform 240ms cubic-bezier(.22,1,.36,1);
+  }
+  .mobile-nav-bar:has(a[href="#pyq-vault-section"][aria-current]) { --nav-index:1; }
+  .mobile-nav-bar:has(a[href="#doubt"][aria-current]) { --nav-index:2; }
+  .mobile-nav-bar:has(a[href="#planner"][aria-current]) { --nav-index:3; }
+  .mobile-nav-bar:has(a[href="#progress"][aria-current]) { --nav-index:4; }
+  .mobile-nav-bar .mobile-nav-item { box-sizing:border-box;width:100%;height:50px;min-width:0;gap:4px;color:#99a7bc;transition:color 180ms; }
+  .mobile-nav-bar .mobile-nav-item svg { width:21px;height:21px;transform:none;filter:none;transition:transform 180ms,color 180ms; }
+  .mobile-nav-bar .mobile-nav-item span {
+    position:static;opacity:1;transform:none;line-height:12px;font-size:10px;font-weight:500;
+    letter-spacing:0;text-transform:none;color:inherit;transition:color 180ms;
+  }
+  .mobile-nav-bar .mobile-nav-item.active { color:#5ee7c5; }
+  .mobile-nav-bar .mobile-nav-item.active svg { transform:translateY(-1px);filter:none; }
+  .mobile-nav-bar .mobile-nav-item.active span { color:#c3fff0; }
+  .mobile-nav-bar .mobile-nav-ai {
+    box-sizing:border-box;justify-self:center;top:-14px;width:48px;height:48px;
+    border:2px solid #0e1421;background:linear-gradient(145deg,#a59aff,#72d9d0);
+    color:#0e1421;animation:none;box-shadow:0 3px 12px #0005,inset 0 1px 1px #ffffff66;
+    transition:box-shadow 180ms,scale 160ms;
+  }
+  .mobile-nav-bar .mobile-nav-ai svg { width:24px;height:24px; }
+  .mobile-nav-bar .mobile-nav-ai span {
+    position:absolute;bottom:-18px;font:500 10px/12px Inter,sans-serif;color:#99a7bc;
+  }
+  .mobile-nav-bar .mobile-nav-ai[aria-current] { box-shadow:0 0 0 1px #5ee7c590,0 3px 14px #5ee7c51c,inset 0 1px 1px #ffffff66; }
+  .mobile-nav-bar .mobile-nav-ai[aria-current] span { color:#c3fff0; }
+  .mobile-nav-bar .mobile-nav-item:active svg { transform:scale(.9); }
+  .mobile-nav-bar .mobile-nav-ai:active { scale:.95; }
+  body.study-screens.typing-mode .mobile-nav-bar {
+    display:grid !important;translate:0 calc(100% + 40px + env(safe-area-inset-bottom,0px));
+    opacity:0;visibility:hidden;pointer-events:none;
+  }
+  @media(prefers-reduced-motion:reduce) {
+    .mobile-nav-bar::after,.mobile-nav-bar a,.mobile-nav-bar svg,.mobile-nav-bar span { transition:none !important; }
+  }
+}
+
+</style>
 </body>
 
 </html>
+
 
 
 
