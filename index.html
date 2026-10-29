@@ -9534,26 +9534,26 @@ window.createPhotoCrop=(stage,img,onReady)=>{
 
   .mobile-nav-bar {
     box-sizing:border-box;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));
-    width:calc(100% - 24px);max-width:420px;height:64px;padding:6px 8px;
-    bottom:calc(8px + env(safe-area-inset-bottom,0px));border-radius:28px;
+    width:calc(100% - 32px);max-width:380px;height:56px;padding:5px 8px;
+    bottom:calc(8px + env(safe-area-inset-bottom,0px));border-radius:24px;
     background:rgba(14,20,33,.94);border:1px solid rgba(139,124,255,.19);
-    box-shadow:0 8px 28px #0005,inset 0 1px 0 #ffffff0a;
+    box-shadow:none;
     backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
     isolation:isolate;--nav-index:0;
   }
-  .mobile-nav-bar::before { opacity:.22;padding:1px;border-radius:inherit;pointer-events:none; }
+  .mobile-nav-bar::before { opacity:.14;padding:1px;border-radius:inherit;pointer-events:none; }
   .mobile-nav-bar::after {
-    content:"";position:absolute;left:8px;top:6px;height:50px;width:calc((100% - 16px)/5);
-    border-radius:21px;background:linear-gradient(140deg,#8b7cff19,#5ee7c510);
-    box-shadow:inset 0 1px 0 #ffffff08;pointer-events:none;z-index:-1;
-    transform:translateX(calc(var(--nav-index)*100%));transition:transform 240ms cubic-bezier(.22,1,.36,1);
+    content:"";position:absolute;left:8px;top:5px;height:28px;width:calc((100% - 16px)/5);
+    border-radius:12px;background:rgba(94,231,197,.07);
+    box-shadow:none;pointer-events:none;z-index:-1;
+    transform:translateX(calc(var(--nav-index)*100%)) scaleX(.65);transition:transform 240ms cubic-bezier(.22,1,.36,1);
   }
   .mobile-nav-bar:has(a[href="#pyq-vault-section"][aria-current]) { --nav-index:1; }
   .mobile-nav-bar:has(a[href="#doubt"][aria-current]) { --nav-index:2; }
   .mobile-nav-bar:has(a[href="#planner"][aria-current]) { --nav-index:3; }
   .mobile-nav-bar:has(a[href="#progress"][aria-current]) { --nav-index:4; }
-  .mobile-nav-bar .mobile-nav-item { box-sizing:border-box;width:100%;height:50px;min-width:0;gap:4px;color:#99a7bc;transition:color 180ms; }
-  .mobile-nav-bar .mobile-nav-item svg { width:21px;height:21px;transform:none;filter:none;transition:transform 180ms,color 180ms; }
+  .mobile-nav-bar .mobile-nav-item { box-sizing:border-box;width:100%;height:44px;min-width:0;gap:2px;color:#99a7bc;transition:color 180ms; }
+  .mobile-nav-bar .mobile-nav-item svg { width:20px;height:20px;transform:none;filter:none;transition:transform 180ms,color 180ms; }
   .mobile-nav-bar .mobile-nav-item span {
     position:static;opacity:1;transform:none;line-height:12px;font-size:10px;font-weight:500;
     letter-spacing:0;text-transform:none;color:inherit;transition:color 180ms;
@@ -9562,16 +9562,16 @@ window.createPhotoCrop=(stage,img,onReady)=>{
   .mobile-nav-bar .mobile-nav-item.active svg { transform:translateY(-1px);filter:none; }
   .mobile-nav-bar .mobile-nav-item.active span { color:#c3fff0; }
   .mobile-nav-bar .mobile-nav-ai {
-    box-sizing:border-box;justify-self:center;top:-14px;width:48px;height:48px;
+    box-sizing:border-box;justify-self:center;top:-10px;width:44px;height:44px;
     border:2px solid #0e1421;background:linear-gradient(145deg,#a59aff,#72d9d0);
-    color:#0e1421;animation:none;box-shadow:0 3px 12px #0005,inset 0 1px 1px #ffffff66;
+    color:#0e1421;animation:none;box-shadow:inset 0 1px 1px #ffffff44;
     transition:box-shadow 180ms,scale 160ms;
   }
-  .mobile-nav-bar .mobile-nav-ai svg { width:24px;height:24px; }
+  .mobile-nav-bar .mobile-nav-ai svg { width:22px;height:22px; }
   .mobile-nav-bar .mobile-nav-ai span {
-    position:absolute;bottom:-18px;font:500 10px/12px Inter,sans-serif;color:#99a7bc;
+    position:absolute;bottom:-13px;font:500 10px/12px Inter,sans-serif;color:#99a7bc;
   }
-  .mobile-nav-bar .mobile-nav-ai[aria-current] { box-shadow:0 0 0 1px #5ee7c590,0 3px 14px #5ee7c51c,inset 0 1px 1px #ffffff66; }
+  .mobile-nav-bar .mobile-nav-ai[aria-current] { box-shadow:0 0 0 1px #5ee7c560,inset 0 1px 1px #ffffff44; }
   .mobile-nav-bar .mobile-nav-ai[aria-current] span { color:#c3fff0; }
   .mobile-nav-bar .mobile-nav-item:active svg { transform:scale(.9); }
   .mobile-nav-bar .mobile-nav-ai:active { scale:.95; }
